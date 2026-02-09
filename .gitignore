@@ -1,34 +1,18 @@
-# Laravel specific
-/vendor/
-/node_modules/
+/node_modules
+/public/hot
+/public/uploads
 /public/storage
-/storage/*.key
-/.env
-/.env.backup
-Homestead.yaml
-Homestead.json
-
-# Laravel logs and cache
-/storage/logs/*.log
-/storage/framework/cache/*
-/storage/framework/sessions/*
-/storage/framework/views/*
-
-# Composer & NPM
-composer.lock
-package-lock.json
-yarn.lock
-
-# IDE/editor files
+/bootstrap/cache/*
+/storage/app/public
+/vendor
 /.idea
-/.vscode
-*.sublime-project
-*.sublime-workspace
+/.vagrant
 
-# OS generated files
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+.env
+readme
+/Modules/Theme/node_modules
 .DS_Store
-Thumbs.db
-
-# Testing & coverage
-.phpunit.result.cache
-coverage/
