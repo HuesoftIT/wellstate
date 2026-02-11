@@ -203,6 +203,11 @@ class PermissionsTableSeeder extends Seeder
             "155" => ["EmployeeWorkingShiftController@destroy", "Quản lý phân ca cho nhân viên"],
             "156" => ["EmployeeWorkingShiftController@active",  "Quản lý phân ca cho nhân viên"],
 
+            "157" => ["BookingController@confirmPayment",  "Quản lý đặt lịch"],
+            "158" => ["BookingController@complete",  "Quản lý đặt lịch"],
+            "159" => ["BookingController@cancel",  "Quản lý đặt lịch"],
+            "160" => ["BookingController@printInvoice", "In / xuất hóa đơn booking"],
+
         ];
 
         //ADD PERMISSIONS - Thêm các quyền

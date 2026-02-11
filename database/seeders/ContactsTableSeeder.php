@@ -1,8 +1,10 @@
 <?php
+namespace Database\Seeders;
 
 use App\Contact;
+use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-namespace Database\Seeders;
+
 class ContactsTableSeeder extends Seeder
 {
     /**

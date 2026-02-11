@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use App\Newsletter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;

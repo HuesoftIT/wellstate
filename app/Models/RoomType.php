@@ -43,4 +43,14 @@ class RoomType extends Model
             ->withTimestamps()
             ->wherePivotNull('deleted_at');
     }
+
+    public function branchRoomTypes()
+    {
+        return $this->hasMany(BranchRoomType::class, 'room_type_id');
+    }
+
+    public function activeBranchRoomTypes()
+    {
+        return $this->branchRoomTypes()->where('is_active', 1);
+    }
 }

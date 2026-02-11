@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTO\BookingDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBranchRequest;
 use App\Http\Requests\UpdateBranchRequest;
@@ -39,16 +40,27 @@ class BookingController extends Controller
             //2. Create booking
             $booking = $this->bookingService->createBookingSkeleton($request, $startTime, $endTime, $maxDuration);
 
-           
-
             //3. Create GUEST + SERVICE + ROOM
             [$subtotal, $totalDuration] = $this->bookingService->createGuestsAndServices($booking, $request, $startTime);
-            
+
+            $bookingDTO = new BookingDTO(
+                customerId: auth('customer')->id() ?? null,
+                membershipId: auth('customer')->user()?->membership_id ?? null,
+                branchId: $booking->branch_id,
+                branchRoomTypeId: $booking->room_type_id,
+                bookingDate: $booking->booking_date,
+                totalGuests: $booking->total_guests,
+                subtotal: $subtotal,
+                serviceIds: $booking->guests
+                    ->flatMap(fn($g) => $g->services->pluck('service_id'))
+                    ->toArray()
+            );
+
             //4. apply promotion
-            $promotionResult = $this->promotionService->apply($request->discount_code, $booking, $subtotal);
-            
+            $promotionResult = $this->promotionService->apply($request->discount_code, $bookingDTO);
+
             //5. complete booking
-            $this->bookingService->finalizeBooking($booking, $subtotal, $totalDuration, $promotionResult);
+            $this->bookingService->finalizeBooking($booking, $bookingDTO->subtotal, $totalDuration, $promotionResult);
         });
 
         return redirect()
@@ -66,13 +78,17 @@ class BookingController extends Controller
         ]);
 
         if ($request->filled('search')) {
-            $query->where('booking_code', 'like', '%' . $request->search . '%')
-                ->where('booker_name', 'like', '%' . $request->search . '%')
-                ->where('booker_phone', 'like', '%' . $request->search . '%');
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_code', 'like', "%{$search}%")
+                    ->orWhere('booker_name', 'like', "%{$search}%")
+                    ->orWhere('booker_phone', 'like', "%{$search}%");
+            });
         }
 
-        if ($request->filled('date')) {
-            $query->whereDate('booking_date', $request->date);
+        if ($request->filled('booking_date')) {
+            $query->whereDate('booking_date', $request->booking_date);
         }
 
         if ($request->filled('branch_id')) {
@@ -125,7 +141,9 @@ class BookingController extends Controller
             'customer',
             'guests.services.rooms',
             'guests.services.service',
+            'branchRoomType',
         ])->findOrFail($id);
+
 
         return view('admin.bookings.show', compact('booking'));
     }
@@ -179,5 +197,68 @@ class BookingController extends Controller
         Alert::success('Đã huỷ booking');
 
         return redirect()->route('admin.bookings.index');
+    }
+
+    public function complete($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        // ❌ Chưa thanh toán thì không cho complete
+        if ($booking->payment_status !== 'paid') {
+            Alert::error('Booking chưa thanh toán, không thể hoàn thành');
+            return back();
+        }
+
+        // ❌ Đã hoàn thành rồi
+        if ($booking->status === 'completed') {
+            Alert::warning('Booking đã được hoàn thành trước đó');
+            return back();
+        }
+
+        // ❌ Booking bị huỷ
+        if ($booking->status === 'cancelled') {
+            Alert::error('Booking đã bị huỷ, không thể hoàn thành');
+            return back();
+        }
+
+        $booking->update([
+            'status' => 'completed',
+        ]);
+
+        Alert::success('Booking đã được hoàn thành');
+
+        return redirect()->route('bookings.show', $booking->id);
+    }
+
+
+    public function confirmPayment($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if ($booking->payment_status === 'paid') {
+            Alert::warning('Booking này đã được thanh toán trước đó');
+            return back();
+        }
+
+        if (! in_array($booking->status, ['pending', 'confirmed'])) {
+            Alert::error('Không thể xác nhận thanh toán cho booking ở trạng thái này');
+            return back();
+        }
+
+        // 2. Update payment
+        $booking->update([
+            'payment_status' => 'paid',
+        ]);
+
+        // (Optional) Nếu bạn có bảng payments sau này
+        // $booking->payments()->create([
+        //     'amount' => $booking->total_amount,
+        //     'method' => 'cash', // hoặc transfer
+        //     'confirmed_by' => Auth::id(),
+        // ]);
+
+        Alert::success('Đã xác nhận thanh toán booking');
+
+        return redirect()->route('bookings.index');
     }
 }

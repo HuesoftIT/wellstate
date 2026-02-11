@@ -41,6 +41,10 @@ class BookingService
 
     public function createBookingSkeleton(Request $request, Carbon $startTime, Carbon $endTime, int $maxDuration): Booking
     {
+        $branchRoomType = BranchRoomType::active()
+            ->where('branch_id', $request->branch_id)
+            ->where('room_type_id', $request->room_type_id)
+            ->first();
         return Booking::create([
             'booking_code'   => $this->generateBookingCode(),
             'customer_id' => auth('customer')->check()
@@ -49,6 +53,7 @@ class BookingService
 
             'branch_id'      => $request->branch_id,
             'room_type_id'   => $request->room_type_id,
+            'branch_room_type_id' => optional($branchRoomType)->id,
 
             'booker_name'    => $request->booker_name,
             'booker_phone'   => $request->booker_phone,

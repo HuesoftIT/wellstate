@@ -240,7 +240,7 @@
 
                     <div class="flex gap-3">
                         <input id="promo-code" type="text" name="discount_code" placeholder="Nhập mã giảm giá"
-                            class="input h-11 flex-1 uppercase">
+                            class="input h-11 flex-1">
 
                         <button type="button" id="apply-promo"
                             class="px-5 h-11 bg-slate-800 text-white rounded-lg

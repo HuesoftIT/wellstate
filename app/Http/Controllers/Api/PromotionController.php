@@ -15,15 +15,17 @@ class PromotionController extends Controller
     /*
     {
         "discount_code": "khuyen-mai",
+        "room_fee": 10000,
         "subtotal": 5300000,
         "services": [16,17],
         "membership_id": 1,
-        "user_id": 8,
+        "customer_id": 8,
         "booking_date": "2026-02-07"
     }
-  */
+    */
     public function apply(Request $request) {
         $discount_code = $request->discount_code;
+        $services = $request->services;
         $room_fee = $request->room_fee;
         $subtotal = $request->subtotal;
 

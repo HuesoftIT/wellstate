@@ -1,18 +1,67 @@
+# ===============================
+# Laravel core
+# ===============================
+/vendor
 /node_modules
+
+/public/storage
 /public/hot
 /public/uploads
-/public/storage
-/bootstrap/cache/*
-/storage/app/public
-/vendor
-/.idea
-/.vagrant
 
+/storage/*.key
+/storage/app/public
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+/bootstrap/cache/*
+
+.env
+.env.*
+
+
+# ===============================
+# Frontend build / logs
+# ===============================
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+vite.config.js.timestamp-*
+mix-manifest.json
+
+
+# ===============================
+# IDE / OS
+# ===============================
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+
+# ===============================
+# Homestead / Vagrant
+# ===============================
 Homestead.json
 Homestead.yaml
-npm-debug.log
-yarn-error.log
-.env
+.vagrant
+
+
+# ===============================
+# Laravel Modules (nwidart/laravel-modules)
+# ===============================
+/Modules/*/node_modules
+/Modules/*/vendor
+
+
+# ===============================
+# Testing / cache
+# ===============================
+.phpunit.result.cache
+
+
+# ===============================
+# Misc
+# ===============================
 readme
-/Modules/Theme/node_modules
-.DS_Store

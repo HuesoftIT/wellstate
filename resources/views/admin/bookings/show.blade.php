@@ -30,16 +30,76 @@
             <h5 class="float-left">{{ __('message.detail') }}</h5>
 
             <div class="box-tools">
+
                 <a href="{{ route('bookings.index') }}" class="btn btn-default btn-sm mr-1">
                     <i class="fa fa-arrow-left"></i> {{ __('message.lists') }}
                 </a>
 
-                @can('BookingController@update')
-                    <a href="{{ route('bookings.edit', $booking->id) }}" class="btn btn-default btn-sm mr-1">
-                        <i class="far fa-edit"></i> {{ __('message.edit') }}
-                    </a>
+                {{-- CONFIRM PAYMENT --}}
+                @can('BookingController@confirmPayment')
+                    @if ($booking->payment_status === 'unpaid' && in_array($booking->status, ['pending', 'confirmed']))
+                        <form action="{{ route('bookings.confirm-payment', $booking->id) }}" method="POST"
+                            style="display:inline" onsubmit="return confirm('Xác nhận booking này đã thanh toán?')">
+                            @csrf
+                            @method('PATCH')
+
+                            <button class="btn btn-success btn-sm mr-1">
+                                <i class="fas fa-credit-card"></i> Xác nhận thanh toán
+                            </button>
+                        </form>
+                    @endif
                 @endcan
+
+                {{-- CONFIRM BOOKING --}}
+                @can('BookingController@confirm')
+                    @if ($booking->status === 'pending')
+                        <form action="{{ route('bookings.confirm', $booking->id) }}" method="POST" style="display:inline"
+                            onsubmit="return confirm('Xác nhận booking này?')">
+                            @csrf
+                            @method('PATCH')
+
+                            <button class="btn btn-primary btn-sm mr-1">
+                                <i class="fas fa-check"></i> Xác nhận booking
+                            </button>
+                        </form>
+                    @endif
+                @endcan
+
+                {{-- COMPLETE --}}
+                @can('BookingController@update')
+                    @if ($booking->status === 'confirmed' && $booking->payment_status === 'paid')
+                        <form action="{{ route('bookings.update', $booking->id) }}" method="POST" style="display:inline"
+                            onsubmit="return confirm('Đánh dấu booking này là hoàn thành?')">
+                            @csrf
+                            @method('PUT')
+
+                            <input type="hidden" name="status" value="completed">
+                            <input type="hidden" name="payment_status" value="paid">
+
+                            <button class="btn btn-info btn-sm mr-1">
+                                <i class="fas fa-flag-checkered"></i> Hoàn thành
+                            </button>
+                        </form>
+                    @endif
+                @endcan
+
+                {{-- CANCEL --}}
+                @can('BookingController@destroy')
+                    @if (!in_array($booking->status, ['completed', 'cancelled']))
+                        <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST" style="display:inline"
+                            onsubmit="return confirm('Bạn chắc chắn muốn huỷ booking này?')">
+                            @csrf
+                            @method('PATCH')
+
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fas fa-times"></i> Huỷ booking
+                            </button>
+                        </form>
+                    @endif
+                @endcan
+
             </div>
+
         </div>
 
         {{-- BASIC INFO --}}
@@ -71,6 +131,25 @@
                         <td>{{ optional($booking->branch)->name ?? '-' }}</td>
                     </tr>
 
+
+                    <tr>
+                        <th>Loại phòng</th>
+                        <td>{{ optional($booking->branchRoomType)->roomType->name ?? '-' }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Phí phòng</th>
+                        <td>
+                            @if (optional($booking->branchRoomType)->price)
+                                <strong class="text-danger">
+                                    {{ number_format($booking->branchRoomType->price, 0, ',', '.') }} ₫
+                                </strong>
+                            @else
+                                <span class="text-muted">0 ₫</span>
+                            @endif
+                        </td>
+                    </tr>
+
                     <tr>
                         <th>Ngày booking</th>
                         <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('d/m/Y') }}</td>
@@ -95,25 +174,27 @@
 
                     <tr>
                         <th>Trạng thái</th>
-                        <td>
+                        {{-- STATUS --}}
+                        <td >
                             @php
-                                if ($booking->status === 'pending') {
-                                    $statusClass = 'label-warning';
-                                } elseif ($booking->status === 'confirmed') {
-                                    $statusClass = 'label-success';
-                                } elseif ($booking->status === 'cancelled') {
-                                    $statusClass = 'label-danger';
-                                } elseif ($booking->status === 'completed') {
-                                    $statusClass = 'label-primary';
-                                } else {
-                                    $statusClass = 'label-default';
-                                }
+                                $statusMap = [
+                                    'pending' => ['class' => 'label-warning', 'text' => 'Chờ xác nhận'],
+                                    'confirmed' => ['class' => 'label-success', 'text' => 'Đã xác nhận'],
+                                    'cancelled' => ['class' => 'label-danger', 'text' => 'Đã huỷ'],
+                                    'completed' => ['class' => 'label-primary', 'text' => 'Hoàn thành'],
+                                ];
+
+                                $status = $statusMap[$booking->status] ?? [
+                                    'class' => 'label-default',
+                                    'text' => 'Không xác định',
+                                ];
                             @endphp
 
-                            <span class="label {{ $statusClass }}">
-                                {{ ucfirst($booking->status) }}
+                            <span class="label {{ $status['class'] }}">
+                                {{ $status['text'] }}
                             </span>
                         </td>
+
                     </tr>
 
                     <tr>
@@ -152,7 +233,6 @@
                                 <th>#</th>
                                 <th>Khách</th>
                                 <th>Dịch vụ</th>
-                                <th>Phòng</th>
                                 <th>Thời lượng</th>
                                 <th>Giá</th>
                             </tr>
@@ -164,7 +244,6 @@
                                         <td>{{ $gIndex + 1 }}</td>
                                         <td>{{ $guest->guest_name ?? 'Guest' }}</td>
                                         <td>{{ optional($service->service)->title ?? '-' }}</td>
-                                        <td>{{ optional($service->room)->name ?? '-' }}</td>
                                         <td>{{ $service->duration }} phút</td>
                                         <td>{{ number_format($service->price) }} đ</td>
                                     </tr>

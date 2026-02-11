@@ -11,7 +11,7 @@ class Booking extends Model
 
     protected $fillable = [
         'booking_code',
-        "room_type_id",
+        "branch_room_type_id",
         'booker_name',
         'booker_phone',
         'customer_id',
@@ -23,6 +23,8 @@ class Booking extends Model
         'total_duration',
         'subtotal_amount',
         'promotion_code',
+        "promotion_id",
+        "promotion_snapshot",
         'discount_amount',
         'total_amount',
         'status',
@@ -60,8 +62,10 @@ class Booking extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function roomType()
+   
+
+    public function branchRoomType()
     {
-        return $this->belongsTo(RoomType::class);
+        return $this->belongsTo(BranchRoomType::class);
     }
 }

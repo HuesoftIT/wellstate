@@ -92,4 +92,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'locale']], function
 
 	Route::patch('bookings/{id}/confirm', [BookingController::class, 'confirm'])
 		->name('bookings.confirm');
+	Route::patch('/bookings/{id}/confirm-payment', [
+		BookingController::class,
+		'confirmPayment'
+	])->name('bookings.confirm-payment');
+	Route::patch(
+		'/admin/bookings/{booking}/complete',
+		[BookingController::class, 'complete']
+	)->name('bookings.complete');
 });

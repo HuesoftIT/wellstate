@@ -1,5 +1,6 @@
 <?php
 
+namespace Database\Seeders;
 use App\News;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;

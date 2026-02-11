@@ -2,19 +2,20 @@
 
 namespace App\Services\Promotion;
 
+use App\DTO\BookingDTO;
+use App\DTO\PromotionResultDTO;
 use App\Models\Booking;
 use App\Models\Promotion;
 use App\Models\PromotionRule;
 use Carbon\Carbon;
 use Exception;
-use phpDocumentor\Reflection\PseudoTypes\LowercaseString;
 
 class PromotionService
 {
     /**
      * ENTRY POINT
      */
-    public function apply(?string $code, Booking $booking, float $subtotal): array
+    public function apply(?string $code, BookingDTO $booking): array
     {
         if (empty($code)) {
             return $this->emptyResult();
@@ -22,11 +23,11 @@ class PromotionService
 
         $promotion = $this->findValidPromotion($code);
 
-        $this->validateBase($promotion, $booking, $subtotal);
+        $this->validateBase($promotion, $booking);
         $this->validateRules($promotion, $booking);
         $this->validateUserUsage($promotion, $booking);
 
-        $discount = $this->calculateDiscount($promotion, $subtotal);
+        $discount = $this->calculateDiscount($promotion, $booking->subtotal);
 
         return [
             'promotion' => $promotion,
@@ -63,12 +64,11 @@ class PromotionService
      */
     protected function validateBase(
         Promotion $promotion,
-        Booking $booking,
-        float $subtotal
+        BookingDTO $booking,
     ): void {
         if (
             $promotion->discount_min_order_value &&
-            $subtotal < $promotion->discount_min_order_value
+            $booking->subtotal < $promotion->discount_min_order_value
         ) {
             throw new Exception('Đơn hàng chưa đủ điều kiện áp dụng');
         }
@@ -81,17 +81,19 @@ class PromotionService
         }
     }
 
+
+
     /**
      * ===== PER USER LIMIT =====
      */
-    protected function validateUserUsage(Promotion $promotion, Booking $booking): void
+    protected function validateUserUsage(Promotion $promotion, BookingDTO $booking): void
     {
-        if (! $promotion->discount_max_uses_per_user || ! $booking->customer) {
+        if (! $promotion->discount_max_uses_per_user || ! $booking->customerId) {
             return;
         }
 
-        $usedCount = $booking->customer
-            ->bookings()
+        $usedCount = Booking::active()
+            ->where('customer_id', $booking->customerId)
             ->where('promotion_id', $promotion->id)
             ->count();
 
@@ -103,7 +105,7 @@ class PromotionService
     /**
      * ===== RULES =====
      */
-    protected function validateRules(Promotion $promotion, Booking $booking): void
+    protected function validateRules(Promotion $promotion, BookingDTO $booking): void
     {
         foreach ($promotion->rules()->get() as $rule) {
             if (! $this->checkRule($rule, $booking)) {
@@ -112,7 +114,7 @@ class PromotionService
         }
     }
 
-    protected function checkRule(PromotionRule $rule, Booking $booking): bool
+    protected function checkRule(PromotionRule $rule, BookingDTO $booking): bool
     {
         $config = $rule->config ?? [];
 
@@ -128,50 +130,51 @@ class PromotionService
     /**
      * ===== SERVICE RULE =====
      */
-    protected function checkServiceRule(array $config, Booking $booking): bool
+    protected function checkServiceRule(array $config, BookingDTO $booking): bool
     {
-        $serviceIds = $booking->guestServices()
-            ->pluck('service_id')
-            ->unique()
-            ->toArray();
-
         $ruleIds = $config['ids'] ?? [];
         $mode = $config['mode'] ?? 'only';
 
         return $mode === 'only'
-            ? empty(array_diff($serviceIds, $ruleIds))
-            : empty(array_intersect($serviceIds, $ruleIds));
+            ? empty(array_diff($booking->serviceIds, $ruleIds))
+            : empty(array_intersect($booking->serviceIds, $ruleIds));
     }
 
     /**
      * ===== MEMBERSHIP RULE =====
      */
-    protected function checkMembershipRule(array $config, Booking $booking): bool
+    protected function checkMembershipRule(array $config, BookingDTO $booking): bool
     {
-        return $booking->customer &&
-            in_array($booking->customer->membership_id, $config['ids'] ?? []);
+        if (! $booking->membershipId) {
+            return false;
+        }
+        return in_array($booking->membershipId, $config['ids'] ?? []);
     }
 
     /**
      * ===== USER RULE =====
      */
-    protected function checkUserRule(array $config, Booking $booking): bool
+    protected function checkUserRule(array $config, BookingDTO $booking): bool
     {
-        if (! $booking->customer) {
+        if (! $booking->customerId) {
             return false;
         }
-
+        $ids  = $config['ids'] ?? [];
         $mode = $config['mode'] ?? 'only';
 
+        if (empty($ids)) {
+            return true;
+        }
+
         return $mode === 'only'
-            ? in_array($booking->customer->id, $config['ids'] ?? [])
-            : ! in_array($booking->customer->id, $config['ids'] ?? []);
+            ? in_array($booking->customerId, $config['ids'] ?? [])
+            : ! in_array($booking->customerId, $config['ids'] ?? []);
     }
 
     /**
      * ===== BIRTHDAY RULE =====
      */
-    protected function checkBirthdayRule(array $config, Booking $booking): bool
+    protected function checkBirthdayRule(array $config, BookingDTO $booking): bool
     {
         return !($config['enabled'] ?? false)
             || ($booking->customer?->birthday?->isBirthday() ?? false);

@@ -546,22 +546,31 @@
         const endHour = 23;
         const step = 15;
 
-        const disabledTimes = ['10:00', '12:15', '18:30'];
+        const disabledTimes = [];
 
         const baseClass =
             'border rounded-lg py-2 text-sm font-medium transition text-center';
-
         const normalClass =
             'text-slate-500 hover:border-blue-500 hover:text-blue-600';
-
         const activeClass =
             'bg-blue-600 text-white border-blue-600';
-
         const disabledClass =
             'bg-slate-100 text-slate-300 cursor-not-allowed';
 
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
         function pad(n) {
             return n.toString().padStart(2, '0');
+        }
+
+        function timeToMinutes(time) {
+            const [h, m] = time.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function isPastTime(time) {
+            return timeToMinutes(time) <= currentMinutes;
         }
 
         function render() {
@@ -578,26 +587,27 @@
                     btn.textContent = time;
                     btn.dataset.time = time;
 
-                    btn.className = `${baseClass} ${normalClass}`;
+                    const disabled =
+                        disabledTimes.includes(time) || isPastTime(time);
 
-                    if (disabledTimes.includes(time)) {
-                        btn.className = `${baseClass} ${disabledClass}`;
-                        btn.disabled = true;
-                    }
+                    btn.className = `${baseClass} ${
+                    disabled ? disabledClass : normalClass
+                }`;
 
-                    btn.addEventListener('click', () => {
-                        document
-                            .querySelectorAll('[data-time]')
-                            .forEach(b => {
+                    btn.disabled = disabled;
+
+                    if (!disabled) {
+                        btn.addEventListener('click', () => {
+                            document.querySelectorAll('[data-time]').forEach(b => {
                                 b.classList.remove(...activeClass.split(' '));
                                 b.classList.add(...normalClass.split(' '));
                             });
 
-                        btn.classList.remove(...normalClass.split(' '));
-                        btn.classList.add(...activeClass.split(' '));
-
-                        input.value = time;
-                    });
+                            btn.classList.remove(...normalClass.split(' '));
+                            btn.classList.add(...activeClass.split(' '));
+                            input.value = time;
+                        });
+                    }
 
                     container.appendChild(btn);
                 }
@@ -607,6 +617,7 @@
         render();
     });
 </script>
+
 <script>
     document.addEventListener('change', function(e) {
         if (!e.target.classList.contains('service-category')) return;
@@ -788,8 +799,10 @@
         room: null,
         roomFee: 0,
         subtotal: 0,
+        total: 0,
         discount: 0,
         promotionId: null,
+        services: [],
     };
     const qs = (s, p = document) => p.querySelector(s);
     const qsa = (s, p = document) => [...p.querySelectorAll(s)];
@@ -811,7 +824,8 @@
             state.discount ? `-${money(state.discount)}` : '0đ';
 
         const total = state.subtotal + state.roomFee - state.discount;
-        qs('#summary-total').textContent = money(total);
+        state.total = total;
+        qs('#summary-total').textContent = money(state.total);
     }
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -852,10 +866,11 @@
             if (!e.target.classList.contains('service-select')) return;
 
             let subtotal = 0;
+            state.services = [];
             qsa('.service-select').forEach(select => {
                 const opt = select.selectedOptions[0];
-                console.log(opt);
                 if (opt && opt.dataset.price) {
+                    state.services.push(opt.value);
                     const price = Number(opt?.dataset?.price || 0);
                     subtotal += price;
 
@@ -879,7 +894,7 @@
         });
 
         qs('#apply-promo')?.addEventListener('click', () => {
-            state.discount = 100000;
+            state.discount = 0;
             renderSummary();
         });
 
@@ -893,8 +908,8 @@
     async function applyPromotion() {
         const codeInput = document.getElementById('promo-code');
         const messageEl = document.getElementById('promo-message');
-        c
-        const code = codeInput.value.trim().toUpperCase();
+
+        const code = codeInput.value.trim();
 
         if (!code) {
 
@@ -911,9 +926,9 @@
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    services: ,
-                    membership_id: {{ auth()->guard('customer')->user()?->membership_id ?? 'null' }}
-                    customer_id: {{ auth()->guard('customer')->user()->id ?? null }},
+                    services: state.services || [],
+                    membership_id: {{ auth()->guard('customer')->user()?->membership_id ?? 'null' }},
+                    customer_id: {{ auth()->guard('customer')->user()->id ?? 'null' }},
                     discount_code: code,
                     subtotal: state.subtotal,
                     room_fee: state.roomFee
@@ -925,7 +940,7 @@
             console.log('data:', data)
             if (!res.ok) throw data;
 
-            state.discount = data.discount_amount;
+            state.discount = data.discount;
             state.promotionId = data.promotion_id;
             state.total = data.total_after_discount;
 

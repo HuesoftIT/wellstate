@@ -43,7 +43,7 @@ class Promotion extends Model
         return $this->hasMany(PromotionRule::class)
             ->orderBy('order');
     }
-    
+
     static public function uploadAndResize($image, $width = 450, $height = null)
     {
         if (!$image) {
@@ -98,13 +98,18 @@ class Promotion extends Model
 
     public function getStatusTextAttribute(): string
     {
-        return match ($this->status) {
-            'disabled' => 'Tắt',
-            'upcoming' => 'Sắp diễn ra',
-            'expired'  => 'Hết hạn',
-            default    => 'Đang áp dụng',
-        };
+        switch ($this->status) {
+            case 'disabled':
+                return 'Tắt';
+            case 'upcoming':
+                return 'Sắp diễn ra';
+            case 'expired':
+                return 'Hết hạn';
+            default:
+                return 'Đang áp dụng';
+        }
     }
+
 
     public function scopeStatus($query, string $status)
     {
@@ -126,7 +131,8 @@ class Promotion extends Model
         };
     }
 
-    public function scopeActive($query) {
+    public function scopeActive($query)
+    {
         return $query->where('is_active', 1);
     }
 }

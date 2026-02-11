@@ -194,23 +194,24 @@
                             {{-- STATUS --}}
                             <td class="text-center">
                                 @php
-                                    if ($item->status === 'pending') {
-                                        $statusClass = 'label-warning';
-                                    } elseif ($item->status === 'confirmed') {
-                                        $statusClass = 'label-success';
-                                    } elseif ($item->status === 'cancelled') {
-                                        $statusClass = 'label-danger';
-                                    } elseif ($item->status === 'completed') {
-                                        $statusClass = 'label-primary';
-                                    } else {
-                                        $statusClass = 'label-default';
-                                    }
+                                    $statusMap = [
+                                        'pending' => ['class' => 'label-warning', 'text' => 'Chờ xác nhận'],
+                                        'confirmed' => ['class' => 'label-success', 'text' => 'Đã xác nhận'],
+                                        'cancelled' => ['class' => 'label-danger', 'text' => 'Đã huỷ'],
+                                        'completed' => ['class' => 'label-primary', 'text' => 'Hoàn thành'],
+                                    ];
+
+                                    $status = $statusMap[$item->status] ?? [
+                                        'class' => 'label-default',
+                                        'text' => 'Không xác định',
+                                    ];
                                 @endphp
 
-                                <span class="label {{ $statusClass }}">
-                                    {{ ucfirst($item->status) }}
+                                <span class="label {{ $status['class'] }}">
+                                    {{ $status['text'] }}
                                 </span>
                             </td>
+
 
                             {{-- PAYMENT --}}
                             <td class="text-center">
@@ -227,42 +228,77 @@
                             </td>
 
                             {{-- ACTION --}}
-                            <td class="dropdown">
+                            <td class="dropdown text-center">
                                 <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                     <i class="fal fa-tools"></i>
                                 </button>
 
                                 <div class="dropdown-menu p-0">
+
+                                    {{-- VIEW --}}
                                     @can('BookingController@show')
-                                        <a href="{{ route('bookings.show', $item->id) }}"
-                                            class="btn btn-info btn-sm dropdown-item">
-                                            <i class="fas fa-eye"></i> {{ __('message.view') }}
+                                        <a href="{{ route('bookings.show', $item->id) }}" class="dropdown-item">
+                                            <i class="fas fa-eye text-info"></i> Xem chi tiết
                                         </a>
                                     @endcan
 
-                                    @can('BookingController@update')
-                                        <a href="{{ route('bookings.edit', $item->id) }}"
-                                            class="btn btn-primary btn-sm dropdown-item">
-                                            <i class="far fa-edit"></i> {{ __('message.edit') }}
-                                        </a>
+                                    {{-- EDIT (chỉ khi chưa hoàn thành / huỷ) --}}
+                                    {{-- @can('BookingController@update')
+                                        @if (!in_array($item->status, ['completed', 'cancelled']))
+                                            <a href="{{ route('bookings.edit', $item->id) }}" class="dropdown-item">
+                                                <i class="far fa-edit text-primary"></i> Chỉnh sửa
+                                            </a>
+                                        @endif
+                                    @endcan --}}
+
+                                    {{-- CONFIRM PAYMENT --}}
+                                    @can('BookingController@confirmPayment')
+                                        @if ($item->status === 'pending' && $item->payment_status === 'unpaid')
+                                            <form action="{{ route('bookings.confirm-payment', $item->id) }}" method="POST"
+                                                onsubmit="return confirm('Xác nhận booking này đã thanh toán?')">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button type="submit" class="dropdown-item">
+                                                    <i class="fas fa-credit-card text-success"></i> Xác nhận thanh toán
+                                                </button>
+                                            </form>
+                                        @endif
                                     @endcan
 
-                                    @can('BookingController@destroy')
-                                        <form action="{{ route('bookings.cancel', $item->id) }}" method="POST"
-                                            style="display:inline"
-                                            onsubmit="return confirm('Bạn chắc chắn muốn huỷ booking này?')">
+                                    {{-- COMPLETE --}}
+                                    @can('BookingController@complete')
+                                        @if ($item->status === 'pending' && $item->payment_status === 'paid')
+                                            <form action="{{ route('bookings.complete', $item->id) }}" method="POST"
+                                                onsubmit="return confirm('Đánh dấu booking này đã hoàn thành?')">
+                                                @csrf
+                                                @method('PATCH')
 
-                                            @csrf
-                                            @method('PATCH')
+                                                <button type="submit" class="dropdown-item">
+                                                    <i class="fas fa-check-circle text-success"></i> Hoàn thành
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endcan
 
-                                            <button type="submit" class="btn btn-danger btn-sm dropdown-item">
-                                                <i class="fas fa-times"></i> Huỷ
-                                            </button>
-                                        </form>
+                                    {{-- CANCEL --}}
+                                    @can('BookingController@cancel')
+                                        @if (!in_array($item->status, ['completed', 'cancelled']))
+                                            <form action="{{ route('bookings.cancel', $item->id) }}" method="POST"
+                                                onsubmit="return confirm('Bạn chắc chắn muốn huỷ booking này?')">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="fas fa-times"></i> Huỷ booking
+                                                </button>
+                                            </form>
+                                        @endif
                                     @endcan
 
                                 </div>
                             </td>
+
                         </tr>
                     @empty
                         <tr>
