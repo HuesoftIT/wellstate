@@ -927,8 +927,8 @@
                 },
                 body: JSON.stringify({
                     services: state.services || [],
-                    membership_id: {{ auth()->guard('customer')->user()?->membership_id ?? 'null' }},
-                    customer_id: {{ auth()->guard('customer')->user()->id ?? 'null' }},
+                    membership_id: {{ optional(auth()->guard('customer')->user())->membership_id ?? 'null' }},
+                    customer_id: {{ auth()->guard('customer')->check() ? auth()->guard('customer')->user()->id : 'null' }},
                     discount_code: code,
                     subtotal: state.subtotal,
                     room_fee: state.roomFee

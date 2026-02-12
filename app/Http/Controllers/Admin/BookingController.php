@@ -43,18 +43,25 @@ class BookingController extends Controller
             //3. Create GUEST + SERVICE + ROOM
             [$subtotal, $totalDuration] = $this->bookingService->createGuestsAndServices($booking, $request, $startTime);
 
+            $customer = auth('customer')->user();
+
+            $serviceIds = $booking->guests
+                ->flatMap(function ($g) {
+                    return $g->services->pluck('service_id');
+                })
+                ->toArray();
+
             $bookingDTO = new BookingDTO(
-                customerId: auth('customer')->id() ?? null,
-                membershipId: auth('customer')->user()?->membership_id ?? null,
-                branchId: $booking->branch_id,
-                branchRoomTypeId: $booking->room_type_id,
-                bookingDate: $booking->booking_date,
-                totalGuests: $booking->total_guests,
-                subtotal: $subtotal,
-                serviceIds: $booking->guests
-                    ->flatMap(fn($g) => $g->services->pluck('service_id'))
-                    ->toArray()
+                $customer ? $customer->id : null,
+                $customer ? $customer->membership_id : null,
+                $booking->branch_id,
+                $booking->room_type_id,
+                $booking->booking_date,
+                $booking->total_guests,
+                $subtotal,
+                $serviceIds
             );
+
 
             //4. apply promotion
             $promotionResult = $this->promotionService->apply($request->discount_code, $bookingDTO);
