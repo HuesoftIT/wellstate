@@ -176,8 +176,8 @@ class PromotionService
      */
     protected function checkBirthdayRule(array $config, BookingDTO $booking): bool
     {
-        return !($config['enabled'] ?? false)
-            || ($booking->customer?->birthday?->isBirthday() ?? false);
+        // return !($config['enabled'] ?? false)
+        //     || ($booking->customer?->birthday?->isBirthday() ?? false);
     }
 
     /**
