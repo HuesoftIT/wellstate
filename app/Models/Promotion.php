@@ -111,25 +111,35 @@ class Promotion extends Model
     }
 
 
-    public function scopeStatus($query, string $status)
+    public function scopeStatus($query, $status)
     {
         $now = now();
 
-        return match ($status) {
-            'active' => $query->where('is_active', 1)
+        if ($status === 'active') {
+            return $query->where('is_active', 1)
                 ->where('start_date', '<=', $now)
-                ->where(fn($q) => $q->whereNull('end_date')->orWhere('end_date', '>=', $now)),
+                ->where(function ($q) use ($now) {
+                    $q->whereNull('end_date')
+                        ->orWhere('end_date', '>=', $now);
+                });
+        }
 
-            'upcoming' => $query->where('is_active', 1)
-                ->where('start_date', '>', $now),
+        if ($status === 'upcoming') {
+            return $query->where('is_active', 1)
+                ->where('start_date', '>', $now);
+        }
 
-            'expired' => $query->where('end_date', '<', $now),
+        if ($status === 'expired') {
+            return $query->where('end_date', '<', $now);
+        }
 
-            'disabled' => $query->where('is_active', 0),
+        if ($status === 'disabled') {
+            return $query->where('is_active', 0);
+        }
 
-            default => $query
-        };
+        return $query;
     }
+
 
     public function scopeActive($query)
     {
