@@ -132,7 +132,15 @@
                                     class="fa fa-copy"></i>
                                 {{ $item->discount_code }}</td>
                             <td>{{ ucfirst($item->type) }}</td>
-                            <td>{{ ucfirst($item->discount_type) }}</td>
+                            <td>
+                                @if ($item->discount_type === 'fixed')
+                                    Giảm tiền cố định
+                                @elseif ($item->discount_type === 'percent')
+                                    Giảm theo phần trăm
+                                @else
+                                    —
+                                @endif
+                            </td>
 
                             <td class="text-right">
                                 {{ number_format($item->discount_value) }}

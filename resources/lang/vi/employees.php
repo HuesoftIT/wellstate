@@ -30,6 +30,8 @@ return [
     'created_at' => 'Ngày tạo',
     'updated_at' => 'Ngày cập nhật',
 
+    'search_by_name' => "Tìm kiếm theo tên",
+
     /*
     |--------------------------------------------------------------------------
     | Messages

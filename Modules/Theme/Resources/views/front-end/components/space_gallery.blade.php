@@ -4,15 +4,17 @@
         <!-- TITLE -->
         <div class="text-center max-w-3xl mx-auto mb-10">
             <h2 class="text-[58px] font-open-sans font-medium text-[#4C4C4C] mb-4">
-                Không gian sang trọng & an yên
+                Không gian sang trọng & chuẩn mực nghỉ dưỡng
             </h2>
 
             <p class="text-[#4C4C4C] leading-relaxed text-sm md:text-base">
-                Bước vào Sana Spa, bạn như lạc vào một ốc đảo bình yên giữa nhịp sống hối hả.
-                Chính sự êm ái, tĩnh lặng đó sẽ vỗ về mọi giác quan, nâng niu từng khoảnh khắc
-                trải nghiệm, giúp mỗi khách hàng trút bỏ âu lo và đắm chìm trong sự an yên tuyệt đối.
+                Bước vào WELLSTATE, bạn như bước vào một không gian chăm sóc sức khỏe
+                được thiết kế tinh tế và chuẩn mực. Sự yên tĩnh, riêng tư và hài hòa
+                trong từng chi tiết giúp đánh thức mọi giác quan, mang lại cảm giác
+                thư thái sâu bên trong, để mỗi trải nghiệm đều trọn vẹn và đáng nhớ.
             </p>
         </div>
+
 
         <!-- SWIPER -->
         <div class="swiper spaceSwiper">
@@ -20,11 +22,12 @@
 
                 <!-- ITEM -->
                 @foreach ($customer_review_images as $item)
-                      <div class="swiper-slide">
-                        <img src="{{ Storage::url($item->image) }}" class="w-full h-[260px] object-cover rounded-xl" alt="{{ $item->name}}">
+                    <div class="swiper-slide">
+                        <img src="{{ Storage::url($item->image) }}" class="w-full h-[260px] object-cover rounded-xl"
+                            alt="{{ $item->name }}">
                     </div>
                 @endforeach
-                  
+
 
             </div>
         </div>

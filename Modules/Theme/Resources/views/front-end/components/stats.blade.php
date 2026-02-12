@@ -6,7 +6,7 @@
             {{-- LEFT CONTENT --}}
             <div class="lg:col-span-6">
                 <p class="text-xs tracking-widest text-gray-600 mb-3">
-                    SANA HOLDING
+                    WELLSTATE
                 </p>
 
                 <h2 class="font-open-sans font-medium text-[58px] text-[#7a8f2c] mb-6">
@@ -14,11 +14,10 @@
                 </h2>
 
                 <p class="text-gray-600 leading-relaxed mb-8 max-w-xl">
-                    Hơn 10.000 khách hàng đã lựa chọn SANA HOLDING để trải nghiệm, trong đó 99,9% hài lòng với kết quả
-                    mang lại. Đây là minh
-                    chứng rõ nhất cho chất lượng dịch vụ, sự tận tâm và uy tín của thương hiệu. Tại SANA HOLDING, khách
-                    hàng được lắng nghe, thấu hiểu và chăm sóc theo cách riêng biệt, để mỗi trải nghiệm đều trọn vẹn và
-                    đáng nhớ.
+                    Hơn 10.000 khách hàng đã lựa chọn WELLSTATE để trải nghiệm, trong đó 99,9% hài lòng với kết quả
+                    mang lại. Đây là minh chứng rõ nhất cho chất lượng dịch vụ, sự tận tâm và uy tín của thương hiệu.
+                    Tại WELLSTATE, khách hàng được lắng nghe, thấu hiểu và chăm sóc theo cách riêng biệt,
+                    để mỗi trải nghiệm đều trọn vẹn và đáng nhớ.
                 </p>
 
                 <a href="/gioi-thieu"
@@ -26,6 +25,7 @@
                     TÌM HIỂU THÊM
                 </a>
             </div>
+
 
             {{-- RIGHT STATS --}}
             <div id="stats-section"

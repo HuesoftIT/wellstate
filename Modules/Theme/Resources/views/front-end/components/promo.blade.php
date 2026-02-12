@@ -9,7 +9,6 @@
 
         {{-- LEFT CONTENT --}}
         <div class="lg:col-span-5">
-            <img src="/logo-sana.svg" class="w-28 mb-6" alt="">
 
             <h3 class="text-[#7a8f2c] text-[30px] uppercase font-open-sans font-semibold mb-4">
                 ƯU ĐÃI SIÊU HẤP DẪN<br>

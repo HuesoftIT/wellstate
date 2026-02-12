@@ -56,11 +56,19 @@ class EmployeeServiceController extends Controller
                 $q->active();
             }
         ])->active()->get();
+        $employee = null;
+        $selectedServiceIds = [];
 
 
         return view(
             'admin.employee_services.create',
-            compact('branches', 'employees', 'serviceCategories')
+            compact(
+                'branches',
+                'employees',
+                'serviceCategories',
+                'employee',
+                'selectedServiceIds'
+            )
         );
     }
 

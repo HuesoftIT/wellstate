@@ -92,13 +92,7 @@
             font-style: normal;
         }
 
-        @font-face {
-            font-family: 'Lora';
-            src: url('/fonts/lora/Lora-VariableFont_wght.ttf') format('truetype');
-            font-weight: 100 900;
-            font-style: normal;
-            font-display: swap;
-        }
+       
 
         @font-face {
             font-family: 'Lora';
@@ -481,9 +475,11 @@
 
         function generateUID() {
             return 'g_' + Math.random().toString(36).substring(2, 10);
-        }
+        };
 
         function renderGuests(count) {
+            if (!guestContainer) return;
+
             guestContainer.innerHTML = '';
 
             for (let i = 0; i < count; i++) {
@@ -508,7 +504,7 @@
 
                 guestContainer.appendChild(guestFragment);
             }
-        }
+        };
 
         function addService(wrapper, guestIndex) {
             const serviceIndex = wrapper.children.length;
@@ -527,12 +523,15 @@
                 });
 
             wrapper.appendChild(serviceFragment);
-        }
+        };
 
-        renderGuests(parseInt(guestCountInput.value) || 1);
+        renderGuests(parseInt(guestCountInput?.value) || 1);
+
+        if (!guestCountInput) return;
 
         guestCountInput.addEventListener('input', function() {
-            renderGuests(Math.max(1, parseInt(this.value) || 1));
+            const count = Math.max(1, parseInt(this.value, 10) || 1);
+            renderGuests(count);
         });
 
     });
@@ -574,6 +573,7 @@
         }
 
         function render() {
+            if (!container) return;
             container.innerHTML = '';
 
             for (let h = startHour; h <= endHour; h++) {
@@ -682,7 +682,6 @@
             .then(res => res.json())
             .then(res => {
                 const roomTypes = res.data;
-                console.log('roomTypes:', roomTypes)
 
                 if (!roomTypes.length) {
                     container.innerHTML = `
@@ -809,24 +808,32 @@
     const money = v =>
         new Intl.NumberFormat('vi-VN').format(v) + 'đ';
 
+    function setText(selector, value) {
+        const el = qs(selector);
+        if (el) el.textContent = value;
+    }
+
     function renderSummary() {
-        qs('#summary-branch').textContent = state.branch || '-';
-        qs('#summary-date').textContent = state.date || '-';
-        qs('#summary-time').textContent = state.time || '-';
-        qs('#summary-guests').textContent = state.guests + ' khách';
-        qs('#summary-room').textContent = state.room || '-';
+        setText('#summary-branch', state.branch || '-');
+        setText('#summary-date', state.date || '-');
+        setText('#summary-time', state.time || '-');
+        setText('#summary-guests', state.guests + ' khách');
+        setText('#summary-room', state.room || '-');
 
-        qs('#summary-subtotal').textContent = money(state.subtotal);
-        qs('#summary-room-fee').textContent =
-            state.roomFee ? `+${money(state.roomFee)}` : '0đ';
+        setText('#summary-subtotal', money(state.subtotal));
+        setText('#summary-room-fee',
+            state.roomFee ? `+${money(state.roomFee)}` : '0đ'
+        );
 
-        qs('#summary-discount').textContent =
-            state.discount ? `-${money(state.discount)}` : '0đ';
+        setText('#summary-discount',
+            state.discount ? `-${money(state.discount)}` : '0đ'
+        );
 
         const total = state.subtotal + state.roomFee - state.discount;
         state.total = total;
-        qs('#summary-total').textContent = money(state.total);
+        setText('#summary-total', money(state.total));
     }
+
     document.addEventListener('DOMContentLoaded', () => {
 
         qsa("input[name='branch_id']").forEach(radio => {
@@ -903,81 +910,85 @@
 </script>
 
 <script>
-    document.getElementById('apply-promo').addEventListener('click', applyPromotion);
-
-    async function applyPromotion() {
-        const codeInput = document.getElementById('promo-code');
-        const messageEl = document.getElementById('promo-message');
-
-        const code = codeInput.value.trim();
-
-        if (!code) {
-
-            showPromoMessage('Vui lòng nhập mã giảm giá', false);
-            return;
+    document.addEventListener('DOMContentLoaded', function() {
+        const applyPromoBtn = document.getElementById('apply-promo');
+        if (applyPromoBtn) {
+            applyPromoBtn.addEventListener('click', applyPromotion);
         }
 
-        try {
-            const res = await fetch('/api/ajax/promotions/apply', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    services: state.services || [],
-                    membership_id: {{ optional(auth()->guard('customer')->user())->membership_id ?? 'null' }},
-                    customer_id: {{ auth()->guard('customer')->check() ? auth()->guard('customer')->user()->id : 'null' }},
-                    discount_code: code,
-                    subtotal: state.subtotal,
-                    room_fee: state.roomFee
-                })
-            });
+        async function applyPromotion() {
+            const codeInput = document.getElementById('promo-code');
+            const messageEl = document.getElementById('promo-message');
+
+            const code = codeInput.value.trim();
+
+            if (!code) {
+
+                showPromoMessage('Vui lòng nhập mã giảm giá', false);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/ajax/promotions/apply', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        services: state.services || [],
+                        membership_id: {{ optional(auth()->guard('customer')->user())->membership_id ?? 'null' }},
+                        customer_id: {{ auth()->guard('customer')->check() ? auth()->guard('customer')->user()->id : 'null' }},
+                        discount_code: code,
+                        subtotal: state.subtotal,
+                        room_fee: state.roomFee
+                    })
+                });
 
 
-            const data = await res.json();
-            console.log('data:', data)
-            if (!res.ok) throw data;
+                const data = await res.json();
+                if (!res.ok) throw data;
 
-            state.discount = data.discount;
-            state.promotionId = data.promotion_id;
-            state.total = data.total_after_discount;
+                state.discount = data.discount;
+                state.promotionId = data.promotion_id;
+                state.total = data.total_after_discount;
+
+                renderSummary();
+
+                showPromoMessage(data.message || 'Áp dụng mã giảm giá thành công', true);
+
+            } catch (err) {
+                resetPromotion();
+
+                showPromoMessage(
+                    err?.message || 'Mã giảm giá không hợp lệ',
+                    false
+                );
+            }
+        }
+
+
+
+        function resetPromotion() {
+            state.discount = 0;
+            state.promotionId = null;
+            state.total = state.subtotal + state.roomFee;
 
             renderSummary();
 
-            showPromoMessage(data.message || 'Áp dụng mã giảm giá thành công', true);
-
-        } catch (err) {
-            resetPromotion();
-
-            showPromoMessage(
-                err?.message || 'Mã giảm giá không hợp lệ',
-                false
-            );
+            document.getElementById('promo-code').value = '';
         }
-    }
 
+        function showPromoMessage(text, success = true) {
+            const el = document.getElementById('promo-message');
 
-
-    function resetPromotion() {
-        state.discount = 0;
-        state.promotionId = null;
-        state.total = state.subtotal + state.roomFee;
-
-        renderSummary();
-
-        document.getElementById('promo-code').value = '';
-    }
-
-    function showPromoMessage(text, success = true) {
-        const el = document.getElementById('promo-message');
-
-        el.classList.remove('hidden');
-        el.classList.toggle('text-green-600', success);
-        el.classList.toggle('text-red-500', !success);
-        el.innerText = text;
-    }
+            el.classList.remove('hidden');
+            el.classList.toggle('text-green-600', success);
+            el.classList.toggle('text-red-500', !success);
+            el.innerText = text;
+        }
+    });
 </script>
 
 

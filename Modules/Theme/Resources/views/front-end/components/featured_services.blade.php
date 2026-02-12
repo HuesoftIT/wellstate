@@ -13,7 +13,7 @@
 
             {{-- HEADER --}}
             <p class="text-[16px] tracking-widest text-[#FFDC97] mb-3">
-                SANA HOLDING
+                WELLSTATE
             </p>
 
             <h2 class="font-open-sans text-[58px] font-medium text-[#cddc8c] mb-4">
@@ -21,7 +21,8 @@
             </h2>
 
             <p class="text-[16px]  text-[#FFDC97] max-w-xl mb-6 leading-relaxed">
-                SANA HOLDING mang đến giải pháp chăm sóc sức khỏe khoa học, an toàn,
+                WELLSTATE
+                mang đến giải pháp chăm sóc sức khỏe khoa học, an toàn,
                 tối ưu và cá nhân hóa dựa trên y học cổ truyền Trung Hoa
                 và công nghệ hiện đại.
             </p>

@@ -21,12 +21,16 @@
                 ]) !!}
             </td>
             <td class="col-md-8 col-lg-9">
-                {!! Form::select('employee_id', $employees->pluck('name', 'id'), old('employee_id', $employee->id), [
+                {!! Form::select('employee_id', $employees->pluck('name', 'id'), old('employee_id', optional($employee)->id), [
                     'class' => 'form-control input-sm select2',
                     'required',
-                    'disabled',
+                    $employee ? 'disabled' : null,
                 ]) !!}
-                <input type="hidden" name="employee_id" value="{{ $employee->id }}">
+
+
+                @if (isset($employee))
+                    <input type="hidden" name="employee_id" value="{{ $employee->id }}">
+                @endif
 
                 {!! $errors->first('employee_id', '<p class="help-block">:message</p>') !!}
             </td>
