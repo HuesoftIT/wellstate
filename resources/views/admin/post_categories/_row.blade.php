@@ -29,12 +29,13 @@
     </td>
 
     <td class="text-center">
-        {{ $item->created_at?->format(config('settings.format.date')) }}
+        {{ optional($item->created_at)->format(config('settings.format.date')) }}
     </td>
 
     <td class="text-center">
-        {{ $item->updated_at?->format(config('settings.format.date')) }}
+        {{ optional($item->updated_at)->format(config('settings.format.date')) }}
     </td>
+
 
     {{-- ACTION --}}
     <td class="dropdown">

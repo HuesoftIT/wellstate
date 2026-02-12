@@ -147,12 +147,12 @@ class BookingService
         int $totalDuration,
         ?array $promotionResult
     ): void {
-        $promotion = $promotionResult['promotion'] ?? null;
-        $discount  = $promotionResult['discount'] ?? 0;
+        $promotion = isset($promotionResult['promotion']) ? $promotionResult['promotion'] : null;
+        $discount  = isset($promotionResult['discount']) ? $promotionResult['discount'] : 0;
 
         $booking->update([
-            'promotion_id'    => $promotion?->id,
-            'discount_code'  => $promotion?->code,
+            'promotion_id'    => $promotion ? $promotion->id : null,
+            'discount_code'   => $promotion ? $promotion->code : null,
             'total_duration'  => $totalDuration,
             'subtotal_amount' => $subtotal,
             'discount_amount' => $discount,
