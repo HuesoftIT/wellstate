@@ -7,7 +7,7 @@
         <div class="flex items-center gap-10 h-full">
 
             <!-- Logo -->
-            <a href="/" class="flex items-center h-full">
+            <a href="{{ route('page.home')}}" class="flex items-center h-full">
                 <img src="{{ asset($logo) }}" alt="SANA Holding" class="h-[60px] object-contain">
             </a>
 
@@ -15,14 +15,14 @@
             <nav class="h-full hidden lg:flex">
                 <ul class="flex items-center h-full gap-6 uppercase text-[16px] font-medium text-white">
                     <li>
-                        <a href="#" class="hover:text-[#c6d36a] transition font-light">Trang chủ</a>
+                        <a href="{{ route('page.home')}}" class="hover:text-[#c6d36a] transition font-light">Trang chủ</a>
                     </li>
 
                     <li>
-                        <a href="/gioi-thieu" class="hover:text-[#c6d36a] transition font-light">Về chúng tôi</a>
+                        <a href="{{ route('page.introduce')}}" class="hover:text-[#c6d36a] transition font-light">Về chúng tôi</a>
                     </li>
 
-               
+
                     @foreach ($post_categories as $parent)
                         <li class="relative group">
                             {{-- MENU CHA --}}
@@ -78,7 +78,8 @@
 
 
                     <li>
-                        <a href="/lien-he" class="hover:text-[#c6d36a] transition font-light">Liên hệ</a>
+                        <a href="{{ route('page.contact') }}" class="hover:text-[#c6d36a] transition font-light">Liên
+                            hệ</a>
                     </li>
                 </ul>
             </nav>
@@ -88,7 +89,7 @@
         <div class="hidden lg:flex items-center justify-content-end gap-4 ">
 
             <!-- Button -->
-            <a href="/dat-lich"
+            <a href="{{ route('page.booking') }}"
                 class="inline-block ml-4 px-6 py-2 bg-[#8ea33a] text-white font-semibold rounded-sm hover:bg-[#a5bc45] transition text-[15px] font-bold ">
                 ĐẶT LỊCH
             </a>
@@ -130,14 +131,14 @@
 
                 <!-- Trang chủ -->
                 <li>
-                    <a href="/" class="hover:text-[#c6d36a] font-light">
+                    <a href="{{ route('page.home') }}" class="hover:text-[#c6d36a] font-light">
                         Trang chủ
                     </a>
                 </li>
 
                 <!-- Giới thiệu -->
                 <li>
-                    <a href="/gioi-thieu" class="hover:text-[#c6d36a] font-light">
+                    <a href="{{ route('page.introduce') }}" class="hover:text-[#c6d36a] font-light">
                         Về chúng tôi
                     </a>
                 </li>
@@ -174,7 +175,7 @@
 
                 <!-- Liên hệ -->
                 <li>
-                    <a href="/lien-he" class="hover:text-[#c6d36a] font-light">
+                    <a href="{{ route('page.contact') }}" class="hover:text-[#c6d36a] font-light">
                         Liên hệ
                     </a>
                 </li>
@@ -191,7 +192,7 @@
             </div>
 
             <!-- CTA -->
-            <a href="/dat-lich"
+            <a href="{{ route('page.booking') }}"
                 class="inline-block mt-8 px-6 py-2 bg-[#8ea33a] text-white font-semibold
                   rounded-sm hover:bg-[#a5bc45] transition text-[15px]">
                 ĐẶT LỊCH

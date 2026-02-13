@@ -4,7 +4,7 @@
         {{-- Section heading --}}
         <div class="text-center mb-16">
             <p class="text-xs tracking-widest text-white/80 mb-3">
-                SANA HOLDING
+                Wellstate
             </p>
 
             <h2 class="font-open-sans text-[48px] italic text-[#f5e6b3]">

@@ -21,7 +21,7 @@
                            w-20 h-20 rounded-full bg-white shadow-xl
                            flex items-center justify-center
                            [animation:spin_10s_linear_infinite]">
-                    <img src="{{ asset('images/wellstate-logo.png') }}" alt="Sana logo"
+                    <img src="{{ asset('images/wellstate-logo.png') }}" alt="Wellstate logo"
                         class="w-12 h-12 object-contain">
                 </div>
             </div>

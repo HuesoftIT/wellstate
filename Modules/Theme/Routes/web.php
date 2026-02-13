@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Admin\BookingController;
 use Modules\Theme\Http\Controllers\FrontendController;
 
@@ -15,14 +17,14 @@ use Modules\Theme\Http\Controllers\FrontendController;
 */
 
 
-Route::get('/', 'FrontendController@index');
+Route::get('/', 'FrontendController@index')->name('page.home');
 
 Route::get('ajaxFE/{action}', 'AjaxFrontEndController@index');
 
 Route::get("/bai-viet/{slug}", "FrontendController@getDetailPost")->name('detail.post');
 Route::get('/gioi-thieu', 'FrontendController@getIntroduce')->name('page.introduce');
-Route::get('/lien-he', 'FrontendController@contact');
-Route::get('/dich-vu', 'FrontendController@listServices');
+Route::get('/lien-he', 'FrontendController@contact')->name('page.contact');
+Route::get('/dich-vu', 'FrontendController@listServices')->name('page.service');
 Route::get('/san-pham/{slug}', 'FrontendController@renderService');
 
 Route::get('/dat-lich', [FrontendController::class, 'showBookingPage'])

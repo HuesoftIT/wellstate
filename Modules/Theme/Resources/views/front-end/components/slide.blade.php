@@ -1,6 +1,6 @@
 <div class="w-full overflow-hidden">
-    <div class="swiper mySwiper w-full max-w-full h-[400px] slideSwiper">
-        <div class="swiper-wrapper">
+    <div class="swiper mySwiper w-full max-w-full h-[80vh] slideSwiper">
+        <div class="swiper-wrapper h-full">
 
             @foreach ($slides as $slide)
                 <div class="swiper-slide w-full max-w-full">
@@ -9,7 +9,7 @@
                     @endif
 
                     <img src="{{ Storage::url($slide->image) }}" alt="{{ $slide->title ?? '' }}"
-                        class="block w-full max-w-full h-[400px] object-contain">
+                        class="w-full h-full  object-cover">
 
                     @if (!empty($slide->link))
                         </a>

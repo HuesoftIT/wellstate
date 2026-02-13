@@ -9,8 +9,7 @@
         <div class="max-w-3xl mx-auto text-center text-[#4b5b2a]">
 
             {{-- Logo --}}
-            <img src="{{ asset('images/wellstate-logo.png') }}" alt="Sana Holding"
-                class="mx-auto mb-6 w-32 md:w-36 float-y">
+            <img src="{{ asset('images/wellstate-logo.png') }}" alt="Wellstate" class="mx-auto mb-6 w-32 md:w-36 float-y">
 
             {{-- Title --}}
             <h1 class="text-4xl md:text-5xl font-serif tracking-wide">
@@ -28,17 +27,18 @@
 
             {{-- Description --}}
             <p class="text-base leading-relaxed text-[#4c4c4c]">
-                Sana Holding là điểm đến chăm sóc sức khỏe và sắc đẹp mang tinh thần
-                nghỉ dưỡng cao cấp. Như một thánh địa của sự an yên, Sana kết hợp tinh
-                hoa trị liệu Á Đông cùng công nghệ hiện đại tạo nên hành trình thư giãn
+                Wellstate là điểm đến chăm sóc sức khỏe và sắc đẹp mang tinh thần
+                nghỉ dưỡng cao cấp. Như một thánh địa của sự an yên, Wellstate kết hợp tinh
+                hoa trị liệu Á Đông cùng công nghệ hiện đại để tạo nên hành trình thư giãn
                 trọn vẹn. Mỗi liệu trình được thiết kế như một tác phẩm nghệ thuật riêng
-                biệt, giúp tái tạo nguồn năng lượng mới, vẻ đẹp bên ngoài thực sự tỏa
+                biệt, giúp tái tạo nguồn năng lượng mới, để vẻ đẹp bên ngoài thực sự tỏa
                 sáng từ sức khỏe bên trong.
             </p>
 
             <p class="mt-4 font-medium text-[#4b5b2a]">
-                Sana Spa – Nâng niu giác quan, nuôi dưỡng an lành.
+                Wellstate – Nâng niu giác quan, nuôi dưỡng an lành.
             </p>
         </div>
     </div>
+
 </section>

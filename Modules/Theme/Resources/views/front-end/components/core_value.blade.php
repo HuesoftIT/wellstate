@@ -5,7 +5,7 @@
             {{-- LEFT: Content --}}
             <div>
                 <p class="text-[16px] text-[#383E1A] tracking-widest font-semibold mb-2">
-                    SANA HOLDING
+                    Wellstate
                 </p>
 
                 <h2 class="text-[58px] font-open-sans italic font-medium text-[#6b7c2f] mb-6">
@@ -13,7 +13,7 @@
                 </h2>
 
                 <p class="text-gray-600 leading-relaxed mb-10 text-[16px]">
-                    Mỗi trải nghiệm tại Sana Holding được xây dựng dựa trên những giá trị cốt lõi,
+                    Mỗi trải nghiệm tại Wellstate được xây dựng dựa trên những giá trị cốt lõi,
                     nhằm mang đến hành trình chăm sóc sức khỏe và tinh thần một cách trọn vẹn,
                     tinh tế và bền vững.
                 </p>
@@ -29,7 +29,7 @@
                             <h4 class="font-semibold text-[#6b7c2f] mb-2">Tinh tế</h4>
                             <p class="text-gray-600 text-[16px]">
                                 Chú trọng từng chi tiết nhỏ trong không gian, liệu trình
-                                và cảm xúc của khách hàng.
+                                và cảm xúc của khách hàng tại Wellstate.
                             </p>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                         <div>
                             <h4 class="font-semibold text-[#6b7c2f] mb-2">Chữa lành</h4>
                             <p class="text-gray-600 text-[16px]">
-                                Tái tạo năng lượng thân – tâm – trí thông qua liệu pháp
+                                Tái tạo năng lượng thân – tâm – trí thông qua các liệu pháp
                                 trị liệu chuyên sâu và tự nhiên.
                             </p>
                         </div>
@@ -71,13 +71,14 @@
                             <h4 class="font-semibold text-[#6b7c2f] mb-2">Cao cấp</h4>
                             <p class="text-gray-600 text-[16px]">
                                 Dịch vụ, công nghệ và không gian đạt chuẩn wellness
-                                cao cấp, an toàn và hiệu quả.
+                                cao cấp, an toàn và hiệu quả tại Wellstate.
                             </p>
                         </div>
                     </div>
 
                 </div>
             </div>
+
 
             {{-- RIGHT: Images --}}
             <div class="relative flex gap-6 justify-center">
@@ -99,7 +100,7 @@
                            w-20 h-20 rounded-full bg-white shadow-xl
                            flex items-center justify-center
                            [animation:spin_10s_linear_infinite]">
-                    <img src="{{ asset('images/wellstate-logo.png') }}" alt="Sana logo"
+                    <img src="{{ asset('images/wellstate-logo.png') }}" alt="Wellstate logo"
                         class="w-12 h-12 object-contain">
                 </div>
             </div>

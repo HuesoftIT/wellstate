@@ -8,7 +8,7 @@
 
         <!-- IMAGE -->
         <div class="order-1">
-            <img src="{{ asset('images/doi-ngu.jpeg') }}" alt="Sana Holding"
+            <img src="{{ asset('images/doi-ngu.jpeg') }}" alt="Wellstate"
                 class="w-full h-[300px] md:h-[400px] lg:h-full
                        object-cover rounded-xl shadow-lg">
         </div>

@@ -2,8 +2,8 @@
 
 return [
     //header
-    "title" => 'BESOUL',
-    "description" => "BESOUL",
+    "title" => 'Wellstate',
+    "description" => "Wellstate",
     //newsletter
     "login" => "Đăng nhập",
     "register" => "Đăng kí",

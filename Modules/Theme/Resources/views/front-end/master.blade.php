@@ -46,7 +46,8 @@
     <meta name="twitter:title" content="{{ $settings['meta_title'] }}" />
     <meta name="twitter:image" content="{{ asset(Storage::url($settings['company_logo'])) }}" />
     <link rel="preconnect" href="//fonts.googleapis.com">
-    <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" />
+    <link rel="shortcut icon" href="{{ asset( $settings['company_logo'] ?? 'img/favicon.ico') }}" />
+
     <link rel="canonical" href="{{ Request::fullUrl() }}" />
     <link rel="stylesheet" href="{{ asset('css/font-awesome/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/huesoft_css/swiper.css') }}">
@@ -92,7 +93,7 @@
             font-style: normal;
         }
 
-       
+
 
         @font-face {
             font-family: 'Lora';
