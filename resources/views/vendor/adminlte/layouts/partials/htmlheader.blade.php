@@ -1,7 +1,11 @@
 <head>
     <meta charset="UTF-8">
     <title> {{ strip_tags(Config('settings.app_logo')) }} - @yield('htmlheader_title', 'Trang chủ') </title>
-    <link rel="shortcut icon" href="{{ asset($settings['company_logo'] ?? 'img/favicon.ico') }}" />
+    @php
+        $settings = \App\Models\Setting::allConfigsKeyValue();
+    @endphp
+
+    <link rel="shortcut icon" href="{{ asset($settings['company_logo'] ?? 'img/vi.png') }}" />
 
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <meta name="theme-color" content="#ffffff">
@@ -20,4 +24,5 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     @yield('css')
+
 </head>
