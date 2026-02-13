@@ -10,7 +10,7 @@
                     @endif
 
                     <img src="{{ Storage::url($slide->image) }}" alt="{{ $slide->title ?? '' }}"
-                        class="h-full w-full object-contain">
+                        class="max-h-full object-contain">
 
                     @if (!empty($slide->link))
                         </a>

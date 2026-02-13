@@ -30,40 +30,69 @@ class Image extends Model
     {
         return $this->belongsTo(ImageCategory::class, 'image_category_id');
     }
-    static public function uploadAndResize($image, $width = 450, $height = null)
+    // static public function uploadAndResize($image)
+    // {
+    //     if (!$image) {
+    //         return null;
+    //     }
+
+    //     $disk = Storage::disk('public');
+    //     $folder = 'images/wellstate_slides';
+
+    //     if (!$disk->exists($folder)) {
+    //         $disk->makeDirectory($folder);
+    //     }
+
+    //     $timestamp = Carbon::now()->format('Y-m-d-H-i-s');
+    //     $extension = $image->getClientOriginalExtension();
+    //     $filename  = Str::slug(
+    //         pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
+    //     );
+
+    //     $path = "{$folder}/{$timestamp}-{$filename}.{$extension}";
+
+    //     $img = InterventionImage::make($image)
+    //         ->encode($extension, 90); // quality 90
+
+    //     $disk->put($path, (string) $img);
+
+    //     return $path;
+    // }
+
+    static public function uploadAndResize($image)
     {
         if (!$image) {
             return null;
         }
 
         $disk = Storage::disk('public');
-        $folder = 'images/wellstate_images';
+        $folder = 'images/wellstate_slides';
 
-        // Tạo folder nếu chưa có
         if (!$disk->exists($folder)) {
             $disk->makeDirectory($folder);
         }
 
         $timestamp = Carbon::now()->format('Y-m-d-H-i-s');
-        $extension = $image->getClientOriginalExtension();
+        $extension = 'webp'; // convert luôn sang webp
         $filename  = Str::slug(
             pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
         );
 
         $path = "{$folder}/{$timestamp}-{$filename}.{$extension}";
 
-        // Resize image
-        $img = InterventionImage::make($image)
-            ->resize($width, $height, function ($constraint) {
+        $img = InterventionImage::make($image);
+
+        if ($img->width() > 1920) {
+            $img->resize(1920, null, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
-            })
-            ->encode($extension);
+            });
+        }
 
-        // Lưu bằng Storage
+        $img->encode('webp', 90);
+
         $disk->put($path, (string) $img);
 
-        // DB chỉ lưu path tương đối
         return $path;
     }
 }
