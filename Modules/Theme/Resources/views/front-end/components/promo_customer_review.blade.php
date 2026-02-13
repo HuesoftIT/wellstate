@@ -87,6 +87,7 @@
         </div>
 
         <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6">
+            
             @foreach ($customer_google_review_images as $image)
                 <div class="mb-6 break-inside-avoid">
                     <div class="rounded-2xl overflow-hidden shadow-lg bg-white">

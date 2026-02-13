@@ -8,7 +8,7 @@
                 <article class="group">
 
                     <!-- IMAGE -->
-                    <a href="" class="block overflow-hidden bg-[#f3f5e8]">
+                    <a href="{{ route('detail.post', $item->slug) }}" class="block overflow-hidden bg-[#f3f5e8]">
                         <img src="{{ $item->image ? Storage::url($item->image) : asset('images/default-service.jpg') }}"
                             alt="{{ $item->title }}"
                             class="w-full h-[320px] object-cover
@@ -21,7 +21,8 @@
 
                         <!-- TITLE -->
                         <h3 class="text-[16px] md:text-[17px] font-semibold uppercase text-[#2f3e1f] leading-snug">
-                            <a href="" class="hover:text-[#8aa24a] transition font-open-sans text-[18px]">
+                            <a href="{{ route('detail.post', $item->slug) }}"
+                                class="hover:text-[#8aa24a] transition font-open-sans text-[18px]">
                                 {{ $item->title }}
                             </a>
                         </h3>
@@ -38,7 +39,7 @@
                         </p>
 
                         <!-- READ MORE -->
-                        <a href=""
+                        <a href="{{ route('detail.post', $item->slug) }}"
                             class="inline-block mt-3 text-[28px] font-cormorant text-[#873D00] underline underline-offset-4
                               hover:text-[#6e451f] transition">
                             Đọc tiếp
@@ -69,7 +70,7 @@
             <div class="flex flex-col  gap-4">
 
                 @foreach ($new_posts as $post)
-                    <div class="flex items-start gap-6">
+                    <a href="{{ route('detail.post', $post->slug) }}" class="flex items-start gap-6">
                         <!-- IMAGE: 30% -->
                         <div class="w-[30%]">
                             <img src="{{ $post->image ? Storage::url($post->image) : asset('images/default-service.jpg') }}"
@@ -86,7 +87,7 @@
                                 · Không có bình luận
                             </span>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
             {{-- <div class="flex items-start gap-6">

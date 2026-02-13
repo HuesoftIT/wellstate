@@ -3,7 +3,7 @@
 
         {{-- LEFT IMAGE --}}
         <div class="lg:col-span-5 relative">
-            <img src="{{ asset('images/featured_servicesg.jpg') }}" alt="Sana Spa"
+            <img src="{{ asset('images/featured_services.jpg') }}" alt="Sana Spa"
                 class="absolute inset-0 w-full h-full object-cover" />
             <div class="absolute inset-0 bg-black/20"></div>
         </div>

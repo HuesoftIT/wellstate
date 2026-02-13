@@ -1,7 +1,8 @@
 <head>
     <meta charset="UTF-8">
     <title> {{ strip_tags(Config('settings.app_logo')) }} - @yield('htmlheader_title', 'Trang chủ') </title>
-    <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" />
+    <link rel="shortcut icon" href="{{ asset($settings['company_logo'] ?? 'img/favicon.ico') }}" />
+
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <meta name="theme-color" content="#ffffff">
     <!-- CSRF Token -->

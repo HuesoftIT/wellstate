@@ -4,33 +4,31 @@ namespace App\Http\Controllers\Admin;
 
 use App\DTO\BookingDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreBranchRequest;
-use App\Http\Requests\UpdateBranchRequest;
 use App\Models\Branch;
-use App\Models\BranchRoomType;
-use App\Models\RoomType;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Models\{
     Booking,
-    BookingGuest,
-    BookingGuestService,
-    BookingGuestServiceRoom,
-    Service,
     Promotion
 };
 use App\Services\BookingService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Services\Promotion\PromotionService;
 use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    protected $bookingService;
+    protected $promotionService;
+
     public function __construct(
-        protected BookingService $bookingService,
-        protected PromotionService $promotionService
-    ) {}
+        BookingService $bookingService,
+        PromotionService $promotionService
+    ) {
+        $this->bookingService = $bookingService;
+        $this->promotionService = $promotionService;
+    }
+
     public function booking(Request $request)
     {
         DB::transaction(function () use ($request) {

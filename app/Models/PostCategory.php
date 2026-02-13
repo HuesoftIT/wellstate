@@ -48,6 +48,10 @@ class PostCategory extends Model
             ->where('is_active', 1)
             ->orderBy('order');
     }
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'post_category_id');
+    }
 
 
     protected static function booted()
@@ -60,6 +64,5 @@ class PostCategory extends Model
                 $category->slug = Str::slug($category->name);
             }
         });
-    } 
-
+    }
 }

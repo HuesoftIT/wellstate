@@ -13,12 +13,12 @@
 
                 <!-- LOGO -->
                 <div>
-                    <img src="{{ asset('images/wellstate-logo.png') }}" class="h-14 mb-6" alt="">
+                    <img src="{{ asset('images/wellstate-logo.png') }}" class="h-14 mb-6" alt="Wellstate Logo">
 
                     <p class="leading-relaxed">
-                        Sana Holding – Đến để yêu thương lấy bản thân mình.
-                        Giữa lòng cố đô thanh bình, Sana Imperial Spa là điểm đến
-                        lý tưởng để bạn dừng lại, lắng nghe cơ thể.
+                        Wellstate – Đến để tái tạo và cân bằng năng lượng.
+                        Giữa nhịp sống hiện đại, Wellstate là điểm đến
+                        lý tưởng để bạn dừng lại, thư giãn và lắng nghe cơ thể.
                     </p>
 
                     <div class="mt-6 space-y-2">
@@ -32,11 +32,11 @@
 
                     <ul class="mt-4 space-y-4">
                         <li>
-                            <p class="font-medium">Sana Imperial Spa – Huế</p>
+                            <p class="font-medium">Wellstate Spa – Huế</p>
                             <p class="text-sm opacity-90">08 Hùng Vương, TP. Huế</p>
                         </li>
                         <li>
-                            <p class="font-medium">Sana Spa – Hội An</p>
+                            <p class="font-medium">Wellstate Spa – Hội An</p>
                             <p class="text-sm opacity-90">224 Lý Thái Tổ, Hội An</p>
                         </li>
                     </ul>
@@ -65,27 +65,27 @@
                     <div class="flex gap-3 mb-6">
                         <a
                             class="w-10 h-10 bg-[#8aa24a] rounded flex items-center justify-center
-                                  hover:bg-[#9fb85a] transition">f</a>
+                              hover:bg-[#9fb85a] transition">FB</a>
                         <a
                             class="w-10 h-10 bg-[#8aa24a] rounded flex items-center justify-center
-                                  hover:bg-[#9fb85a] transition">ig</a>
+                              hover:bg-[#9fb85a] transition">IG</a>
                         <a
                             class="w-10 h-10 bg-[#8aa24a] rounded flex items-center justify-center
-                                  hover:bg-[#9fb85a] transition">tt</a>
+                              hover:bg-[#9fb85a] transition">TT</a>
                     </div>
 
-                    <iframe class="w-full h-[240px] rounded-lg border border-white/20"></iframe>
                 </div>
 
             </div>
 
             <div
                 class="mt-16 pt-6 border-t border-white/20
-                        flex flex-col md:flex-row justify-between gap-4">
-                <span>© 2025 Sana Spa</span>
+                    flex flex-col md:flex-row justify-between gap-4">
+                <span>© 2025 Wellstate</span>
                 <span>Hotline: 0365 318 639</span>
             </div>
 
         </div>
     </div>
+
 </footer>

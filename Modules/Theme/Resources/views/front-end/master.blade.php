@@ -761,33 +761,7 @@
         });
     </script>
 @endif
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
 
-        const bookerNameInput = document.querySelector('input[name="booker_name"]');
-        const guestServices = document.getElementById('guest-services');
-
-        if (!bookerNameInput || !guestServices) return;
-
-        bookerNameInput.addEventListener('input', function() {
-            const bookerName = this.value.trim();
-            const firstGuest = guestServices.querySelector('.guest-item');
-
-            if (!firstGuest) return;
-
-            const guestNameInput = firstGuest.querySelector(
-                'input[name^="guests"][name$="[name]"]'
-            );
-
-            if (!guestNameInput) return;
-
-            if (guestNameInput.value.trim() === '') {
-                guestNameInput.value = bookerName;
-            }
-        });
-
-    });
-</script>
 
 
 <script>

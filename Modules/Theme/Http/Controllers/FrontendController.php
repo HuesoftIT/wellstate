@@ -185,16 +185,56 @@ class FrontendController extends Controller
         return view('theme::front-end.pages.booking', compact('branches_available', 'room_types_available', 'serviceCategories'));
     }
 
+    // public function getListParents(Request $request, $slugParent)
+    // {
+    //     switch ($slugParent) {
+    //         case 'tin-tuc':
+    //             $events = 
+    //             return view('theme::front-end.pages.event', compact('events', 'new_posts', 'post_category'));
+
+    //         case 'uu-dai':
+
+    //             return view('theme::front-end.pages.event', compact('events', 'new_posts', 'post_category'));
+    //         default:
+    //             return view("theme::front-end.404", compact('slugParent'));
+    //     }
+    // }
     public function getListParents(Request $request, $slugParent)
     {
-        dd($slugParent);
         switch ($slugParent) {
+
+            case 'tin-tuc':
+            case 'uu-dai':
+
+                $post_category = PostCategory::with('children')
+                    ->active()
+                    ->where('slug', $slugParent)
+                    ->firstOrFail();
+
+                $categoryIds = collect([$post_category->id])
+                    ->merge($post_category->children->pluck('id'))
+                    ->toArray();
+
+                $events = Post::with('category')
+                    ->published()
+                    ->whereIn('post_category_id', $categoryIds)
+                    ->orderByDesc('published_at')
+                    ->paginate(10);
+
+                $new_posts = Post::published()
+                    ->latest()
+                    ->take(5)
+                    ->get();
+
+                return view(
+                    'theme::front-end.pages.event',
+                    compact('events', 'new_posts', 'post_category')
+                );
+
             default:
-                dd('Xin chào');
                 return view("theme::front-end.404", compact('slugParent'));
         }
     }
-
 
     public function getDetail($slugParent, $slugDetail, Request $request)
     {
