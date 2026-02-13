@@ -64,7 +64,7 @@ class PromotionService
      */
     protected function validateBase(
         Promotion $promotion,
-        BookingDTO $booking,
+        BookingDTO $booking
     ): void {
         if (
             $promotion->discount_min_order_value &&
