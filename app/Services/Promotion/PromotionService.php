@@ -118,14 +118,24 @@ class PromotionService
     {
         $config = $rule->config ?? [];
 
-        return match ($rule->type) {
-            'service'    => $this->checkServiceRule($config, $booking),
-            'membership' => $this->checkMembershipRule($config, $booking),
-            'user'       => $this->checkUserRule($config, $booking),
-            'birthday'   => $this->checkBirthdayRule($config, $booking),
-            default      => true,
-        };
+        switch ($rule->type) {
+            case 'service':
+                return $this->checkServiceRule($config, $booking);
+
+            case 'membership':
+                return $this->checkMembershipRule($config, $booking);
+
+            case 'user':
+                return $this->checkUserRule($config, $booking);
+
+            case 'birthday':
+                return $this->checkBirthdayRule($config, $booking);
+
+            default:
+                return true;
+        }
     }
+
 
     /**
      * ===== SERVICE RULE =====
@@ -177,7 +187,6 @@ class PromotionService
     protected function checkBirthdayRule(array $config, BookingDTO $booking): bool
     {
         return false;
-       
     }
 
     /**
