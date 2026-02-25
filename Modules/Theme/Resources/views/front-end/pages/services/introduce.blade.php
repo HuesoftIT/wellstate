@@ -1,29 +1,32 @@
-<div class="container mx-auto px-6 py-16">
-    <div class="grid grid-cols-12 gap-8 items-center">
+<div class="container mx-auto px-4 md:px-6 py-12 md:py-16 overflow-hidden">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
 
-        <!-- LEFT: Image (3) -->
-        <div class="col-span-12 md:col-span-3 slide-left">
-            <img src="{{ asset('images/service-introduce-1.png') }}" alt="Spa hallway"
-                class="w-full h-auto object-cover rounded-md">
+        <!-- Left Image -->
+        <div class="md:col-span-3 w-full">
+            <img src="http://127.0.0.1:8000/images/service-introduce-1.png" alt="Spa hallway"
+                class="w-full max-w-full h-auto object-cover rounded-md">
         </div>
 
-        <!-- CENTER: Content (6) -->
-        <div class="col-span-12 md:col-span-6 text-center md:text-left">
-            <h2 class="text-[40px] uppercase text-center font-semibold font-open-sans tracking-wide text-[#3b4a2f] mb-6">
-                {{ $post_category->name }}
+        <!-- Content -->
+        <div class="md:col-span-6 text-center md:text-left">
+            <h2
+                class="text-[28px] md:text-[40px] uppercase font-semibold font-open-sans tracking-wide text-[#3b4a2f] mb-4 md:mb-6">
+                Massage trị liệu & Thư giãn
             </h2>
 
-            <p class="text-[#4a4a4a] leading-relaxed text-[16px]">
-                {{ $post_category->description }}
+            <p class="text-[#4a4a4a] leading-relaxed text-[15px] md:text-[16px]">
+                Kết hợp massage cổ truyền & công nghệ cao giúp hoạt huyết hóa ứ, bài trừ độc tố,
+                lưu thông khí huyết, phục hồi chức năng tạng phủ và giải quyết triệt để
+                các vấn đề đau nhức cơ xương khớp
             </p>
         </div>
 
-        <!-- RIGHT: Logo + Image (3) -->
-        <div class="col-span-12 md:col-span-3 flex flex-col items-center gap-6">
-            <img src="{{ asset('images/wellstate-logo.png') }}" alt="SANA Holding" class="w-40 float-y">
+        <!-- Right Images -->
+        <div class="md:col-span-3 flex flex-col items-center gap-6 w-full">
+            <img src="http://127.0.0.1:8000/images/wellstate-logo.png" alt="Wellstate Logo" class="w-32 md:w-40 h-auto">
 
-            <img src="{{ asset('images/service-introduce-2.jpg') }}" alt="Spa interior"
-                class="w-full rounded-[20px] slide-right">
+            <img src="http://127.0.0.1:8000/images/service-introduce-2.jpg" alt="Spa interior"
+                class="w-full max-w-full h-auto rounded-[20px]">
         </div>
 
     </div>

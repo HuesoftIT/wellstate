@@ -1,5 +1,5 @@
 <div class="w-full overflow-hidden">
-    <div class="swiper mySwiper slideSwiper w-full h-[100vh]">
+    <div class="swiper mySwiper slideSwiper w-full max-h-[100vh]">
         <div class="swiper-wrapper h-full">
 
             @foreach ($slides as $slide)

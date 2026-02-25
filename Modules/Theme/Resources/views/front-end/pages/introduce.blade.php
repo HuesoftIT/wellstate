@@ -6,4 +6,4 @@
     @include('theme::front-end.components.core_value')
     @include('theme::front-end.components.corporate_culture')
 
-@endsection
+@endsection 

@@ -27,7 +27,7 @@ class FrontendController extends Controller
     {
         $mainMenus = $this->menu(1);
         $settings = Setting::allConfigsKeyValue();
-        $logo = asset('images/wellstate-logo.png');
+        $logo = Setting::where('key', 'company_logo_frontend')->first()->value;
         $service_categories = ServiceCategory::active()
             ->orderBy('order', 'ASC')
             ->with('services')

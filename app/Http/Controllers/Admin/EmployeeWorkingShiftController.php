@@ -131,27 +131,53 @@ class EmployeeWorkingShiftController extends Controller
         $employeeIds    = $data['employee_ids'];
         $applyType      = $data['apply_type'];
 
+        // ===== FROM DATE =====
+        switch ($applyType) {
+            case 'single':
+            case '7_days':
+            case 'range':
+                $fromDate = Carbon::parse($data['from_date']);
+                break;
 
-        $fromDate = match ($applyType) {
-            'single'  => Carbon::parse($data['from_date']),
-            '7_days'  => Carbon::parse($data['from_date']),
-            'month'   => Carbon::parse($data['from_date'])->startOfMonth(),
-            'range'   => Carbon::parse($data['from_date']),
-        };
+            case 'month':
+                $fromDate = Carbon::parse($data['from_date'])->startOfMonth();
+                break;
 
-        $toDate = match ($applyType) {
-            'single'  => Carbon::parse($data['from_date']),
-            '7_days'  => Carbon::parse($data['from_date'])->addDays(6),
-            'month'   => Carbon::parse($data['from_date'])->endOfMonth(),
-            'range'   => Carbon::parse($data['to_date']),
-        };
+            default:
+                $fromDate = Carbon::parse($data['from_date']);
+                break;
+        }
+
+        // ===== TO DATE =====
+        switch ($applyType) {
+            case 'single':
+                $toDate = Carbon::parse($data['from_date']);
+                break;
+
+            case '7_days':
+                $toDate = Carbon::parse($data['from_date'])->addDays(6);
+                break;
+
+            case 'month':
+                $toDate = Carbon::parse($data['from_date'])->endOfMonth();
+                break;
+
+            case 'range':
+                $toDate = Carbon::parse($data['to_date']);
+                break;
+
+            default:
+                $toDate = Carbon::parse($data['from_date']);
+                break;
+        }
 
         $dates = CarbonPeriod::create($fromDate, $toDate);
 
         $dateValues = collect($dates)
-            ->map(fn($d) => $d->format('Y-m-d'))
+            ->map(function ($d) {
+                return $d->format('Y-m-d');
+            })
             ->toArray();
-
 
         $hasConflict = EmployeeWorkingShift::query()
             ->whereIn('employee_id', $employeeIds)
@@ -166,7 +192,6 @@ class EmployeeWorkingShiftController extends Controller
                 ])
                 ->withInput();
         }
-
 
         $now  = now();
         $rows = [];
@@ -183,7 +208,6 @@ class EmployeeWorkingShiftController extends Controller
             }
         }
 
-
         DB::transaction(function () use ($rows) {
             EmployeeWorkingShift::insert($rows);
         });
@@ -192,6 +216,7 @@ class EmployeeWorkingShiftController extends Controller
 
         return redirect()->route('employee-working-shifts.index');
     }
+
     public function calendar()
     {
         $branches = Branch::active()->get(['id', 'name']);
@@ -212,10 +237,9 @@ class EmployeeWorkingShiftController extends Controller
         ])
             ->whereBetween('work_date', [$start, $end])
             ->get()
-            ->groupBy(
-                fn($item) =>
-                $item->work_date->format('Y-m-d') . '_' . $item->working_shift_id
-            );
+            ->groupBy(function ($item) {
+                return $item->work_date->format('Y-m-d') . '_' . $item->working_shift_id;
+            });
 
         return response()->json(
             $events->map(function ($group) {

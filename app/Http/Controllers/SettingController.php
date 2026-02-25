@@ -16,6 +16,7 @@ class SettingController extends Controller
     {
         $data = Setting::allConfigs();
         $tabs = array_keys($data);
+        // dd($data);
 
         return view('settings.index', compact('data','tabs'));
     }

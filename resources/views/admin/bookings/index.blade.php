@@ -26,11 +26,11 @@
             <h5 class="float-left">
                 {{ __('message.lists') }}
             </h5>
-            @can('BookingController@store')
+            {{-- @can('BookingController@store')
                 <a href="{{ url('/admin/bookings/create') }}" class="btn btn-default float-right">
                     <i class="fa fa-plus-circle"></i> {{ __('message.new_add') }}
                 </a>
-            @endcan
+            @endcan --}}
 
         </div>
 

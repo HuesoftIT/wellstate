@@ -3,13 +3,13 @@
         <div class="grid lg:grid-cols-2 gap-12 items-center">
 
             {{-- LEFT: Images --}}
-            <div class="relative flex gap-6 justify-center">
+            <div class=" relative flex gap-6 justify-center ">
 
-                <div class="w-[220px] h-[320px] rounded-2xl overflow-hidden shadow-lg">
+                <div class="w-[150px] md:w-[220px] h-[320px] rounded-2xl overflow-hidden shadow-lg">
                     <img src="{{ asset('images/about_us1.png') }}" alt="About image 1" class="w-full h-full object-cover">
                 </div>
 
-                <div class="w-[220px] h-[320px] rounded-2xl overflow-hidden shadow-lg mt-12">
+                <div class="w-[150px] md:w-[220px] h-[320px] rounded-2xl overflow-hidden shadow-lg mt-12">
                     <img src="{{ asset('images/about_us2.png') }}" alt="About image 2"
                         class="w-full h-full object-cover">
                 </div>

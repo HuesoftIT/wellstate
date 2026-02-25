@@ -89,6 +89,13 @@ return [
             "type"=>"image",
             "group_data"=>"company_info", // Thông tin công ty
         ],
+          [
+            "key" => "company_logo_frontend",
+            "value" => "",
+            "description" => "Ảnh logo frontend",
+            "type"=>"image",
+            "group_data"=>"company_info", // Thông tin công ty
+        ],
         [
             "key" => "company_website",
             "value" => "",

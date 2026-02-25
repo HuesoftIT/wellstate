@@ -1,5 +1,5 @@
-<section class="relative h-[420px] w-full bg-cover bg-center"
-    style="background-image: url('/images/wellstate-logo.png');">
+<section class="relative h-[420px] w-full bg-contain bg-center"
+    style="background-image: url('/images/wellstate-logo.png'); background-repeat: no-repeat;">
     <!-- Overlay -->
     <div class="absolute inset-0 bg-[#4a4f1f]/65"></div>
 
