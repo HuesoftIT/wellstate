@@ -153,8 +153,9 @@ class BookingController extends Controller
             ->with('success', 'Đã huỷ booking');
     }
 
-    public function confirm(Booking $booking)
+    public function confirm($id)
     {
+        $booking = Booking::findOrFail($id);
         $booking->update([
             'status' => 'confirmed'
         ]);

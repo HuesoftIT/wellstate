@@ -37,7 +37,7 @@
 
                 {{-- CONFIRM PAYMENT --}}
                 @can('BookingController@confirmPayment')
-                    @if ($booking->payment_status === 'unpaid' && in_array($booking->status, ['pending', 'confirmed']))
+                    @if ($booking->canConfirmPayment())
                         <form action="{{ route('bookings.confirm-payment', $booking->id) }}" method="POST"
                             style="display:inline" onsubmit="return confirm('Xác nhận booking này đã thanh toán?')">
                             @csrf
@@ -52,7 +52,7 @@
 
                 {{-- CONFIRM BOOKING --}}
                 @can('BookingController@confirm')
-                    @if ($booking->status === 'pending')
+                    @if ($booking->canConfirm())
                         <form action="{{ route('bookings.confirm', $booking->id) }}" method="POST" style="display:inline"
                             onsubmit="return confirm('Xác nhận booking này?')">
                             @csrf
@@ -67,7 +67,7 @@
 
                 {{-- COMPLETE --}}
                 @can('BookingController@update')
-                    @if ($booking->status === 'confirmed' && $booking->payment_status === 'paid')
+                    @if ($booking->canComplete())
                         <form action="{{ route('bookings.update', $booking->id) }}" method="POST" style="display:inline"
                             onsubmit="return confirm('Đánh dấu booking này là hoàn thành?')">
                             @csrf
@@ -85,7 +85,7 @@
 
                 {{-- CANCEL --}}
                 @can('BookingController@destroy')
-                    @if (!in_array($booking->status, ['completed', 'cancelled']))
+                    @if ($booking->canCancel())
                         <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST" style="display:inline"
                             onsubmit="return confirm('Bạn chắc chắn muốn huỷ booking này?')">
                             @csrf
@@ -117,7 +117,7 @@
                             {{ $booking->booker_email }} <br>
                         </td>
                     </tr>
-                      <tr>
+                    <tr>
                         <th>Số điện thoại người đặt</th>
                         <td>
                             <b>{{ $booking->booker_phone }}</b>

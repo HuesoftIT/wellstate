@@ -43,7 +43,6 @@
                             </p>
 
                             <!-- Booking Info -->
-                            <!-- Booking Info -->
                             <table width="100%" cellpadding="10" cellspacing="0"
                                 style="margin-top:20px; border-collapse:collapse; font-size:14px;">
 
@@ -113,13 +112,52 @@
 
                             </table>
 
+                            @if ($booking->guests->count())
+                                <h3 style="margin-top:30px; color:#111827; font-size:16px;">
+                                    Danh sách dịch vụ đã đặt
+                                </h3>
+
+                                <table width="100%" cellpadding="8" cellspacing="0"
+                                    style="margin-top:10px; border-collapse:collapse; font-size:13px; border:1px solid #e5e7eb;">
+
+                                    <thead>
+                                        <tr style="background:#f3f4f6; text-align:left;">
+                                            <th style="border:1px solid #e5e7eb;">Khách</th>
+                                            <th style="border:1px solid #e5e7eb;">Dịch vụ</th>
+                                            <th style="border:1px solid #e5e7eb;">Thời lượng</th>
+                                            <th style="border:1px solid #e5e7eb;">Giá</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach ($booking->guests as $guest)
+                                            @foreach ($guest->services as $service)
+                                                <tr>
+                                                    <td style="border:1px solid #e5e7eb;">
+                                                        {{ $guest->guest_name ?? 'Khách' }}
+                                                    </td>
+                                                    <td style="border:1px solid #e5e7eb;">
+                                                        {{ optional($service->service)->title ?? '-' }}
+                                                    </td>
+                                                    <td style="border:1px solid #e5e7eb;">
+                                                        {{ $service->duration }} phút
+                                                    </td>
+                                                    <td style="border:1px solid #e5e7eb; font-weight:bold;">
+                                                        {{ number_format($service->price) }} VNĐ
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
                             <!-- CTA Button -->
-                            <div style="text-align:center; margin-top:30px;">
+                            {{-- <div style="text-align:center; margin-top:30px;">
                                 <a href="{{ url('/') }}"
                                     style="display:inline-block; padding:12px 24px; background:#1f2937; color:#ffffff; text-decoration:none; border-radius:6px; font-size:14px;">
                                     Xem chi tiết đặt lịch
                                 </a>
-                            </div>
+                            </div> --}}
 
                             <p style="margin-top:30px; font-size:13px; color:#6b7280;">
                                 Nếu bạn cần hỗ trợ, vui lòng liên hệ hotline hoặc phản hồi email này.

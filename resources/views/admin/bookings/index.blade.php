@@ -226,18 +226,26 @@
                                         </a>
                                     @endcan
 
-                                    {{-- EDIT (chỉ khi chưa hoàn thành / huỷ) --}}
-                                    {{-- @can('BookingController@update')
-                                        @if (!in_array($item->status, ['completed', 'cancelled']))
-                                            <a href="{{ route('bookings.edit', $item->id) }}" class="dropdown-item">
-                                                <i class="far fa-edit text-primary"></i> Chỉnh sửa
-                                            </a>
+
+                                    {{-- CONFIRM BOOKING --}}
+                                    @can('BookingController@confirm')
+                                        @if ($item->canConfirm())
+                                            <form action="{{ route('bookings.confirm', $item->id) }}" method="POST"
+                                                onsubmit="return confirm('Xác nhận booking này?')">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button type="submit" class="dropdown-item">
+                                                    <i class="fas fa-check text-primary"></i> Xác nhận booking
+                                                </button>
+                                            </form>
                                         @endif
-                                    @endcan --}}
+                                    @endcan
+
 
                                     {{-- CONFIRM PAYMENT --}}
                                     @can('BookingController@confirmPayment')
-                                        @if ($item->status === 'pending' && $item->payment_status === 'unpaid')
+                                        @if ($item->canConfirmPayment())
                                             <form action="{{ route('bookings.confirm-payment', $item->id) }}" method="POST"
                                                 onsubmit="return confirm('Xác nhận booking này đã thanh toán?')">
                                                 @csrf
@@ -250,9 +258,10 @@
                                         @endif
                                     @endcan
 
+
                                     {{-- COMPLETE --}}
                                     @can('BookingController@complete')
-                                        @if ($item->status === 'pending' && $item->payment_status === 'paid')
+                                        @if ($item->canComplete())
                                             <form action="{{ route('bookings.complete', $item->id) }}" method="POST"
                                                 onsubmit="return confirm('Đánh dấu booking này đã hoàn thành?')">
                                                 @csrf
@@ -265,9 +274,10 @@
                                         @endif
                                     @endcan
 
+
                                     {{-- CANCEL --}}
                                     @can('BookingController@cancel')
-                                        @if (!in_array($item->status, ['completed', 'cancelled']))
+                                        @if ($item->canCancel())
                                             <form action="{{ route('bookings.cancel', $item->id) }}" method="POST"
                                                 onsubmit="return confirm('Bạn chắc chắn muốn huỷ booking này?')">
                                                 @csrf
@@ -308,8 +318,8 @@
                 @endcan
                 &nbsp;
                 @can('BookingController@active')
-                    <a href="#" id="activeBookings" data-action="activeBookings" class="btn-act btn btn-success btn-sm"
-                        title="{{ __('message.approved') }}">
+                    <a href="#" id="activeBookings" data-action="activeBookings"
+                        class="btn-act btn btn-success btn-sm" title="{{ __('message.approved') }}">
                         <i class="fa fa-check" aria-hidden="true"></i>
                     </a>
                 @endcan

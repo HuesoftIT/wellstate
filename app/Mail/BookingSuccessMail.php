@@ -15,7 +15,7 @@ class BookingSuccessMail extends Mailable
 
     public function __construct(Booking $booking)
     {
-        $this->booking = $booking;
+        $this->booking = $booking->load((['guests.services.service']));
     }
 
     public function build()

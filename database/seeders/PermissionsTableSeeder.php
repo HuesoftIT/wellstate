@@ -207,6 +207,7 @@ class PermissionsTableSeeder extends Seeder
             "158" => ["BookingController@complete",  "Quản lý đặt lịch"],
             "159" => ["BookingController@cancel",  "Quản lý đặt lịch"],
             "160" => ["BookingController@printInvoice", "In / xuất hóa đơn booking"],
+            "161" => ["BookingController@confirm", "Xác nhận booking"],
 
         ];
 
