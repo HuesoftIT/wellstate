@@ -26,11 +26,11 @@
             <h5 class="float-left">
                 {{ __('message.lists') }}
             </h5>
-            {{-- @can('BookingController@store')
+            @can('BookingController@store')
                 <a href="{{ url('/admin/bookings/create') }}" class="btn btn-default float-right">
                     <i class="fa fa-plus-circle"></i> {{ __('message.new_add') }}
                 </a>
-            @endcan --}}
+            @endcan
 
         </div>
 
@@ -118,7 +118,7 @@
                         <th class="text-center" width="4%">{{ __('message.index') }}</th>
 
                         <th>Mã booking</th>
-                        <th>Người đặt</th>
+                        <th>Email người đặt</th>
                         <th>Chi nhánh</th>
                         <th>Thời gian</th>
                         <th class="text-center">Số khách</th>
@@ -151,7 +151,7 @@
                             {{-- BOOKER --}}
                             <td>
                                 <div class="font-weight-bold text-dark">
-                                    {{ $item->booker_name }}
+                                    {{ $item->booker_email }}
                                 </div>
 
                                 <div class="d-flex align-items-center mt-1 text-muted cursor-pointer"
@@ -193,33 +193,17 @@
 
                             {{-- STATUS --}}
                             <td class="text-center">
-                                @php
-                                    $statusMap = [
-                                        'pending' => ['class' => 'label-warning', 'text' => 'Chờ xác nhận'],
-                                        'confirmed' => ['class' => 'label-success', 'text' => 'Đã xác nhận'],
-                                        'cancelled' => ['class' => 'label-danger', 'text' => 'Đã huỷ'],
-                                        'completed' => ['class' => 'label-primary', 'text' => 'Hoàn thành'],
-                                    ];
-
-                                    $status = $statusMap[$item->status] ?? [
-                                        'class' => 'label-default',
-                                        'text' => 'Không xác định',
-                                    ];
-                                @endphp
-
-                                <span class="label {{ $status['class'] }}">
-                                    {{ $status['text'] }}
+                                <span class="label {{ $item->status_info['class'] }}">
+                                    {{ $item->status_info['text'] }}
                                 </span>
                             </td>
 
 
                             {{-- PAYMENT --}}
                             <td class="text-center">
-                                @if ($item->payment_status === 'paid')
-                                    <span class="label label-success">Đã thanh toán</span>
-                                @else
-                                    <span class="label label-default">Chưa thanh toán</span>
-                                @endif
+                                <span class="label {{ $item->payment_info['class'] }}">
+                                    {{ $item->payment_info['text'] }}
+                                </span>
                             </td>
 
                             {{-- CREATED --}}

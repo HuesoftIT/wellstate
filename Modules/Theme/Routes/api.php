@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\BranchRoomTypeController;
+use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\PromotionController;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,5 +25,5 @@ Route::get(
     '/ajax/branches/{id}/room-types',
     [BranchRoomTypeController::class, 'getRoomTypesById']
 )->name('ajax.branch.room-types');
-Route::post('/ajax/booking/apply-promotion', [BookingController::class, 'applyPromotion']);
 Route::post('/ajax/promotions/apply', [PromotionController::class, 'apply']);
+Route::get('/ajax/branch-available-times', [BranchController::class, 'getAvailableTimes']);

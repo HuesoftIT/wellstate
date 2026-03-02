@@ -112,10 +112,15 @@
                     </tr>
 
                     <tr>
-                        <th>Người đặt</th>
+                        <th>Thông tin người đặt</th>
                         <td>
-                            {{ $booking->booker_name }} <br>
-                            <small class="text-muted">{{ $booking->booker_phone }}</small>
+                            {{ $booking->booker_email }} <br>
+                        </td>
+                    </tr>
+                      <tr>
+                        <th>Số điện thoại người đặt</th>
+                        <td>
+                            <b>{{ $booking->booker_phone }}</b>
                         </td>
                     </tr>
 
@@ -164,9 +169,20 @@
                         <th>Số khách</th>
                         <td>{{ $booking->total_guests }}</td>
                     </tr>
-
                     <tr>
                         <th>Tổng tiền</th>
+                        <td class="text-success text-bold">
+                            {{ number_format($booking->subtotal_amount) }} đ
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Giảm giá</th>
+                        <td class="text-success text-bold">
+                            {{ number_format($booking->discount_amount) }} đ
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Số tiền phải trả</th>
                         <td class="text-success text-bold">
                             {{ number_format($booking->total_amount) }} đ
                         </td>
@@ -175,7 +191,7 @@
                     <tr>
                         <th>Trạng thái</th>
                         {{-- STATUS --}}
-                        <td >
+                        <td>
                             @php
                                 $statusMap = [
                                     'pending' => ['class' => 'label-warning', 'text' => 'Chờ xác nhận'],

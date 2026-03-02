@@ -31,6 +31,10 @@ class Customer extends Authenticatable
         'birthday' => 'date',
     ];
 
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
     /* ================= RELATIONS ================= */
 
     public function membership()

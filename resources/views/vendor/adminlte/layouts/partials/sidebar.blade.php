@@ -107,24 +107,24 @@
                         ],
                     ],
                 ],
-                [
-                    'icon' => 'fad fa-clock',
-                    'title' => __('message.working_shift_management'),
-                    'child' => [
-                        [
-                            'icon' => 'dot fa fa-circle',
-                            'title' => __('message.shift_management'),
-                            'href' => 'admin/working-shifts',
-                            'permission' => 'WorkingShiftController@index',
-                        ],
-                        [
-                            'icon' => 'dot fa fa-circle',
-                            'title' => __('message.employee_shift_assignment'),
-                            'href' => 'admin/employee-working-shifts',
-                            'permission' => 'EmployeeWorkingShiftController@index',
-                        ],
-                    ],
-                ],
+                // [
+                //     'icon' => 'fad fa-clock',
+                //     'title' => __('message.working_shift_management'),
+                //     'child' => [
+                //         [
+                //             'icon' => 'dot fa fa-circle',
+                //             'title' => __('message.shift_management'),
+                //             'href' => 'admin/working-shifts',
+                //             'permission' => 'WorkingShiftController@index',
+                //         ],
+                //         [
+                //             'icon' => 'dot fa fa-circle',
+                //             'title' => __('message.employee_shift_assignment'),
+                //             'href' => 'admin/employee-working-shifts',
+                //             'permission' => 'EmployeeWorkingShiftController@index',
+                //         ],
+                //     ],
+                // ],
 
                 [
                     'icon' => 'fad fa-percent',

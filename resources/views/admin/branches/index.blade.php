@@ -117,12 +117,12 @@
                                 @if (!empty($item->image))
                                     <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
                                         style="
-                    width:50px;
-                    height:50px;
-                    object-fit:cover;
-                    border-radius:4px;
-                    border:1px solid #ddd;
-                ">
+                                            width:50px;
+                                            height:50px;
+                                            object-fit:cover;
+                                            border-radius:4px;
+                                            border:1px solid #ddd;
+                                        ">
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif
@@ -136,7 +136,9 @@
                             {{-- WORKING TIME --}}
                             <td class="text-center">
                                 @if ($item->open_time && $item->close_time)
-                                    {{ $item->open_time->format('H:i') }} - {{ $item->close_time->format('H:i') }}
+                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $item->open_time)->format('H:i') }}
+                                    -
+                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $item->close_time)->format('H:i') }}
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif

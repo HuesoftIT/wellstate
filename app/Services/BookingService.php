@@ -55,7 +55,7 @@ class BookingService
             'room_type_id'   => $request->room_type_id,
             'branch_room_type_id' => optional($branchRoomType)->id,
 
-            'booker_name'    => $request->booker_name,
+            'booker_email'    => $request->booker_email,
             'booker_phone'   => $request->booker_phone,
 
             'booking_date'   => Carbon::createFromFormat(

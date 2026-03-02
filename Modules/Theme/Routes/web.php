@@ -15,7 +15,16 @@ use Modules\Theme\Http\Controllers\FrontendController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+use Illuminate\Support\Facades\Mail;
 
+Route::get('/test-mail', function () {
+    Mail::raw('Test gửi mail từ Laravel', function ($message) {
+        $message->to('lephuocthanhnhat0409@gmail.com')
+            ->subject('Test Mail');
+    });
+
+    return 'Mail sent!';
+});
 
 Route::get('/', 'FrontendController@index')->name('page.home');
 

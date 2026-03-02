@@ -12,6 +12,15 @@
 
     <form method="POST" action="{{ route('post.booking') }}" id="booking" class="min-h-screen py-10 bg-[#f4f8ea]">
         @csrf
+        @if ($errors->any())
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <ul class="text-red-600 text-sm space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>• {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             <div class="lg:col-span-2 space-y-8">
@@ -23,13 +32,17 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                        <!-- Họ tên -->
+                        <!-- Email -->
                         <div>
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
-                                Họ và tên <span class="text-red-500">*</span>
+                                Email <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="booker_name" required=true placeholder="Ví dụ: Nguyễn Văn A"
-                                class="input h-11">
+                            <input type="email" name="booker_email" value="{{ old('booker_email') }}" required autocomplete="email"
+                                placeholder="Ví dụ: example@gmail.com"
+                                class="input h-11 @error('booker_email') border-red-500 @enderror">
+                            @error('booker_email')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Số điện thoại -->
@@ -37,8 +50,12 @@
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
                                 Số điện thoại <span class="text-red-500">*</span>
                             </label>
-                            <input type="tel" name="booker_phone" required=true placeholder="0123 456 789"
-                                class="input h-11">
+                            <input type="tel" name="booker_phone" value="{{ old('booker_phone') }}"
+                                class="input h-11 @error('booker_phone') border-red-500 @enderror">
+
+                            @error('booker_phone')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                     </div>
@@ -48,8 +65,12 @@
                         <label class="block text-[16px] font-medium text-slate-600 mb-1">
                             Số khách
                         </label>
-                        <input type="number" name="guest_count" required=true min="1" max="100" value="1"
-                            id="guest-count" class="input h-11 text-center">
+                        <input type="number" name="guest_count" required=true min="1" max="100"
+                            value="{{ old('guest_count', 1) }}" id="guest-count"
+                            class="input h-11 text-center @error('guest_count') border-red-500 @enderror">
+                        @error('guest_count')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </section>
 
@@ -59,27 +80,14 @@
                         2. Chọn chi nhánh & ngày
                     </h2>
 
-                    <div class="space-y-4">
-                        <!-- Item -->
+                    <div class="space-y-4"> <!-- Item -->
                         @foreach ($branches_available as $item)
                             <label
-                                class="branch-item flex items-center gap-4 p-4 border rounded-lg cursor-pointer
-                        transition
-                        has-[:checked]:border-blue-500
-                        has-[:checked]:bg-blue-50">
-
+                                class="branch-item flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                                 <input type="radio" name="branch_id" value="{{ $item->id }}"
-                                    class="w-5 h-5 text-blue-600 focus:ring-blue-500">
-
-                                <span class="text-[18px] font-medium text-gray-800">
-                                    {{ $item->address }}
-                                </span>
-                            </label>
+                                    class="w-5 h-5 text-blue-600 focus:ring-blue-500"> <span
+                                    class="text-[18px] font-medium text-gray-800"> {{ $item->address }} </span> </label>
                         @endforeach
-
-
-
-
                     </div>
                     <div class="mt-6">
                         <label class="block text-[18px] font-medium text-slate-600 mb-1">
@@ -87,9 +95,15 @@
                         </label>
 
                         <div class="relative">
-                            <input id="booking-date" type="text" placeholder="Chọn thời điểm"
-                                class="input h-11 w-full pr-10 cursor-pointer" name="booking_date">
+                            {{-- <input id="booking-date" type="text" placeholder="Chọn thời điểm"
+                                class="input h-11 w-full pr-10 cursor-pointer" name="booking_date"> --}}
+                            <input id="booking-date" type="text" name="booking_date" value="{{ old('booking_date') }}"
+                                placeholder="{{ now()->format('d/m/Y') }}"
+                                class="input h-11 w-full @error('booking_date') border-red-500 @enderror">
 
+                            @error('booking_date')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
 
                             <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -110,7 +124,15 @@
                     </h2>
 
 
+                    @error('guests')
+                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    @enderror
 
+                    @error('guests.*.services')
+                        <p class="text-red-500 text-sm mt-2">
+                            Mỗi khách phải chọn ít nhất 1 dịch vụ
+                        </p>
+                    @enderror
 
                     <!-- Guest list -->
                     <div id="guest-services" class="space-y-6"></div>
@@ -150,7 +172,7 @@
                     <!-- ===== SERVICE TEMPLATE ===== -->
                     <template id="service-template">
                         <div class="service-item relative rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                         
+
 
                             <div class="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-4 items-end">
 
@@ -179,6 +201,8 @@
                                         disabled>
                                         <option value="">Chọn dịch vụ</option>
                                     </select>
+
+                                    <input type="hidden" name="__SERVICE_NAME__[price]" class="service-price">
                                 </div>
 
                                 <!-- Remove (HẸP) -->
@@ -229,6 +253,10 @@
                     <div id="time-slots" class="grid grid-cols-4 sm:grid-cols-6 gap-3"></div>
 
                     <input type="hidden" name="booking_time" id="booking-time">
+
+                    @error('booking_time')
+                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    @enderror
                 </section>
 
 
@@ -250,7 +278,7 @@
                     </div>
                     <p id="promo-message" class="mt-2 text-sm hidden"></p>
                     <!-- Message -->
-                   
+
                 </section>
 
             </div>
@@ -337,4 +365,13 @@
 
         </div>
     </form>
+
+    <script>
+        @if ($errors->any())
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        @endif
+    </script>
 @endsection

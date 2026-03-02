@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\BookingDTO;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Services\Promotion\PromotionService;
@@ -9,9 +10,12 @@ use Illuminate\Http\Request;
 
 class PromotionController extends Controller
 {
-    public function __construct(
-        protected PromotionService $promotionService
-    ) {}
+    protected $promotionService;
+
+    public function __construct(PromotionService $promotionService)
+    {
+        $this->promotionService = $promotionService;
+    }
     /*
     {
         "discount_code": "khuyen-mai",
@@ -23,15 +27,22 @@ class PromotionController extends Controller
         "booking_date": "2026-02-07"
     }
     */
-    public function apply(Request $request) {
+    public function apply(Request $request)
+    {
+        
         $discount_code = $request->discount_code;
         $services = $request->services;
         $room_fee = $request->room_fee;
         $subtotal = $request->subtotal;
+        $branch_id = $request->branch_id;
+        $room_type_id = $request->room_type_id;
+        $booking_date = $request->booking_date;
+        $total_guests = $request->total_guests;
+        $phone = $request->phone;
 
-        $booking = Booking::findOrFail(41);
-       
+        $bookingDTO = new BookingDTO(null, null,  $branch_id, $room_type_id, $booking_date, $total_guests, $subtotal, $services, $phone);
 
-        return $this->promotionService->apply($discount_code, $booking, $subtotal);
+
+        return $this->promotionService->apply($discount_code, $bookingDTO, $subtotal);
     }
 }

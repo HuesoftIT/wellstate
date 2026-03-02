@@ -10,7 +10,7 @@
 
 <body class="hold-transition login-page">
     <div id="app" class="login-box">
-        <div class="login-logo border-bottom py-4">
+        <div class="login-logo border-bottom py-4" >
             <img src="{{ \DB::table('settings')->where('key', 'company_logo')->value('value') ?? asset('images/logoFB.png') }}"  alt="logo">
         </div>
 

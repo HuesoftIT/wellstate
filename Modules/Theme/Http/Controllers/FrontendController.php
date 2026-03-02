@@ -27,7 +27,8 @@ class FrontendController extends Controller
     {
         $mainMenus = $this->menu(1);
         $settings = Setting::allConfigsKeyValue();
-        $logo = Setting::where('key', 'company_logo_frontend')->first()->value;
+        $logo = Setting::where('key', 'company_logo_frontend')->value('value');
+        $company_phone = Setting::where('key', 'company_phone')->value('value');
         $service_categories = ServiceCategory::active()
             ->orderBy('order', 'ASC')
             ->with('services')
@@ -38,7 +39,6 @@ class FrontendController extends Controller
             }])
             ->orderBy('order')
             ->get();
-        $company_phone = Setting::where('key', 'company_phone')->first()->value;
         $branches = Branch::active()->get();
         \View::share([
             'mainMenus' => $mainMenus,

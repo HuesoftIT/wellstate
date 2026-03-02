@@ -165,7 +165,7 @@
                                         @else
                                             <div class="mt-1">
                                                 @foreach ($services as $service)
-                                                    <span class="label label-success">{{ $service->name }}</span>
+                                                    <span class="label label-success">{{ $service->title }}</span>
                                                 @endforeach
                                             </div>
                                         @endif

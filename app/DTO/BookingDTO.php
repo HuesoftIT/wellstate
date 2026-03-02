@@ -11,7 +11,8 @@ class BookingDTO
     public $bookingDate;
     public $totalGuests;
     public $subtotal;
-    public $serviceIds;
+    public $services;
+    public $phone;
 
     public function __construct(
         $customerId,
@@ -21,7 +22,8 @@ class BookingDTO
         $bookingDate,
         $totalGuests,
         $subtotal,
-        $serviceIds = []
+        $services = [],
+        $phone,
     ) {
         $this->customerId = $customerId;
         $this->membershipId = $membershipId;
@@ -30,6 +32,7 @@ class BookingDTO
         $this->bookingDate = $bookingDate;
         $this->totalGuests = $totalGuests;
         $this->subtotal = $subtotal;
-        $this->serviceIds = $serviceIds;
+        $this->services = $services;
+        $this->phone = $phone;
     }
 }

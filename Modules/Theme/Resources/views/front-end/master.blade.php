@@ -46,7 +46,7 @@
     <meta name="twitter:title" content="{{ $settings['meta_title'] }}" />
     <meta name="twitter:image" content="{{ asset(Storage::url($settings['company_logo'])) }}" />
     <link rel="preconnect" href="//fonts.googleapis.com">
-    <link rel="shortcut icon" href="{{ asset( $settings['company_logo'] ?? 'img/favicon.ico') }}" />
+    <link rel="shortcut icon" href="{{ asset($settings['company_logo'] ?? 'img/favicon.ico') }}" />
 
     <link rel="canonical" href="{{ Request::fullUrl() }}" />
     <link rel="stylesheet" href="{{ asset('css/font-awesome/all.min.css') }}">
@@ -511,6 +511,16 @@
             const serviceIndex = wrapper.children.length;
             const serviceFragment = serviceTemplate.content.cloneNode(true);
 
+            serviceFragment.querySelector('.service-select')
+                .addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const price = selectedOption.dataset.price || 0;
+
+                    const priceInput = this.closest('.service-item')
+                        .querySelector('.service-price');
+
+                    priceInput.value = price;
+                });
             serviceFragment.querySelectorAll('[name]').forEach(el => {
                 el.name = el.name.replace(
                     '__SERVICE_NAME__',
@@ -520,8 +530,17 @@
 
             serviceFragment.querySelector('.remove-service')
                 .addEventListener('click', function() {
+                    const serviceItem = this.closest('.service-item').querySelector('.service-select');
+                    removeService(serviceItem.value, serviceItem.selectedOptions[0]?.dataset.price || 0);
                     this.closest('.service-item').remove();
                 });
+
+            function removeService(serviceId, servicePrice) {
+                state.services = state.services.filter(s => s.id !== serviceId);
+                state.subtotal -= +servicePrice;
+
+                renderSummary();
+            }
 
             wrapper.appendChild(serviceFragment);
         };
@@ -536,88 +555,14 @@
         });
 
     });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.remove-service')) return;
+
+        const button = e.target.closest('.remove-service');
+    })
 </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const container = document.getElementById('time-slots');
-        const input = document.getElementById('booking-time');
 
-        const startHour = 9;
-        const endHour = 23;
-        const step = 15;
-
-        const disabledTimes = [];
-
-        const baseClass =
-            'border rounded-lg py-2 text-sm font-medium transition text-center';
-        const normalClass =
-            'text-slate-500 hover:border-blue-500 hover:text-blue-600';
-        const activeClass =
-            'bg-blue-600 text-white border-blue-600';
-        const disabledClass =
-            'bg-slate-100 text-slate-300 cursor-not-allowed';
-
-        const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-        function pad(n) {
-            return n.toString().padStart(2, '0');
-        }
-
-        function timeToMinutes(time) {
-            const [h, m] = time.split(':').map(Number);
-            return h * 60 + m;
-        }
-
-        function isPastTime(time) {
-            return timeToMinutes(time) <= currentMinutes;
-        }
-
-        function render() {
-            if (!container) return;
-            container.innerHTML = '';
-
-            for (let h = startHour; h <= endHour; h++) {
-                for (let m = 0; m < 60; m += step) {
-                    if (h === endHour && m > 45) break;
-
-                    const time = `${pad(h)}:${pad(m)}`;
-                    const btn = document.createElement('button');
-
-                    btn.type = 'button';
-                    btn.textContent = time;
-                    btn.dataset.time = time;
-
-                    const disabled =
-                        disabledTimes.includes(time) || isPastTime(time);
-
-                    btn.className = `${baseClass} ${
-                    disabled ? disabledClass : normalClass
-                }`;
-
-                    btn.disabled = disabled;
-
-                    if (!disabled) {
-                        btn.addEventListener('click', () => {
-                            document.querySelectorAll('[data-time]').forEach(b => {
-                                b.classList.remove(...activeClass.split(' '));
-                                b.classList.add(...normalClass.split(' '));
-                            });
-
-                            btn.classList.remove(...normalClass.split(' '));
-                            btn.classList.add(...activeClass.split(' '));
-                            input.value = time;
-                        });
-                    }
-
-                    container.appendChild(btn);
-                }
-            }
-        }
-
-        render();
-    });
-</script>
 
 <script>
     document.addEventListener('change', function(e) {
@@ -643,7 +588,6 @@
         fetch(`/api/services?service_category_id=${categoryId}`)
             .then(res => res.json())
             .then(services => {
-                console.log('service: ', services);
                 let options = '<option value="">Chọn dịch vụ</option>';
 
                 services.data.forEach(service => {
@@ -730,9 +674,7 @@
 
                 <div>
                     <p class="font-medium text-gray-800">${room.name}</p>
-                    <p class="text-sm text-slate-500">
-                        Sức chứa ${room.capacity} người
-                    </p>
+                   
                 </div>
             </div>
 
@@ -750,13 +692,21 @@
                 icon: 'success',
                 title: 'Đặt lịch thành công 🎉',
                 html: `
-                    <p class="text-md text-gray-600">
-                        Chúng tôi đã ghi nhận lịch hẹn của bạn.<br>
-                        Nhân viên sẽ liên hệ xác nhận sớm nhất.
-                    </p>
+                    <div style="font-size:15px; line-height:1.6;">
+                        <p>
+                            Chúng tôi đã ghi nhận lịch hẹn của bạn.
+                        </p>
+                        <p>
+                            📩 Email xác nhận đã được gửi đến địa chỉ của bạn.
+                        </p>
+                        <p style="color:#666;">
+                            Vui lòng kiểm tra hộp thư đến (Inbox) 
+                            hoặc thư rác (Spam) nếu chưa thấy email.
+                        </p>
+                    </div>
                 `,
-                timer: 2500,
-                showConfirmButton: false,
+                confirmButtonText: 'Đã hiểu',
+                confirmButtonColor: '#d4a373'
             });
         });
     </script>
@@ -777,6 +727,9 @@
         discount: 0,
         promotionId: null,
         services: [],
+        branchId: null,
+        branchRoomTypeId: null,
+        phone: null,
     };
     const qs = (s, p = document) => p.querySelector(s);
     const qsa = (s, p = document) => [...p.querySelectorAll(s)];
@@ -804,7 +757,8 @@
             state.discount ? `-${money(state.discount)}` : '0đ'
         );
 
-        const total = state.subtotal + state.roomFee - state.discount;
+        const total = (state.subtotal - state.discount) > 0 ? (state.subtotal - state.discount + state.roomFee) : state
+            .roomFee;
         state.total = total;
         setText('#summary-total', money(state.total));
     }
@@ -817,10 +771,14 @@
                     .querySelector('span').innerText.trim();
 
                 state.branch = label;
+                state.branchId = radio.value;
                 renderSummary();
             });
         });
 
+        qs('#customer-phone')?.addEventListener('input', e => {
+            state.phone = e.target.value.trim();
+        });
         qs('#booking-date')?.addEventListener('change', e => {
             state.date = e.target.value;
             renderSummary();
@@ -851,11 +809,16 @@
             state.services = [];
             qsa('.service-select').forEach(select => {
                 const opt = select.selectedOptions[0];
+                const servicePrice = opt.dataset.price;
+
                 if (opt && opt.dataset.price) {
-                    state.services.push(opt.value);
+
+                    state.services.push({
+                        id: opt.value,
+                        price: +servicePrice
+                    });
                     const price = Number(opt?.dataset?.price || 0);
                     subtotal += price;
-
                 }
             });
 
@@ -871,6 +834,7 @@
 
             state.room = e.target.dataset.name;
             state.roomFee = Number(e.target.dataset.fee || 0);
+            state.branchRoomTypeId = e.target.value;
 
             renderSummary();
         });
@@ -887,18 +851,32 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const applyPromoBtn = document.getElementById('apply-promo');
+        const codeInput = document.getElementById('promo-code');
+        const messageEl = document.getElementById('promo-message');
+        let debounceTimer = null;
         if (applyPromoBtn) {
             applyPromoBtn.addEventListener('click', applyPromotion);
         }
+        codeInput.addEventListener('input', function() {
+
+            clearTimeout(debounceTimer);
+
+            const code = this.value.trim();
+
+            if (!code) {
+                resetPromotion(false);
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                applyPromotion();
+            }, 800);
+        });
 
         async function applyPromotion() {
-            const codeInput = document.getElementById('promo-code');
-            const messageEl = document.getElementById('promo-message');
-
             const code = codeInput.value.trim();
 
             if (!code) {
-
                 showPromoMessage('Vui lòng nhập mã giảm giá', false);
                 return;
             }
@@ -917,12 +895,18 @@
                         customer_id: {{ auth()->guard('customer')->check() ? auth()->guard('customer')->user()->id : 'null' }},
                         discount_code: code,
                         subtotal: state.subtotal,
-                        room_fee: state.roomFee
+                        room_fee: state.roomFee,
+                        branch_id: state.branchId,
+                        room_type_id: state.branchRoomTypeId,
+                        booking_date: state.date,
+                        total_guests: state.guests,
+                        phone: state.phone,
                     })
                 });
 
 
                 const data = await res.json();
+                console.log('data apply promo', data);
                 if (!res.ok) throw data;
 
                 state.discount = data.discount;
@@ -952,8 +936,26 @@
 
             renderSummary();
 
-            document.getElementById('promo-code').value = '';
+            messageEl.classList.add('hidden');
+
         }
+
+        const bookingTriggers = [
+            '#guest-count',
+            'input[name="branch_id"]',
+            '#booking-date',
+            '#booking-time',
+            '#room-type-container'
+        ];
+
+        bookingTriggers.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.addEventListener('change', () => {
+                    resetPromotion(false);
+                });
+            });
+        });
+
 
         function showPromoMessage(text, success = true) {
             const el = document.getElementById('promo-message');
@@ -964,8 +966,137 @@
             el.innerText = text;
         }
     });
-</script>
 
+    function invalidatePromotion() {
+        if (!state.promotionId) return;
+        console.log('reset lại promo')
+        state.discount = 0;
+        state.promotionId = null;
+        state.total = state.subtotal + state.roomFee;
+
+        renderSummary();
+        showPromoMessage('Mã giảm giá đã bị hủy do thay đổi thông tin đặt lịch', false);
+    }
+
+    const bookingForm = document.getElementById('booking');
+
+    bookingForm.addEventListener('change', function(e) {
+        // console.log("có change nhá:");
+        if (e.target.closest('#promo-code')) return;
+
+        if (e.target.closest('#apply-promo')) return;
+
+        invalidatePromotion();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const container = document.getElementById('time-slots');
+        const input = document.getElementById('booking-time');
+        const dateInput = document.getElementById('booking-date');
+        const branchInputs = document.querySelectorAll('input[name="branch_id"]');
+
+        const step = 15;
+
+        function pad(n) {
+            return n.toString().padStart(2, '0');
+        }
+
+        function timeToMinutes(time) {
+            const [h, m] = time.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function isToday(selectedDate) {
+            const today = new Date();
+            const [d, m, y] = selectedDate.split('/');
+            const selected = new Date(y, m - 1, d);
+
+            return (
+                selected.getFullYear() === today.getFullYear() &&
+                selected.getMonth() === today.getMonth() &&
+                selected.getDate() === today.getDate()
+            );
+        }
+
+        function getCurrentMinutes() {
+            const now = new Date();
+            return now.getHours() * 60 + now.getMinutes();
+        }
+
+        function render(openTime, closeTime, disabledTimes = []) {
+
+            container.innerHTML = '';
+
+            const startMinutes = timeToMinutes(openTime);
+            const endMinutes = timeToMinutes(closeTime);
+
+            const isTodaySelected = isToday(dateInput.value);
+            const currentMinutes = getCurrentMinutes();
+
+            for (let minutes = startMinutes; minutes <= endMinutes; minutes += step) {
+
+                const h = Math.floor(minutes / 60);
+                const m = minutes % 60;
+                const time = `${pad(h)}:${pad(m)}`;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = time;
+                btn.dataset.time = time;
+
+                let disabled = disabledTimes.includes(time);
+
+                if (isTodaySelected && minutes <= currentMinutes) {
+                    disabled = true;
+                }
+
+                btn.className =
+                    'border rounded-lg py-2 text-sm font-medium text-center transition ' +
+                    (disabled ?
+                        'bg-slate-100 text-slate-300 cursor-not-allowed' :
+                        'text-slate-600 hover:border-blue-500 hover:text-blue-600');
+
+                btn.disabled = disabled;
+
+                if (!disabled) {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-time]').forEach(b => {
+                            b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                        });
+
+                        btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                        input.value = time;
+                    });
+                }
+
+                container.appendChild(btn);
+            }
+        }
+
+        function fetchAvailableTimes() {
+
+            const branch = document.querySelector('input[name="branch_id"]:checked');
+            const date = dateInput.value;
+
+            if (!branch || !date) return;
+
+            fetch(`/api/ajax/branch-available-times?branch_id=${branch.value}&date=${date}`)
+                .then(res => res.json())
+                .then(data => {
+                    render(data.open_time, data.close_time, data.disabled_times);
+                });
+        }
+
+        branchInputs.forEach(input => {
+            input.addEventListener('change', fetchAvailableTimes);
+        });
+
+        dateInput.addEventListener('change', fetchAvailableTimes);
+
+    });
+</script>
 
 
 

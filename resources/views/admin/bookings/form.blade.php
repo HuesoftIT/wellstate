@@ -9,183 +9,201 @@
 
     <table class="table table-condensed">
 
-        {{-- Danh mục dịch vụ --}}
-        <tr class="row {{ $errors->has('service_category_id') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('service_category_id', 'Danh mục dịch vụ', ['class' => 'control-label label-required']) !!}
+        {{-- Thông tin khách --}}
+        <tr>
+            <td width="30%">
+                <label class="control-label label-required">Họ tên</label>
             </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::select('service_category_id', $categories, null, [
-                    'class' => 'form-control input-sm',
-                    'required',
-                    'placeholder' => '-- Chọn danh mục --',
-                ]) !!}
-                {!! $errors->first('service_category_id', '<p class="help-block">:message</p>') !!}
+            <td>
+                <input type="text" name="customer_name" class="form-control input-sm" required>
             </td>
         </tr>
 
-        {{-- Tên dịch vụ --}}
-        <tr class="row {{ $errors->has('name') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('name', 'Tên dịch vụ', ['class' => 'control-label label-required']) !!}
+        <tr>
+            <td>
+                <label class="control-label label-required">Số điện thoại</label>
             </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::text('name', null, ['class' => 'form-control input-sm', 'required']) !!}
-                {!! $errors->first('name', '<p class="help-block">:message</p>') !!}
+            <td>
+                <input type="text" name="customer_phone" class="form-control input-sm" required>
             </td>
         </tr>
 
-        {{-- Combo --}}
-        <tr class="row">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('is_combo', 'Là combo?', ['class' => 'control-label']) !!}
+        <tr>
+            <td>
+                <label class="control-label label-required">Số khách</label>
             </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::checkbox('is_combo', 1, isset($service) ? $service->is_combo : false, ['class' => 'flat-blue']) !!}
-            </td>
-        </tr>
-
-        {{-- Chọn dịch vụ cho combo --}}
-        <tr class="row combo-section" style="display:none">
-            <td class="col-md-4 col-lg-3">
-                <label class="control-label label-required">Dịch vụ trong combo</label>
-            </td>
-            <td class="col-md-8 col-lg-9">
-                <table class="table table-bordered" id="combo-services-table">
-                    <thead>
-                        <tr>
-                            <th>Dịch vụ</th>
-                            <th width="100">Số lượng</th>
-                            <th width="120">Thời gian (phút)</th>
-                            <th width="150">Giá</th>
-                            <th width="50"></th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-
-                <button type="button" class="btn btn-sm btn-primary" id="add-combo-service">
-                    <i class="fa fa-plus"></i> Thêm dịch vụ
-                </button>
+            <td>
+                <input type="number" id="guest_count" name="guest_count" min="1" value="1"
+                    class="form-control input-sm">
             </td>
         </tr>
 
-
-
-        {{-- Hình ảnh --}}
-        <tr class="row {{ $errors->has('image') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('image', trans('news.image'), ['class' => 'control-label']) !!}
+        {{-- Chi nhánh --}}
+        <tr>
+            <td>
+                <label class="control-label label-required">Chi nhánh</label>
             </td>
-            <td class="col-md-8 col-lg-9">
-                <div>
-                    <div class="input-group inputfile-wrap ">
-                        <input type="text" class="form-control input-sm" readonly>
-                        <div class="input-group-btn">
-                            <button type="button" class="btn btn-danger btn-sm">
-                                <i class=" fa fa-upload"></i>
-                                {{ __('message.upload') }}
-                            </button>
-                            {!! Form::file(
-                                'image',
-                                array_merge(['id' => 'image', 'class' => 'form-control input-sm', 'accept' => 'image/*']),
-                            ) !!}
+            <td>
+                <select name="branch_id" id="branch_id" class="form-control input-sm" required>
+                    <option value="">-- Chọn chi nhánh --</option>
+                    @foreach ($branches as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
+                    @endforeach
+                </select>
+            </td>
+        </tr>
+
+        {{-- Ngày --}}
+        <tr>
+            <td>
+                <label class="control-label label-required">Ngày</label>
+            </td>
+            <td>
+                <input id="booking_date" type="date" name="booking_date" min="{{ now()->format('Y-m-d') }}"
+                    class="form-control input-sm" required>
+            </td>
+        </tr>
+
+        {{-- Giờ --}}
+        <tr>
+            <td>
+                <label class="control-label label-required">Giờ</label>
+            </td>
+            <td>
+                <div id="time-slots" class="grid grid-cols-4 sm:grid-cols-6 gap-3"></div>
+
+                <input type="hidden" name="booking_time" id="booking_time">
+            </td>
+        </tr>
+
+        {{-- Loại phòng --}}
+        <tr>
+            <td class="align-middle" width="25%">
+                <label class="control-label label-required">Loại phòng</label>
+            </td>
+            <td>
+                <select name="room_type_id" id="room_type_id" class="form-control input-sm" required>
+                    <option value="">-- Vui lòng chọn chi nhánh --</option>
+                </select>
+            </td>
+        </tr>
+
+        <tr id="guest-services-row">
+            <td class="align-top">
+                <label class="control-label">Dịch vụ theo khách</label>
+            </td>
+            <td>
+                <div id="guests-container"></div>
+                {{-- <div class="guest-services-container">
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">
+                            Tên khách
+                        </label>
+                        <div class="col-sm-6">
+                            <input type="text" name="guest_names[]" class="form-control input-sm"
+                                placeholder="Tên khách (tùy chọn)">
                         </div>
-                        {!! $errors->first('image', '<p class="help-block">:message</p>') !!}
                     </div>
-                    <div class="clearfix"></div>
-                    <div class="imgprev-wrap" style="display:{{ !empty($service->image) ? 'block' : 'none' }}">
-                        <input type="hidden" value="" name="img-hidden" />
-                        <img class="img-preview"
-                            src="{{ !empty($service->image) ? Storage::url($service->image) : '' }}"
-                            alt="{{ trans('service.image') }}" />
-                        <i class="fa fa-trash text-danger"></i>
+
+                    <div class="guest-service-item panel panel-default mb-3">
+
+                        <div class="form-group row">
+                            <label class="col-sm-1 col-form-label">
+                                Loại dịch vụ
+                            </label>
+                            <div class="col-sm-4">
+                                <select name="guests[0][services][0][service_category_id]"
+                                    class="form-control input-sm">
+                                    <option value="">-- Chọn loại dịch vụ --</option>
+                                    @foreach ($serviceCategories as $category)
+                                        <option value="{{ $category->id }}">
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <label class="col-sm-1 col-form-label">
+                                Dịch vụ
+                            </label>
+                            <div class="col-sm-5">
+                                <select name="guest_services[]" class="form-control input-sm">
+                                    <option value="">-- Chọn dịch vụ --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-sm-1 text-right">
+                                <button type="button" class="btn btn-danger btn-sm remove-service">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
+
+
+
+                </div> --}}
+                {{-- Add Button --}}
+                <div class="text-left">
+                    <button type="button" id="add-guest" class="btn btn-primary btn-sm">
+                        <i class="fa fa-plus"></i> Thêm khách
+                    </button>
                 </div>
             </td>
         </tr>
-
-        {{-- Slug --}}
-        {{-- <tr class="row {{ $errors->has('slug') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('slug', 'Slug', ['class' => 'control-label']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::text('slug', null, ['class' => 'form-control input-sm']) !!}
-                <small class="text-muted">Để trống sẽ tự sinh theo tên</small>
-                {!! $errors->first('slug', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr> --}}
-
-        {{-- Thời gian --}}
-        <tr class="row {{ $errors->has('duration') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('duration', 'Thời gian (phút)', ['class' => 'control-label label-required']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::number('duration', null, ['class' => 'form-control input-sm', 'required', 'min' => 1]) !!}
-                {!! $errors->first('duration', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr>
-
-        {{-- Giá --}}
-        <tr class="row {{ $errors->has('price') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('price_display', 'Giá (VND)', ['class' => 'control-label label-required']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                <input type="text" id="price_display" class="form-control input-sm money-input"
-                    value="{{ old('price', isset($service) ? number_format($service->price) : '') }}"
-                    autocomplete="off">
-
-                <input type="hidden" name="price" id="price">
-
-                {!! $errors->first('price', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr>
-
-
-        {{-- Giá khuyến mãi --}}
-        <tr class="row {{ $errors->has('sale_price') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('sale_price_display', 'Giá khuyến mãi (VND)', ['class' => 'control-label']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                <input type="text" id="sale_price_display" class="form-control input-sm money-input"
-                    value="{{ old('sale_price', isset($service) && $service->sale_price ? number_format($service->sale_price) : '') }}"
-                    autocomplete="off">
-
-                <input type="hidden" name="sale_price" id="sale_price">
-
-                {!! $errors->first('sale_price', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr>
-
-
-
-
-        {{-- Mô tả --}}
-        <tr class="row {{ $errors->has('description') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('description', 'Mô tả', ['class' => 'control-label']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::textarea('description', null, ['class' => 'form-control input-sm', 'rows' => 5]) !!}
-                {!! $errors->first('description', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr>
-
-        {{-- Kích hoạt --}}
-        <tr class="row">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('is_active', 'Kích hoạt', ['class' => 'control-label']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::checkbox('is_active', 1, isset($service) ? $service->is_active : true, ['class' => 'flat-blue']) !!}
-            </td>
-        </tr>
-
     </table>
+    <template id="guest-template">
+        <div class="guest-item panel panel-default p-3 mb-3">
+
+            <h4>Khách <span class="guest-index"></span></h4>
+
+            <div class="form-group">
+                <label>Tên khách</label>
+                <input type="text" class="form-control guest-name">
+            </div>
+
+            <div class="services-container"></div>
+
+            <button type="button" class="btn btn-primary btn-sm add-service">
+                <i class="fa fa-plus"></i> Thêm dịch vụ
+            </button>
+
+            <button type="button" class="btn btn-danger btn-sm remove-guest">
+                <i class="fa fa-trash"></i> Xóa khách
+            </button>
+
+        </div>
+    </template>
+    <template id="service-template">
+        <div class="service-item row mb-2">
+
+            <div class="col-sm-4">
+                <select class="form-control service-category">
+                    <option value="">Chọn loại dịch vụ</option>
+                    @foreach ($serviceCategories as $category)
+                        <option value="{{ $category->id }}">
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-sm-6">
+                <select class="form-control service-select" disabled>
+                    <option value="">Chọn dịch vụ</option>
+                </select>
+            </div>
+
+            <div class="col-sm-2 text-right">
+                <button type="button" class="btn btn-danger btn-sm remove-service">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+        </div>
+    </template>
 </div>
 
 
@@ -253,215 +271,267 @@
         });
     </script>
     <script>
-        window.servicesData = @json($servicesForCombo);
+        flatpickr("#booking_date", {
+            dateFormat: "d/m/Y",
+            minDate: "today",
+            locale: "vn",
+            disableMobile: true,
+            todayBtn: true,
+            allowInput: false
+        });
     </script>
     <script>
-        window.existingComboItems = @json(isset($service) && $service->is_combo
-                ? $service->comboItems->map(fn($item) => [
-                        'service_id' => $item->service_id,
-                        'quantity' => $item->quantity,
-                    ]
-        )
-                : []
-        );
-    </script>
+        document.addEventListener('DOMContentLoaded', function() {
 
-    <script>
-        $(function() {
+            const branchSelect = document.getElementById('branch_id');
+            const roomTypeSelect = document.getElementById('room_type_id');
 
-            function toggleCombo() {
-                if ($('[name="is_combo"]').is(':checked')) {
-                    console.log('123e')
-                    $('.combo-section').show();
-                } else {
-                    $('.combo-section').hide();
+            branchSelect.addEventListener('change', function() {
+                const branchId = this.value;
+
+                roomTypeSelect.innerHTML = '<option value="">Đang tải...</option>';
+
+                if (!branchId) {
+                    roomTypeSelect.innerHTML = '<option value="">-- Chọn loại phòng --</option>';
+                    return;
                 }
-            }
-            toggleCombo();
-            $('[name="is_combo"]').on('ifChanged', function() {
-                toggleCombo();
-            });
 
-            function serviceOptions(excludeIds = []) {
-                return servicesData
-                    .filter(s => !excludeIds.includes(String(s.id)))
-                    .map(s => `
-            <option value="${s.id}" data-price="${s.price}" data-duration="${s.duration}">
-                ${s.name}
-            </option>
-        `)
-                    .join('');
-            }
+                fetch(`/api/ajax/branches/${branchId}/room-types`)
+                    .then(res => res.json())
+                    .then(data => {
 
-            $('#add-combo-service').click(function() {
-                const index = Date.now();
-
-                const row = $(`
-                    <tr>
-                        <td>
-                            <select name="combo_items[${index}][service_id]"
-                                    class="form-control select2 service-select"
-                                    style="width:100%">
-                                <option value="">-- Chọn dịch vụ --</option>
-                                ${serviceOptions()}
-                            </select>
-                        </td>
-                        <td>
-                            <input type="number"
-                                name="combo_items[${index}][quantity]"
-                                class="form-control qty"
-                                value="1" min="1">
-                        </td>
-                        <td class="duration">0</td>
-                        <td class="price">0</td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm remove-row">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    `);
-
-                $('#combo-services-table tbody').append(row);
-
-                row.find('.select2').select2({
-                    placeholder: 'Chọn dịch vụ',
-                    allowClear: true
-                });
-
-                updateServiceOptions();
-            });
-
-
-            function recalcCombo() {
-                let totalPrice = 0;
-                let totalDuration = 0;
-
-                $('#combo-services-table tbody tr').each(function() {
-                    const select = $(this).find('.service-select option:selected');
-                    const qty = parseInt($(this).find('.qty').val()) || 1;
-
-                    const price = parseFloat(select.data('price') || 0) * qty;
-                    const duration = parseInt(select.data('duration') || 0) * qty;
-
-                    $(this).find('.price').text(price.toLocaleString());
-                    $(this).find('.duration').text(duration);
-
-                    totalPrice += price;
-                    totalDuration += duration;
-                });
-
-                $('#price_display').val(totalPrice.toLocaleString());
-                $('#price').val(totalPrice);
-
-                $('#duration').val(totalDuration);
-            }
-
-            function updateServiceOptions() {
-                let selectedIds = [];
-
-                $('.service-select').each(function() {
-                    if ($(this).val()) {
-                        selectedIds.push($(this).val());
-                    }
-                });
-
-                $('.service-select').each(function() {
-                    let select = $(this);
-                    let currentValue = select.val();
-
-                    let html = `
-            <option value="">-- Chọn dịch vụ --</option>
-            ${serviceOptions(selectedIds.filter(id => id !== currentValue))}
-        `;
-
-                    select
-                        .html(html)
-                        .val(currentValue)
-                        .select2({
-                            placeholder: 'Chọn dịch vụ',
-                            allowClear: true,
-                            width: '100%'
+                        roomTypeSelect.innerHTML = '<option value="">-- Chọn loại phòng --</option>';
+                        data = data.data || [];
+                        data.forEach(room => {
+                            const option = document.createElement('option');
+                            option.value = room.id;
+                            option.textContent =
+                                `${room.name} - ${room.price.toLocaleString()}đ`;
+                            roomTypeSelect.appendChild(option);
                         });
-                });
+
+                    })
+                    .catch(() => {
+                        roomTypeSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+                    });
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const container = document.getElementById('time-slots');
+            const input = document.getElementById('booking_time');
+            const dateInput = document.getElementById('booking_date');
+            const branchSelect = document.getElementById('branch_id');
+
+            const step = 15;
+
+            function pad(n) {
+                return n.toString().padStart(2, '0');
             }
 
-            function addComboRow(serviceId = null, quantity = 1) {
-                const index = Date.now() + Math.random();
-
-                const row = $(`
-                    <tr>
-                        <td>
-                            <select name="combo_items[${index}][service_id]"
-                                    class="form-control select2 service-select"
-                                    style="width:100%">
-                                <option value="">-- Chọn dịch vụ --</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="number"
-                                name="combo_items[${index}][quantity]"
-                                class="form-control qty"
-                                value="${quantity}" min="1">
-                        </td>
-                        <td class="duration">0</td>
-                        <td class="price">0</td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm remove-row">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `);
-
-                $('#combo-services-table tbody').append(row);
-
-                const select = row.find('.service-select');
-
-                select.html(`
-        <option value="">-- Chọn dịch vụ --</option>
-        ${serviceOptions()}
-    `);
-
-                select.val(serviceId).select2({
-                    placeholder: 'Chọn dịch vụ',
-                    allowClear: true,
-                    width: '100%'
-                });
-
-                updateServiceOptions();
-                recalcCombo();
+            function timeToMinutes(time) {
+                const [h, m] = time.split(':').map(Number);
+                return h * 60 + m;
             }
 
-            function toggleCombo() {
-                if ($('[name="is_combo"]').is(':checked')) {
-                    $('.combo-section').show();
-                } else {
-                    $('.combo-section').hide();
-                    $('#combo-services-table tbody').empty(); 
+            function isToday(selectedDate) {
+                if (!selectedDate) return false;
+
+                const today = new Date();
+                const [d, m, y] = selectedDate.split('/');
+                const selected = new Date(y, m - 1, d);
+
+                return (
+                    selected.getFullYear() === today.getFullYear() &&
+                    selected.getMonth() === today.getMonth() &&
+                    selected.getDate() === today.getDate()
+                );
+            }
+
+            function getCurrentMinutes() {
+                const now = new Date();
+                return now.getHours() * 60 + now.getMinutes();
+            }
+
+            function render(openTime, closeTime, disabledTimes = []) {
+
+                container.innerHTML = '';
+
+                const startMinutes = timeToMinutes(openTime);
+                const endMinutes = timeToMinutes(closeTime);
+
+                const isTodaySelected = isToday(dateInput.value);
+                const currentMinutes = getCurrentMinutes();
+
+                for (let minutes = startMinutes; minutes <= endMinutes; minutes += step) {
+
+                    const h = Math.floor(minutes / 60);
+                    const m = minutes % 60;
+                    const time = `${pad(h)}:${pad(m)}`;
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = time;
+                    btn.dataset.time = time;
+
+                    let disabled = disabledTimes.includes(time);
+
+                    if (isTodaySelected && minutes <= currentMinutes) {
+                        disabled = true;
+                    }
+
+                    btn.className =
+                        'border rounded-lg py-2 text-sm font-medium text-center transition ' +
+                        (disabled ?
+                            'bg-slate-100 text-slate-300 cursor-not-allowed' :
+                            'text-slate-600 hover:border-blue-500 hover:text-blue-600');
+
+                    btn.disabled = disabled;
+
+                    if (!disabled) {
+                        btn.addEventListener('click', () => {
+                            document.querySelectorAll('[data-time]').forEach(b => {
+                                b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                            });
+
+                            btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                            input.value = time;
+                        });
+                    }
+
+                    container.appendChild(btn);
                 }
             }
 
+            function fetchAvailableTimes() {
 
+                const branch = branchSelect.value;
+                const date = dateInput.value;
 
-            $(document).on('change keyup', '.service-select, .qty', recalcCombo);
-            $(document).on('change', '.service-select', function() {
-                recalcCombo();
-                updateServiceOptions();
-            });
+                if (!branch || !date) {
+                    container.innerHTML = '';
+                    return;
+                }
 
-            $(document).on('click', '.remove-row', function() {
-                $(this).closest('tr').remove();
-                recalcCombo();
-                updateServiceOptions();
-            });
-            if (typeof existingComboItems !== 'undefined' && existingComboItems.length) {
-                $('.combo-section').show();
-
-                existingComboItems.forEach(item => {
-                    addComboRow(item.service_id, item.quantity);
-                });
+                fetch(`/api/ajax/branch-available-times?branch_id=${branch}&date=${date}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        render(data.open_time, data.close_time, data.disabled_times);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
             }
+
+            branchSelect.addEventListener('change', fetchAvailableTimes);
+            dateInput.addEventListener('change', fetchAvailableTimes);
+
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const guestsContainer = document.getElementById('guests-container');
+            const guestTemplate = document.getElementById('guest-template');
+            const serviceTemplate = document.getElementById('service-template');
+            const addGuestBtn = document.getElementById('add-guest');
+            const guestCountInput = document.getElementById('guest_count');
+
+            function updateIndexes() {
+                const guests = guestsContainer.querySelectorAll('.guest-item');
+
+                guests.forEach((guest, gIndex) => {
+
+                    guest.querySelector('.guest-index').innerText = gIndex + 1;
+
+                    const nameInput = guest.querySelector('.guest-name');
+                    nameInput.name = `guests[${gIndex}][name]`;
+
+                    guest.querySelectorAll('.service-item').forEach((service, sIndex) => {
+
+                        service.querySelector('.service-category')
+                            .name = `guests[${gIndex}][services][${sIndex}][service_category_id]`;
+
+                        service.querySelector('.service-select')
+                            .name = `guests[${gIndex}][services][${sIndex}][service_id]`;
+
+                    });
+                });
+
+                guestCountInput.value = guests.length || 1;
+            }
+
+            function addGuest() {
+                const clone = guestTemplate.content.cloneNode(true);
+                guestsContainer.appendChild(clone);
+                updateIndexes();
+            }
+
+            function removeLastGuest() {
+                const guests = guestsContainer.querySelectorAll('.guest-item');
+                if (guests.length > 1) {
+                    guests[guests.length - 1].remove();
+                    updateIndexes();
+                }
+            }
+
+            function syncGuestToCount(count) {
+                const current = guestsContainer.querySelectorAll('.guest-item').length;
+
+                if (count > current) {
+                    for (let i = current; i < count; i++) {
+                        addGuest();
+                    }
+                }
+
+                if (count < current) {
+                    for (let i = current; i > count; i--) {
+                        removeLastGuest();
+                    }
+                }
+            }
+
+            guestCountInput.addEventListener('input', function() {
+                let count = parseInt(this.value) || 1;
+
+                if (count < 1) count = 1;
+
+                syncGuestToCount(count);
+            });
+
+            addGuestBtn.addEventListener('click', function() {
+                addGuest();
+            });
+
+            guestsContainer.addEventListener('click', function(e) {
+
+                if (e.target.closest('.remove-guest')) {
+                    const guests = guestsContainer.querySelectorAll('.guest-item');
+
+                    if (guests.length > 1) {
+                        e.target.closest('.guest-item').remove();
+                        updateIndexes();
+                    }
+                }
+
+                if (e.target.closest('.add-service')) {
+                    const guestItem = e.target.closest('.guest-item');
+                    const clone = serviceTemplate.content.cloneNode(true);
+                    guestItem.querySelector('.services-container').appendChild(clone);
+                    updateIndexes();
+                }
+
+                if (e.target.closest('.remove-service')) {
+                    e.target.closest('.service-item').remove();
+                    updateIndexes();
+                }
+
+            });
+
+            syncGuestToCount(parseInt(guestCountInput.value) || 1);
 
         });
     </script>

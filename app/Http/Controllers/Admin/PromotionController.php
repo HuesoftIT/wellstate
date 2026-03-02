@@ -96,7 +96,7 @@ class PromotionController extends Controller
                 'type'   => 'service',
                 'order'  => 1,
                 'config' => [
-                    'mode' => 'only',
+                    'mode' => 'include',
                     'ids'  => array_map('intval', $request->service_ids),
                 ],
             ]);
@@ -226,7 +226,7 @@ class PromotionController extends Controller
             ->unique()
             ->toArray();
 
-        $users = \App\Models\Customer::whereIn('id', $userIds)->get();
+        $users = Customer::whereIn('id', $userIds)->get();
 
         $serviceIds = $promotion->rules
             ->where('type', 'service')
@@ -235,7 +235,7 @@ class PromotionController extends Controller
             ->unique()
             ->toArray();
 
-        $services = \App\Models\Service::whereIn('id', $serviceIds)->get();
+        $services = Service::whereIn('id', $serviceIds)->get();
 
         $membershipIds = $promotion->rules
             ->where('type', 'membership')
@@ -244,7 +244,7 @@ class PromotionController extends Controller
             ->unique()
             ->toArray();
 
-        $memberships = \App\Models\Membership::whereIn('id', $membershipIds)->get();
+        $memberships = Membership::whereIn('id', $membershipIds)->get();
 
         $backUrl = $request->get('back_url');
 

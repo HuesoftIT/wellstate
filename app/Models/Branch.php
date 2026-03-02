@@ -31,8 +31,6 @@ class Branch extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'open_time' => 'datetime:H:i',
-        'close_time' => 'datetime:H:i',
         'latitude' => 'float',
         'longitude' => 'float',
     ];

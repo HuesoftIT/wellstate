@@ -15,7 +15,7 @@ class PromotionService
     /**
      * ENTRY POINT
      */
-    public function apply(?string $code, BookingDTO $booking): array
+    public function apply($code, BookingDTO $booking)
     {
         if (empty($code)) {
             return $this->emptyResult();
@@ -27,20 +27,50 @@ class PromotionService
         $this->validateRules($promotion, $booking);
         $this->validateUserUsage($promotion, $booking);
 
-        $discount = $this->calculateDiscount($promotion, $booking->subtotal);
+        $eligibleAmount = $this->getEligibleAmount($promotion, $booking);
+
+        if ($eligibleAmount <= 0) {
+            throw new Exception('Không có dịch vụ hợp lệ để áp dụng khuyến mãi');
+        }
+        $discount = $this->calculateDiscount($promotion, $eligibleAmount);
 
         return [
             'promotion' => $promotion,
             'discount'  => $discount,
+            'eligible_amount' => $eligibleAmount,
         ];
     }
+    protected function getEligibleAmount(Promotion $promotion, BookingDTO $booking)
+    {
+        $amount = 0;
 
+        foreach ($promotion->rules as $rule) {
+            if ($rule->type === 'service') {
+
+                $config = $rule->config ?? [];
+                $ruleIds = $config['ids'] ?? [];
+
+                foreach ($booking->services as $service) {
+                    if (in_array($service['id'], $ruleIds)) {
+                        $amount += $service['price'];
+                    }
+                }
+            }
+        }
+
+        // Nếu không có service rule -> áp cho toàn bộ booking
+        if ($amount == 0) {
+            return $booking->subtotal;
+        }
+
+        return $amount;
+    }
     /**
      * ===== FIND & BASIC VALIDATE =====
      */
     protected function findValidPromotion(string $code): Promotion
     {
-        $code = trim(mb_strtolower($code));
+        $code = trim($code);
         $promotion = Promotion::active()->where('discount_code', $code)
             ->first();
 
@@ -65,7 +95,7 @@ class PromotionService
     protected function validateBase(
         Promotion $promotion,
         BookingDTO $booking
-    ): void {
+    ) {
         if (
             $promotion->discount_min_order_value &&
             $booking->subtotal < $promotion->discount_min_order_value
@@ -86,9 +116,9 @@ class PromotionService
     /**
      * ===== PER USER LIMIT =====
      */
-    protected function validateUserUsage(Promotion $promotion, BookingDTO $booking): void
+    protected function validateUserUsage(Promotion $promotion, BookingDTO $booking)
     {
-        if (! $promotion->discount_max_uses_per_user || ! $booking->customerId) {
+        if (! $promotion->discount_max_uses_per_user || ! $booking->customerId || !$booking->phone) {
             return;
         }
 
@@ -105,7 +135,7 @@ class PromotionService
     /**
      * ===== RULES =====
      */
-    protected function validateRules(Promotion $promotion, BookingDTO $booking): void
+    protected function validateRules(Promotion $promotion, BookingDTO $booking)
     {
         foreach ($promotion->rules()->get() as $rule) {
             if (! $this->checkRule($rule, $booking)) {
@@ -114,7 +144,7 @@ class PromotionService
         }
     }
 
-    protected function checkRule(PromotionRule $rule, BookingDTO $booking): bool
+    protected function checkRule(PromotionRule $rule, BookingDTO $booking)
     {
         $config = $rule->config ?? [];
 
@@ -140,20 +170,25 @@ class PromotionService
     /**
      * ===== SERVICE RULE =====
      */
-    protected function checkServiceRule(array $config, BookingDTO $booking): bool
+    protected function checkServiceRule(array $config, BookingDTO $booking)
     {
         $ruleIds = $config['ids'] ?? [];
-        $mode = $config['mode'] ?? 'only';
+        $mode = $config['mode'] ?? 'include';
 
-        return $mode === 'only'
-            ? empty(array_diff($booking->serviceIds, $ruleIds))
-            : empty(array_intersect($booking->serviceIds, $ruleIds));
+        $bookingServiceIds = array_map('intval', array_column($booking->services, 'id'));
+        $ruleIds = array_map('intval', $ruleIds);
+
+        if ($mode === 'only') {
+            return empty(array_diff($bookingServiceIds, $ruleIds));
+        }
+
+        return !empty(array_intersect($bookingServiceIds, $ruleIds));
     }
 
     /**
      * ===== MEMBERSHIP RULE =====
      */
-    protected function checkMembershipRule(array $config, BookingDTO $booking): bool
+    protected function checkMembershipRule(array $config, BookingDTO $booking)
     {
         if (! $booking->membershipId) {
             return false;
@@ -164,7 +199,7 @@ class PromotionService
     /**
      * ===== USER RULE =====
      */
-    protected function checkUserRule(array $config, BookingDTO $booking): bool
+    protected function checkUserRule(array $config, BookingDTO $booking)
     {
         if (! $booking->customerId) {
             return false;
@@ -184,7 +219,7 @@ class PromotionService
     /**
      * ===== BIRTHDAY RULE =====
      */
-    protected function checkBirthdayRule(array $config, BookingDTO $booking): bool
+    protected function checkBirthdayRule(array $config, BookingDTO $booking)
     {
         return false;
     }
@@ -192,7 +227,7 @@ class PromotionService
     /**
      * ===== DISCOUNT =====
      */
-    protected function calculateDiscount(Promotion $promotion, float $subtotal): float
+    protected function calculateDiscount(Promotion $promotion, $subtotal)
     {
         $discount = $promotion->discount_type === 'percent'
             ? $subtotal * ($promotion->discount_value / 100)

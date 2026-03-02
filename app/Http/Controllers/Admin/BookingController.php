@@ -4,17 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\DTO\BookingDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreBookingRequest;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Models\{
     Booking,
-    Promotion
+    Promotion,
+    ServiceCategory
 };
 use App\Services\BookingService;
 use Illuminate\Support\Facades\DB;
 use App\Services\Promotion\PromotionService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingSuccessMail;
 
 class BookingController extends Controller
 {
@@ -29,9 +33,10 @@ class BookingController extends Controller
         $this->promotionService = $promotionService;
     }
 
-    public function booking(Request $request)
+    public function booking(StoreBookingRequest $request)
     {
-        DB::transaction(function () use ($request) {
+       
+        $booking = DB::transaction(function () use ($request) {
             //1. Count time
             [$startTime, $endTime, $maxDuration] = $this->bookingService->calculateBookingTime($request);
 
@@ -43,12 +48,18 @@ class BookingController extends Controller
 
             $customer = auth('customer')->user();
 
-            $serviceIds = $booking->guests
-                ->flatMap(function ($g) {
-                    return $g->services->pluck('service_id');
+            $services = $booking->guests
+                ->flatMap(function ($guest) {
+                    return $guest->services->map(function ($service) {
+                        return [
+                            'id' => $service->service_id,
+                            'price' => $service->price,
+                        ];
+                    });
                 })
+                ->values()
                 ->toArray();
-
+            $phone = $request->booker_phone;
             $bookingDTO = new BookingDTO(
                 $customer ? $customer->id : null,
                 $customer ? $customer->membership_id : null,
@@ -57,7 +68,8 @@ class BookingController extends Controller
                 $booking->booking_date,
                 $booking->total_guests,
                 $subtotal,
-                $serviceIds
+                $services,
+                $phone
             );
 
 
@@ -66,8 +78,12 @@ class BookingController extends Controller
 
             //5. complete booking
             $this->bookingService->finalizeBooking($booking, $bookingDTO->subtotal, $totalDuration, $promotionResult);
-        });
 
+            return $booking;
+        });
+        if ($booking && $booking->booker_email) {
+            Mail::to($booking->booker_email)->send(new BookingSuccessMail($booking));
+        }
         return redirect()
             ->route('page.booking')
             ->with('success_booking', 'Đặt lịch thành công!');
@@ -87,7 +103,7 @@ class BookingController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('booking_code', 'like', "%{$search}%")
-                    ->orWhere('booker_name', 'like', "%{$search}%")
+                    ->orWhere('booker_email', 'like', "%{$search}%")
                     ->orWhere('booker_phone', 'like', "%{$search}%");
             });
         }
@@ -115,6 +131,15 @@ class BookingController extends Controller
         $branches = Branch::active()->pluck('name', 'id');
 
         return view('admin.bookings.index', compact('bookings', 'branches'));
+    }
+
+    public function create(Request $request)
+    {
+        $branches = Branch::active()->with('roomTypes')->pluck('name', 'id');
+        $serviceCategories = ServiceCategory::active()->with('services')->get();
+
+
+        return view('admin.bookings.create', compact('branches', 'serviceCategories'));
     }
 
     public function cancel($id)
