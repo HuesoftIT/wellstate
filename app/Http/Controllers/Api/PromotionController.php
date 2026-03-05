@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\DTO\BookingDTO;
 use App\Http\Controllers\Controller;
-use App\Models\Booking;
 use App\Services\Promotion\PromotionService;
 use Illuminate\Http\Request;
 
@@ -29,7 +28,7 @@ class PromotionController extends Controller
     */
     public function apply(Request $request)
     {
-        
+
         $discount_code = $request->discount_code;
         $services = $request->services;
         $room_fee = $request->room_fee;
@@ -44,5 +43,15 @@ class PromotionController extends Controller
 
 
         return $this->promotionService->apply($discount_code, $bookingDTO, $subtotal);
+    }
+
+    public function check(Request $request)
+    {
+        $bookingData = BookingDTO::fromRequest($request);
+
+        $promotions = app(PromotionService::class)
+            ->getAvailablePromotions($bookingData);
+
+        return response()->json($promotions);
     }
 }

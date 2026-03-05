@@ -32,19 +32,18 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                        <!-- Email -->
+                        <!-- Họ và tên -->
                         <div>
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
-                                Email <span class="text-red-500">*</span>
+                                Họ và tên <span class="text-red-500">*</span>
                             </label>
-                            <input type="email" name="booker_email" value="{{ old('booker_email') }}" required autocomplete="email"
-                                placeholder="Ví dụ: example@gmail.com"
-                                class="input h-11 @error('booker_email') border-red-500 @enderror">
-                            @error('booker_email')
+                            <input type="text" name="booker_name" value="{{ old('booker_name') }}" required
+                                autocomplete="name" placeholder="Ví dụ: Nguyễn Văn A"
+                                class="input h-11 @error('booker_name') border-red-500 @enderror">
+                            @error('booker_name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-
                         <!-- Số điện thoại -->
                         <div>
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
@@ -57,6 +56,21 @@
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-[16px] font-medium text-slate-600 mb-1">
+                                Email
+                            </label>
+                            <input type="email" name="booker_email" value="{{ old('booker_email') }}" 
+                                autocomplete="email" placeholder="Ví dụ: example@gmail.com"
+                                class="input h-11 @error('booker_email') border-red-500 @enderror">
+                            @error('booker_email')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+
+
 
                     </div>
 

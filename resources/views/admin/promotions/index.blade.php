@@ -40,7 +40,7 @@
 
                 {{-- Search by name --}}
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control input-sm"
-                    placeholder="{{ __('message.search_keyword') }}" style="width:150px">
+                    placeholder="Nhập tên khuyến mãi / mã khuyến mãi" style="width:150px">
 
                 {{-- Promotion Type --}}
                 {!! Form::select(
@@ -70,9 +70,9 @@
                 <button class="btn btn-secondary btn-sm" type="submit">
                     <i class="fa fa-search"></i> {{ __('message.search') }}
                 </button>
-                <a href="{{ route('promotions.index') }}" class="btn btn-default btn-sm">
+                {{-- <a href="{{ route('promotions.index') }}" class="btn btn-default btn-sm">
                     <i class="fa fa-refresh"></i>Làm mới
-                </a>
+                </a> --}}
 
             </div>
             {!! Form::close() !!}

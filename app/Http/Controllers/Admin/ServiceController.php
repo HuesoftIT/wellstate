@@ -49,7 +49,7 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        $categories  = ServiceCategory::where('is_active', 1)->pluck('title', 'id');
+        $categories  = ServiceCategory::where('is_active', 1)->pluck('name', 'id');
         $servicesForCombo = Service::where('is_combo', false)
             ->where('is_active', true)
             ->get(['id', 'title', 'price', 'duration']);
@@ -96,7 +96,7 @@ class ServiceController extends Controller
             ->where('is_active', true)
             ->get(['id', 'title', 'price', 'duration']);
 
-        $categories = ServiceCategory::pluck('title', 'id');
+        $categories = ServiceCategory::pluck('name', 'id');
 
         return view(
             'admin.services.edit',

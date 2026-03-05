@@ -35,7 +35,6 @@ class BookingController extends Controller
 
     public function booking(StoreBookingRequest $request)
     {
-       
         $booking = DB::transaction(function () use ($request) {
             //1. Count time
             [$startTime, $endTime, $maxDuration] = $this->bookingService->calculateBookingTime($request);
@@ -71,10 +70,15 @@ class BookingController extends Controller
                 $services,
                 $phone
             );
-
+            $promotion_code = null;
+            if ($request->promotion_id) {
+                $promotion_code = Promotion::find($request->promotion_id)->discount_code;
+            } else if ($request->discount_code) {
+                $promotion_code = $request->discount_code;
+            }
 
             //4. apply promotion
-            $promotionResult = $this->promotionService->apply($request->discount_code, $bookingDTO);
+            $promotionResult = $this->promotionService->apply($promotion_code, $bookingDTO);
 
             //5. complete booking
             $this->bookingService->finalizeBooking($booking, $bookingDTO->subtotal, $totalDuration, $promotionResult);
@@ -142,6 +146,15 @@ class BookingController extends Controller
         return view('admin.bookings.create', compact('branches', 'serviceCategories'));
     }
 
+    public function store(StoreBookingRequest $request)
+    {
+        $this->booking($request);
+        Alert::success('Tạo booking thành công');
+
+        return redirect()->route('bookings.index')
+            ->with('success', 'Đặt lịch thành công');
+    }
+
     public function cancel($id)
     {
         $booking = Booking::findOrFail($id);
@@ -149,8 +162,12 @@ class BookingController extends Controller
             'status' => 'cancelled'
         ]);
 
-        return redirect()->route('bookings.index')
+        Alert::success('Đã hủy booking');
+
+        return redirect()->back()
             ->with('success', 'Đã huỷ booking');
+        // return redirect()->route('bookings.index')
+        //     ->with('success', 'Đã huỷ booking');
     }
 
     public function confirm($id)
@@ -159,12 +176,45 @@ class BookingController extends Controller
         $booking->update([
             'status' => 'confirmed'
         ]);
+        Alert::success('Booking đã được xác nhận');
 
-        return redirect()->route('bookings.index')
+        return redirect()->back()
             ->with('success', 'Đã xác nhận booking');
+        // return redirect()->route('bookings.index')
+        //     ->with('success', 'Đã xác nhận booking');
     }
 
+    public function complete($id)
+    {
+        $booking = Booking::findOrFail($id);
 
+        // ❌ Chưa thanh toán thì không cho complete
+        if ($booking->payment_status !== 'paid') {
+            Alert::error('Booking chưa thanh toán, không thể hoàn thành');
+            return back();
+        }
+
+        // ❌ Đã hoàn thành rồi
+        if ($booking->status === 'completed') {
+            Alert::warning('Booking đã được hoàn thành trước đó');
+            return back();
+        }
+
+        // ❌ Booking bị huỷ
+        if ($booking->status === 'cancelled') {
+            Alert::error('Booking đã bị huỷ, không thể hoàn thành');
+            return back();
+        }
+
+        $booking->update([
+            'status' => 'completed',
+        ]);
+
+        Alert::success('Booking đã được hoàn thành');
+
+        return redirect()->back()
+            ->with('success', 'Booking đã được hoàn thành');
+    }
     public function show($id)
     {
         $booking = Booking::with([
@@ -230,36 +280,7 @@ class BookingController extends Controller
         return redirect()->route('admin.bookings.index');
     }
 
-    public function complete($id)
-    {
-        $booking = Booking::findOrFail($id);
 
-        // ❌ Chưa thanh toán thì không cho complete
-        if ($booking->payment_status !== 'paid') {
-            Alert::error('Booking chưa thanh toán, không thể hoàn thành');
-            return back();
-        }
-
-        // ❌ Đã hoàn thành rồi
-        if ($booking->status === 'completed') {
-            Alert::warning('Booking đã được hoàn thành trước đó');
-            return back();
-        }
-
-        // ❌ Booking bị huỷ
-        if ($booking->status === 'cancelled') {
-            Alert::error('Booking đã bị huỷ, không thể hoàn thành');
-            return back();
-        }
-
-        $booking->update([
-            'status' => 'completed',
-        ]);
-
-        Alert::success('Booking đã được hoàn thành');
-
-        return redirect()->route('bookings.show', $booking->id);
-    }
 
 
     public function confirmPayment($id)
@@ -290,6 +311,7 @@ class BookingController extends Controller
 
         Alert::success('Đã xác nhận thanh toán booking');
 
-        return redirect()->route('bookings.index');
+        return redirect()->back();
+        // return redirect()->route('bookings.index');
     }
 }

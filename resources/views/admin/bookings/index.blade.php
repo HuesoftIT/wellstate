@@ -143,9 +143,9 @@
 
                             {{-- BOOKING CODE --}}
                             <td>
-                                <strong class="text-primary">
+                                <a href="{{ route('bookings.show', $item->id)}}" class="text-primary text-bold">
                                     {{ $item->booking_code }}
-                                </strong>
+                                </a>
                             </td>
 
                             {{-- BOOKER --}}

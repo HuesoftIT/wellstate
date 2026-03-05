@@ -692,19 +692,21 @@
                 icon: 'success',
                 title: 'Đặt lịch thành công 🎉',
                 html: `
-                    <div style="font-size:15px; line-height:1.6;">
-                        <p>
-                            Chúng tôi đã ghi nhận lịch hẹn của bạn.
-                        </p>
-                        <p>
-                            📩 Email xác nhận đã được gửi đến địa chỉ của bạn.
-                        </p>
-                        <p style="color:#666;">
-                            Vui lòng kiểm tra hộp thư đến (Inbox) 
-                            hoặc thư rác (Spam) nếu chưa thấy email.
-                        </p>
-                    </div>
-                `,
+                <div style="font-size:15px; line-height:1.6;">
+                    <p>
+                        Chúng tôi đã ghi nhận lịch hẹn của bạn.
+                    </p>
+                    <p>
+                        📞 Nhân viên của chúng tôi sẽ gọi đến 
+                        <strong>số điện thoại bạn đã cung cấp</strong> 
+                        để xác nhận lịch hẹn trong thời gian sớm nhất.
+                    </p>
+                    <p style="color:#666;">
+                        Vui lòng giữ máy để chúng tôi có thể liên hệ xác nhận.
+                        Xin cảm ơn!
+                    </p>
+                </div>
+            `,
                 confirmButtonText: 'Đã hiểu',
                 confirmButtonColor: '#d4a373'
             });
@@ -857,21 +859,25 @@
         if (applyPromoBtn) {
             applyPromoBtn.addEventListener('click', applyPromotion);
         }
-        codeInput.addEventListener('input', function() {
 
-            clearTimeout(debounceTimer);
+        if (codeInput) {
+            codeInput.addEventListener('input', function() {
 
-            const code = this.value.trim();
+                clearTimeout(debounceTimer);
 
-            if (!code) {
-                resetPromotion(false);
-                return;
-            }
+                const code = this.value.trim();
 
-            debounceTimer = setTimeout(() => {
-                applyPromotion();
-            }, 800);
-        });
+                if (!code) {
+                    resetPromotion(false);
+                    return;
+                }
+
+                debounceTimer = setTimeout(() => {
+                    applyPromotion();
+                }, 800);
+            });
+        }
+
 
         async function applyPromotion() {
             const code = codeInput.value.trim();
@@ -980,14 +986,15 @@
 
     const bookingForm = document.getElementById('booking');
 
-    bookingForm.addEventListener('change', function(e) {
-        // console.log("có change nhá:");
-        if (e.target.closest('#promo-code')) return;
+    if (bookingForm) {
+        bookingForm.addEventListener('change', function(e) {
+            if (e.target.closest('#promo-code')) return;
 
-        if (e.target.closest('#apply-promo')) return;
+            if (e.target.closest('#apply-promo')) return;
 
-        invalidatePromotion();
-    });
+            invalidatePromotion();
+        });
+    }
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1093,8 +1100,11 @@
             input.addEventListener('change', fetchAvailableTimes);
         });
 
-        dateInput.addEventListener('change', fetchAvailableTimes);
+        if (dateInput) {
+            dateInput.addEventListener('change', fetchAvailableTimes);
 
+        }
+                
     });
 </script>
 

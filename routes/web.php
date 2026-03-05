@@ -89,9 +89,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'locale']], function
 	)->name('employee-working-shifts.calendar.events');
 	Route::resource('employee-working-shifts', 'Admin\EmployeeWorkingShiftController');
 	Route::resource('bookings', 'Admin\BookingController');
+
 	Route::patch('bookings/{id}/cancel', [BookingController::class, 'cancel'])
 		->name('bookings.cancel');
-
 	Route::patch('bookings/{id}/confirm', [BookingController::class, 'confirm'])
 		->name('bookings.confirm');
 	Route::patch('/bookings/{id}/confirm-payment', [

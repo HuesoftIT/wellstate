@@ -25,13 +25,13 @@
         </tr>
 
         {{-- Tên dịch vụ --}}
-        <tr class="row {{ $errors->has('name') ? 'has-error' : '' }}">
+        <tr class="row {{ $errors->has('title') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('name', 'Tên dịch vụ', ['class' => 'control-label label-required']) !!}
+                {!! Form::label('title', 'Tên dịch vụ', ['class' => 'control-label label-required']) !!}
             </td>
             <td class="col-md-8 col-lg-9">
-                {!! Form::text('name', null, ['class' => 'form-control input-sm', 'required']) !!}
-                {!! $errors->first('name', '<p class="help-block">:message</p>') !!}
+                {!! Form::text('title', null, ['class' => 'form-control input-sm', 'required']) !!}
+                {!! $errors->first('title', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
 
@@ -224,7 +224,7 @@
                 var file = document.querySelector('#image').files[0];
                 var reader = new FileReader();
 
-                if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+                    if (/\.(jpe?g|png|gif|webp)$/i.test(file.name)) {
 
                     reader.addEventListener("load", function() {
                         preview.src = reader.result;
@@ -287,7 +287,7 @@
                     .filter(s => !excludeIds.includes(String(s.id)))
                     .map(s => `
             <option value="${s.id}" data-price="${s.price}" data-duration="${s.duration}">
-                ${s.name}
+                ${s.title}
             </option>
         `)
                     .join('');
@@ -438,7 +438,7 @@
                     $('.combo-section').show();
                 } else {
                     $('.combo-section').hide();
-                    $('#combo-services-table tbody').empty(); 
+                    $('#combo-services-table tbody').empty();
                 }
             }
 

@@ -9,7 +9,6 @@ use App\Models\Customer;
 use App\Models\Membership;
 use App\Models\Promotion;
 use App\Models\Service;
-use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -25,7 +24,12 @@ class PromotionController extends Controller
         $query = Promotion::query();
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('discount_code', 'like', '%' . $search . '%');
+            });
         }
 
         if ($request->filled('type')) {

@@ -12,12 +12,30 @@ class StoreBookingRequest extends FormRequest
     {
         return true;
     }
+    protected function prepareForValidation()
+    {
+        if ($this->booker_phone) {
 
+            $phone = preg_replace('/[^0-9]/', '', $this->booker_phone);
+
+            if (substr($phone, 0, 2) == '84') {
+                $phone = '0' . substr($phone, 2);
+            }
+
+            $this->merge([
+                'booker_phone' => $phone
+            ]);
+        }
+    }
     public function rules()
     {
         return [
-            'booker_email'     => 'required|email|max:255',
-            'booker_phone'     => 'required|string|max:20',
+            'booker_email'     => 'nullable|email|max:255',
+            'booker_name'      => 'required|string|max:255',
+            'booker_phone' => [
+                'required',
+                'regex:/^(03|05|07|08|09)[0-9]{8}$/'
+            ],
 
             'guest_count'      => 'required|integer|min:1',
 
@@ -31,14 +49,14 @@ class StoreBookingRequest extends FormRequest
 
             // Guests
             'guests'                       => 'required|array|min:1',
-            'guests.*.uid'                 => 'required|string',
+            'guests.*.uid'                 => 'nullable|string',
             'guests.*.name'                => 'required|string|max:255',
 
             // Services inside guest
             'guests.*.services'                          => 'required|array|min:1',
             'guests.*.services.*.service_category_id'    => 'required|exists:service_categories,id',
             'guests.*.services.*.service_id'             => 'required|exists:services,id',
-            'guests.*.services.*.price'                  => 'required|numeric|min:0',
+            'guests.*.services.*.price'                  => 'nullable|numeric|min:0',
         ];
     }
 
@@ -47,13 +65,15 @@ class StoreBookingRequest extends FormRequest
         return [
 
             // Booker
-            'booker_email.required' => 'Vui lòng nhập email người đặt.',
             'booker_email.email'   => 'Email người đặt không hợp lệ.',
             'booker_email.max'      => 'Email người đặt không được vượt quá 255 ký tự.',
 
+            'booker_name.required' => 'Vui lòng nhập tên người đặt.',
+            'booker_name.string'   => 'Tên người đặt không hợp lệ.',
+            'booker_name.max'      => 'Tên người đặt không được vượt quá 255 ký tự.',
+
             'booker_phone.required' => 'Vui lòng nhập số điện thoại.',
-            'booker_phone.string'   => 'Số điện thoại không hợp lệ.',
-            'booker_phone.max'      => 'Số điện thoại không được vượt quá 20 ký tự.',
+            'booker_phone.regex'    => 'Số điện thoại không đúng định dạng.',
 
             // Guest count
             'guest_count.required' => 'Vui lòng nhập số lượng khách.',
@@ -104,6 +124,7 @@ class StoreBookingRequest extends FormRequest
     {
         return [
             'booker_email' => 'email người đặt',
+            'booker_name' => 'tên người đặt',
             'booker_phone' => 'số điện thoại',
             'guest_count' => 'số lượng khách',
             'branch_id' => 'chi nhánh',

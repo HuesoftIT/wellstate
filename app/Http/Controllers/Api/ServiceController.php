@@ -17,7 +17,7 @@ class ServiceController extends Controller
         // Kiểm tra category có tồn tại
         $category = ServiceCategory::find($request->service_category_id);
 
-        if (!$category) {
+        if (!$category) { 
             return response()->json([
                 'success' => false,
                 'message' => 'Danh mục dịch vụ không tồn tại',

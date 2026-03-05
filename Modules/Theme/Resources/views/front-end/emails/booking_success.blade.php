@@ -84,11 +84,24 @@
                                 @if ($booking->discount_amount > 0)
                                     <tr>
                                         <td style="color:#6b7280;">Giảm giá</td>
-                                        <td style="color:#dc2626; font-weight:bold;">
+                                        <td style="color:#23a651; font-weight:bold;">
                                             - {{ number_format($booking->discount_amount) }} VNĐ
                                         </td>
                                     </tr>
                                 @endif
+
+                                <tr style="background:#f9fafb;">
+                                    <td>Phí phòng</td>
+                                    <td>
+                                        @if (optional($booking->branchRoomType)->price)
+                                            <strong class="text-danger">
+                                                {{ number_format($booking->branchRoomType->price, 0, ',', '.') }} ₫
+                                            </strong>
+                                        @else
+                                            <span class="text-muted">0 ₫</span>
+                                        @endif
+                                    </td>
+                                </tr>
 
                                 <!-- Tổng tiền -->
                                 <tr style="background:#fef3c7;">

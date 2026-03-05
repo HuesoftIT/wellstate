@@ -68,10 +68,11 @@
                 {{-- COMPLETE --}}
                 @can('BookingController@update')
                     @if ($booking->canComplete())
-                        <form action="{{ route('bookings.update', $booking->id) }}" method="POST" style="display:inline"
+                        <form action="{{ route('bookings.complete', $booking->id) }}" method="POST" style="display:inline"
                             onsubmit="return confirm('Đánh dấu booking này là hoàn thành?')">
                             @csrf
-                            @method('PUT')
+                            @method('PATCH')
+
 
                             <input type="hidden" name="status" value="completed">
                             <input type="hidden" name="payment_status" value="paid">
@@ -112,11 +113,22 @@
                     </tr>
 
                     <tr>
-                        <th>Thông tin người đặt</th>
+                        <th>Tên người đặt</th>
                         <td>
-                            {{ $booking->booker_email }} <br>
+                            {{ $booking->booker_name }} <br>
                         </td>
                     </tr>
+                    @if (!$booking->booker_email)
+                        <tr>
+                            <th>Email người đặt</th>
+                            <td class="text-muted">-</td>
+                        </tr>
+                    @else
+                        <tr>
+                            <th>Email người đặt</th>
+                            <td>{{ $booking->booker_email }}</td>
+                        </tr>
+                    @endif
                     <tr>
                         <th>Số điện thoại người đặt</th>
                         <td>
@@ -171,19 +183,21 @@
                     </tr>
                     <tr>
                         <th>Tổng tiền</th>
-                        <td class="text-success text-bold">
+                        <td class="text-dark font-weight-bold">
                             {{ number_format($booking->subtotal_amount) }} đ
                         </td>
                     </tr>
+
                     <tr>
                         <th>Giảm giá</th>
-                        <td class="text-success text-bold">
-                            {{ number_format($booking->discount_amount) }} đ
+                        <td class="text-danger font-weight-bold">
+                            - {{ number_format($booking->discount_amount) }} đ
                         </td>
                     </tr>
+
                     <tr>
                         <th>Số tiền phải trả</th>
-                        <td class="text-success text-bold">
+                        <td class="text-success font-weight-bold">
                             {{ number_format($booking->total_amount) }} đ
                         </td>
                     </tr>
@@ -272,4 +286,7 @@
         @endif
 
     </div>
+
+    @include('sweetalert::alert')
+
 @endsection

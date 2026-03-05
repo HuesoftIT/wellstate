@@ -6,17 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->renameColumn('booker_name', 'booker_email');
+            $table->string('booker_email')
+                ->after('booker_name');
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->renameColumn('booker_email', 'booker_name');
+            $table->dropColumn('booker_email');
         });
     }
 };

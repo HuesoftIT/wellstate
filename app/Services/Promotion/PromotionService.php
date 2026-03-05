@@ -3,7 +3,6 @@
 namespace App\Services\Promotion;
 
 use App\DTO\BookingDTO;
-use App\DTO\PromotionResultDTO;
 use App\Models\Booking;
 use App\Models\Promotion;
 use App\Models\PromotionRule;
@@ -12,6 +11,66 @@ use Exception;
 
 class PromotionService
 {
+    public function getAvailablePromotions(BookingDTO $booking): array
+    {
+        $today = now()->toDateString();
+
+        $promotions = Promotion::with('rules')
+            ->where('is_active', 1)
+            ->where('start_date', '<=', $today)
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')
+                    ->orWhere('end_date', '>=', $today);
+            })
+            ->where(function ($q) use ($booking) {
+                $q->whereNull('discount_min_order_value')
+                    ->orWhere('discount_min_order_value', '<=', $booking->subtotal);
+            })
+            ->get();
+
+        $validPromotions = [];
+
+        foreach ($promotions as $promotion) {
+
+            try {
+
+                // 🔥 tái sử dụng toàn bộ engine apply
+                $this->validateBase($promotion, $booking);
+                $this->validateRules($promotion, $booking);
+                $this->validateUserUsage($promotion, $booking);
+
+                $eligibleAmount = $this->getEligibleAmount($promotion, $booking);
+
+                if ($eligibleAmount <= 0) {
+                    continue;
+                }
+
+                $discount = $this->calculateDiscount($promotion, $eligibleAmount);
+
+                $validPromotions[] = [
+                    'id' => $promotion->id,
+                    'title' => $promotion->title,
+                    "discount_code" => $promotion->discount_code,
+                    'discount_type' => $promotion->discount_type,
+                    'discount_value' => $promotion->discount_value,
+                    'eligible_amount' => $eligibleAmount,
+                    'discount_amount' => $discount,
+                    'final_total' => max(0, $booking->subtotal - $discount),
+                ];
+            } catch (\Throwable $e) {
+                // ❌ Không làm gì cả
+                // Promotion không hợp lệ thì bỏ qua
+                continue;
+            }
+        }
+
+        // Optional: sort theo discount lớn nhất
+        usort($validPromotions, function ($a, $b) {
+            return $b['discount_amount'] <=> $a['discount_amount'];
+        });
+
+        return $validPromotions;
+    }
     /**
      * ENTRY POINT
      */
