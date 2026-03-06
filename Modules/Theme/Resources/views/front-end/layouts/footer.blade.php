@@ -49,10 +49,14 @@
                     </h4>
 
                     <ul class="space-y-4">
-                        <li class="hover:text-[#FFDC97] transition">Về chúng tôi</li>
-                        <li class="hover:text-[#FFDC97] transition">Combo tiết kiệm</li>
-                        <li class="hover:text-[#FFDC97] transition">Massage trị liệu</li>
-                        <li class="hover:text-[#FFDC97] transition">Gội đầu dưỡng sinh</li>
+                        @foreach ($service_categories as $item)
+                            <li class="hover:text-[#FFDC97] transition">
+                                <a
+                                    href="{{ route('slugDetail.getDetail', ['slugParent' => 'dich-vu', 'slugDetail' => $item->slug]) }}">
+                                    {{ $item->name }}
+                                </a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
 

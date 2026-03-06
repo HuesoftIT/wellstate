@@ -7,22 +7,109 @@
         <div class="flex items-center gap-10 h-full">
 
             <!-- Logo -->
-            <a href="{{ route('page.home')}}" class="flex items-center h-full">
-                <img src="{{ asset($logo) }}" alt="SANA Holding" class="h-[60px] object-contain">
+            <a href="{{ route('page.home') }}" class="flex items-center h-full">
+                <img src="{{ asset($logo) }}" alt="Wellstate spa" class="h-[60px] object-contain">
             </a>
 
             <!-- Menu -->
             <nav class="h-full hidden lg:flex">
                 <ul class="flex items-center h-full gap-6 uppercase text-[16px] font-medium text-white">
                     <li>
-                        <a href="{{ route('page.home')}}" class="hover:text-[#c6d36a] transition font-light">Trang chủ</a>
+                        <a href="{{ route('page.home') }}" class="hover:text-[#c6d36a] transition font-light">Trang
+                            chủ</a>
                     </li>
 
                     <li>
-                        <a href="{{ route('page.introduce')}}" class="hover:text-[#c6d36a] transition font-light">Về chúng tôi</a>
+                        <a href="{{ route('page.introduce') }}" class="hover:text-[#c6d36a] transition font-light">Về
+                            chúng tôi</a>
                     </li>
 
+                    <li class="relative group">
 
+                        <a href="/dich-vu" class="flex items-center gap-1 hover:text-[#c6d36a] transition font-light">
+                            Dịch vụ
+
+                            <svg class="w-4 h-4 mt-[1px]" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </a>
+
+                        <div class="absolute h-[40px] w-full top-[100%] left-0"></div>
+
+                        <div
+                            class="absolute left-0 top-full mt-4
+                                w-[320px]
+                                bg-white text-black
+                                shadow-xl rounded-md
+                                opacity-0 invisible
+                                translate-y-2
+                                group-hover:opacity-100
+                                group-hover:visible
+                                group-hover:translate-y-0
+                                transition-all duration-200
+                                z-50">
+
+                            <ul class="py-2">
+
+                                @foreach ($service_categories as $category)
+                                    <li class="relative group/category">
+
+                                        <a href="/dich-vu/{{ $category->slug }}"
+                                            class="flex justify-between items-center px-5 py-3 text-[15px]
+                                                hover:bg-[#f5f8eb] hover:text-[#7a8f2c] transition">
+
+                                            {{ $category->name }}
+
+                                            @if ($category->services->count())
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    stroke-width="2" viewBox="0 0 24 24">
+                                                    <path d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            @endif
+
+                                        </a>
+
+                                        {{-- submenu services --}}
+                                        @if ($category->services->count())
+                                            <div class="absolute top-0 left-full h-full w-4 bg-transparent mt-[-8px]">
+                                            </div>
+                                            <div
+                                                class="absolute left-full top-0 ml-1
+                                                w-[280px]
+                                                bg-white shadow-lg rounded-md
+                                                opacity-0 invisible
+                                                group-hover/category:opacity-100
+                                                group-hover/category:visible
+                                                transition mt-[-8px]">
+
+                                                <ul class="py-2">
+
+                                                    @foreach ($category->services as $service)
+                                                        <li>
+                                                            <a href="/dich-vu/{{ $category->slug }}/{{ $service->slug }}"
+                                                                class="block px-5 py-3 text-[14px]
+                                            hover:bg-[#f5f8eb]
+                                            hover:text-[#7a8f2c] transition">
+
+                                                                {{ $service->title }}
+
+                                                            </a>
+                                                        </li>
+                                                    @endforeach
+
+                                                </ul>
+
+                                            </div>
+                                        @endif
+
+                                    </li>
+                                @endforeach
+
+                            </ul>
+                        </div>
+
+                    </li>
                     @foreach ($post_categories as $parent)
                         <li class="relative group">
                             {{-- MENU CHA --}}
@@ -118,7 +205,7 @@
 
     <!-- Header -->
     <div class="flex items-center justify-between p-6 border-b border-white/20 relative">
-        <img src="{{ asset($logo) }}" alt="SANA Holding" class="h-[45px] mx-auto">
+        <img src="{{ asset($logo) }}" alt="Wellstate spa" class="h-[45px] mx-auto">
 
         <button id="mobile-menu-close" class="text-white text-xl absolute top-3 right-4">
             <i class="fa-solid fa-xmark"></i>
@@ -142,7 +229,38 @@
                         Về chúng tôi
                     </a>
                 </li>
+                <li>
 
+                    <!-- MENU CHA -->
+                    <button class="flex items-center uppercase justify-between w-full hover:text-[#c6d36a] font-light"
+                        onclick="toggleSubMenu(this)">
+
+                        <span>Dịch vụ</span>
+
+                        <i class="fa-solid fa-chevron-down text-[13px] transition-transform"></i>
+
+                    </button>
+
+                    <!-- MENU DANH MỤC -->
+                    <ul class="mt-2 ml-4 hidden flex flex-col gap-3 text-[15px] normal-case font-normal">
+
+                        @foreach ($service_categories as $category)
+                            <li>
+
+                                <!-- CATEGORY -->
+                                <a href="{{ route('slugDetail.getDetail', ['slugParent' => 'dich-vu', 'slugDetail' => $category->slug]) }}"
+                                    class="flex items-center justify-between w-full hover:text-[#c6d36a]">
+
+                                    <span>{{ $category->name }}</span>
+
+                                </a>
+
+                            </li>
+                        @endforeach
+
+                    </ul>
+
+                </li>
                 @foreach ($post_categories as $parent)
                     <li>
                         {{-- MENU CHA --}}

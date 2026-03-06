@@ -5,8 +5,8 @@
             <!-- LEFT: IMAGE -->
             <div class="lg:col-span-6">
                 <div class="rounded-[20px] overflow-hidden">
-                    <img src="{{ $post->image ? Storage::url($post->image) : asset('images/default-service.jpg') }}"
-                        alt="{{ $post->title }}" class="w-full h-full object-cover">
+                    <img src="{{ $service->image ? Storage::url($service->image) : asset('images/default-service.jpg') }}"
+                        alt="{{ $service->title }}" class="w-full h-full object-cover">
                 </div>
             </div>
 
@@ -14,11 +14,11 @@
             <div class="lg:col-span-6">
 
                 <p class="text-[20px] font-open-sans font-medium text-[#6f7f3a] mb-2">
-                    Sản phẩm: {{ $post->title }}
+                    Sản phẩm: {{ $service->title }}
                 </p>
 
                 <h1 class="text-[40px] font-open-sans font-medium text-[#2f3b1c] leading-tight mb-6">
-                    {{ $post->title }}
+                    {{ $service->title }}
                 </h1>
 
                 <p class="text-[34px] font-open-sans font-medium text-[#2f3b1c] mb-8">
@@ -55,9 +55,9 @@
 
     <div class="container mx-auto px-6 pb-4">
         <div class="bg-[#fafcf5] rounded-md py-4 px-8">
-            <h3 class="font-open-sans text-[32px] font-semibold text-[#2f3b1c] mb-6">{{ $post_category->name }}</h3>
+            <h3 class="font-open-sans text-[32px] font-semibold text-[#2f3b1c] mb-6">{{ $service_category->name }}</h3>
             <div class="max-w-none list-decimal">
-                {!! $post->content !!}
+                {!! $service->description !!}
             </div>
         </div>
 

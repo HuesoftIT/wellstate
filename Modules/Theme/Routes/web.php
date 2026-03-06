@@ -33,8 +33,8 @@ Route::get('ajaxFE/{action}', 'AjaxFrontEndController@index');
 Route::get("/bai-viet/{slug}", "FrontendController@getDetailPost")->name('detail.post');
 Route::get('/gioi-thieu', 'FrontendController@getIntroduce')->name('page.introduce');
 Route::get('/lien-he', 'FrontendController@contact')->name('page.contact');
-Route::get('/dich-vu', 'FrontendController@listServices')->name('page.service');
-Route::get('/san-pham/{slug}', 'FrontendController@renderService');
+Route::get('/dich-vu', 'FrontendController@listServices')->name('page.services');
+Route::get('/dich-vu/{service_category_slug}/{slug}', 'FrontendController@renderService')->name('page.service.detail');
 
 Route::get('/dat-lich', [FrontendController::class, 'showBookingPage'])
     ->name('page.booking');
@@ -48,4 +48,6 @@ Route::get('/{slug}.html', 'FrontendController@getPage');
 Route::group(['prefix' => '{slugParent}'], function () {
     Route::get('/', 'FrontendController@getListParents')->name('slugParent.getListParents');
     Route::get('/{slugDetail}', 'FrontendController@getDetail')->name('slugDetail.getDetail');
+    Route::get('/{slugDetail}/{slugChild}', 'FrontendController@getChildDetail')
+        ->name('slugChild.getChildDetail');
 });

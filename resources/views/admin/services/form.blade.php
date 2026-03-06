@@ -138,7 +138,8 @@
                     value="{{ old('price', isset($service) ? number_format($service->price) : '') }}"
                     autocomplete="off">
 
-                <input type="hidden" name="price" id="price">
+                <input type="hidden" name="price" id="price"
+                    value="{{ old('price', isset($service) ? $service->price : '') }}">
 
                 {!! $errors->first('price', '<p class="help-block">:message</p>') !!}
             </td>
@@ -155,7 +156,9 @@
                     value="{{ old('sale_price', isset($service) && $service->sale_price ? number_format($service->sale_price) : '') }}"
                     autocomplete="off">
 
-                <input type="hidden" name="sale_price" id="sale_price">
+                <input type="hidden" name="sale_price" id="sale_price"
+                    value="{{ old('sale_price', isset($service) ? $service->sale_price : '') }}">
+
 
                 {!! $errors->first('sale_price', '<p class="help-block">:message</p>') !!}
             </td>
@@ -224,7 +227,7 @@
                 var file = document.querySelector('#image').files[0];
                 var reader = new FileReader();
 
-                    if (/\.(jpe?g|png|gif|webp)$/i.test(file.name)) {
+                if (/\.(jpe?g|png|gif|webp)$/i.test(file.name)) {
 
                     reader.addEventListener("load", function() {
                         preview.src = reader.result;

@@ -20,7 +20,8 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Service::with('serviceCategory')->sortable();
+        $query = Service::with('serviceCategory')->sortable()
+            ->orderBy('created_at', 'desc');
 
         // Tìm kiếm theo tên
         if ($request->filled('search')) {
@@ -53,6 +54,7 @@ class ServiceController extends Controller
         $servicesForCombo = Service::where('is_combo', false)
             ->where('is_active', true)
             ->get(['id', 'title', 'price', 'duration']);
+    
         return view('admin.services.create', compact('categories', 'servicesForCombo'));
     }
 
@@ -97,7 +99,7 @@ class ServiceController extends Controller
             ->get(['id', 'title', 'price', 'duration']);
 
         $categories = ServiceCategory::pluck('name', 'id');
-
+        Alert::success('Chỉnh sửa dịch vụ thành công');
         return view(
             'admin.services.edit',
             compact('service', 'categories', 'servicesForCombo')

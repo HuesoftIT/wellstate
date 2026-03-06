@@ -11,14 +11,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Image;
-use App\Models\News;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\Promotion;
 use App\Models\RoomType;
+use App\Models\Service;
 use App\Models\ServiceCategory;
-use App\Models\Slide;
-use Modules\Theme\Entities\Menu;
+
 
 
 class FrontendController extends Controller
@@ -33,7 +32,7 @@ class FrontendController extends Controller
             ->orderBy('order', 'ASC')
             ->with('services')
             ->get();
-        $post_categories = PostCategory::root()
+        $post_categories = PostCategory::root()->active()
             ->with(['children' => function ($q) {
                 $q->active()->orderBy('order');
             }])
@@ -167,13 +166,13 @@ class FrontendController extends Controller
         return view('theme::front-end.pages.posts.detail', compact('data'));
     }
 
-    public function renderService(Request $request, $slug)
+    public function renderService($service_category_slug, $slug, Request $request)
     {
-        $post = Post::published()->where('slug', $slug)->first();
-        $posts = Post::published()->where('post_category_id', $post->post_category_id)->where('id', '!=', $post->id)->orderBy('published_at', 'DESC')->get();
-        $post_category = PostCategory::active()->where('id', $post->post_category_id)->first();
+        $service = Service::active()->where('slug', $slug)->first();
+        $services = Service::active()->where('service_category_id', $service->service_category_id)->where('id', '!=', $service->id)->orderBy('created_at', 'DESC')->get();
+        $service_category = ServiceCategory::active()->where('slug', $service_category_slug)->first();
         $branches = Branch::active()->get();
-        return view('theme::front-end.pages.services.detail', compact('post', 'posts', 'post_category', 'branches'));
+        return view('theme::front-end.pages.services.detail', compact('service', 'services', 'service_category', 'branches'));
     }
 
     public function showBookingPage(Request $request)
@@ -238,12 +237,29 @@ class FrontendController extends Controller
 
     public function getDetail($slugParent, $slugDetail, Request $request)
     {
-        $post_category = PostCategory::active()->where('slug', $slugDetail)->first();
-        $posts = Post::published()->where('post_category_id', $post_category->id)->orderBy('published_at', 'DESC')->get();
+        $post_category = PostCategory::active()
+            ->where('slug', $slugDetail)
+            ->first();
+
+        $posts = collect();
+
+        if ($post_category) {
+            $posts = Post::published()
+                ->where('post_category_id', $post_category->id)
+                ->orderBy('published_at', 'DESC')
+                ->get();
+        }
+
         switch ($slugParent) {
             case "dich-vu":
                 // dd($post_category, $posts);
-                return view("theme::front-end.pages.services.page_list", compact('post_category', 'posts'));
+                $service_category = ServiceCategory::active()->where('slug', $slugDetail)->first();
+                if (!$service_category) {
+                    return view("theme::front-end.404", compact('slugParent', 'slugDetail'));
+                }
+                $services = Service::active()->where('service_category_id', $service_category->id)->get();
+
+                return view("theme::front-end.pages.services.page_list", compact('service_category', 'services'));
             case "uu-dai":
                 $promotions = $posts;
 
@@ -268,6 +284,17 @@ class FrontendController extends Controller
         //     default:
         //         return view("theme::front-end.404", compact('slugParent', 'slugDetail'));
         // }
+    }
+
+    public function getChildDetail($slugParent, $slugDetail, $slugChild, Request $request)
+    {
+        switch ($slugParent) {
+            case "dich-vu":
+                $service = Service::active()->where('slug', $slugChild)->first();
+                return view("theme::front-end.pages.services.detail", compact('service'));
+            default:
+                return view("theme::front-end.404", compact('slugParent', 'slugDetail', 'slugChild'));
+        }
     }
 
     public function getPage($slug, Request $request)

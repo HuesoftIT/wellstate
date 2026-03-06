@@ -1,37 +1,43 @@
 <div class="container mx-auto px-6 py-16">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" style="background : url()">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
 
-        @forelse ($posts as $post)
-            <div class="bg-[#e6f0cf] rounded-[14px] overflow-hidden text-center flex flex-col h-full">
+        @forelse ($services as $service)
+            <div class="bg-[#e6f0cf] rounded-xl overflow-hidden flex flex-col">
 
                 <!-- IMAGE -->
-                <img src="{{ $post->image ? Storage::url($post->image) : asset('images/default-service.jpg') }}"
-                    alt="{{ $post->title }}" class="w-full h-[280px] object-cover">
+                <img src="{{ $service->image ? Storage::url($service->image) : asset('images/default-service.jpg') }}"
+                    alt="{{ $service->title }}" class="w-full h-[140px] md:h-[200px] lg:h-[260px] object-cover">
 
                 <!-- CONTENT -->
-                <div class="p-6 flex flex-col flex-1">
+                <div class="p-3 md:p-5 flex flex-col flex-1 text-center">
 
-                    <h3 class="uppercase text-[28px] font-open-sans text-[#3b4a2f] mb-3">
-                        {{ $post->title }}
+                    <!-- TITLE -->
+                    <h3
+                        class="uppercase text-[14px] md:text-[18px] lg:text-[22px] font-open-sans text-[#3b4a2f] mb-1 line-clamp-2">
+                        {{ $service->title }}
                     </h3>
 
-                    <p class="text-[16px] font-open-sans text-[#4a4a4a] mb-3">
-                        {{ $post_category->name }}
+                    <!-- CATEGORY -->
+                    <p class="text-[14px] md:text-[18px] text-[#4a4a4a] mb-1">
+                        {{ $service_category->name }}
                     </p>
 
-                    <p class="text-[#3b4a2f] text-[28px] font-open-sans mb-6">
-                        Liên hệ: {{ $company_phone }}
+                    <!-- PHONE -->
+                    <p class="text-[#3b4a2f] text-[14px] md:text-[16px] font-medium mb-3">
+                        {{ $company_phone }}
                     </p>
 
                     <!-- BUTTON -->
-                    <a href="/san-pham/{{ $post->slug }}"
-                        class="mt-auto inline-block px-6 py-4 text-[18px] font-cormorant
-                               bg-[#6f7f3a] text-white rounded
-                               hover:bg-[#5f6e31] transition">
+                    <a href="{{ route('page.service.detail', ['service_category_slug' => $service_category->slug, 'slug' => $service->slug]) }}"
+                        class="mt-auto text-[12px] md:text-[14px] px-3 py-1.5 md:px-4 md:py-2
+                           bg-[#6f7f3a] text-white rounded
+                           hover:bg-[#5f6e31] transition">
                         Xem chi tiết
                     </a>
+
                 </div>
             </div>
+
         @empty
             <div class="col-span-full">
                 <div

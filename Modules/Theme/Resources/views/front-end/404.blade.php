@@ -41,13 +41,44 @@
     </div>
 @endsection
 @section('content')
-    <div class="container article article-detail">
-        <h1 class="title-h2 title-font text-center pt-30 pb-30">
-            {{ trans('theme::frontend.error_page.not_found') }}
-        </h1>
-        <div class="text-center">
-            {{ trans('theme::frontend.error_page.sorry_page') }}, <a class="intro-btn"
-                href="{{ url('/') }}">{{ trans('theme::frontend.home') }}</a>
+    <div class="min-h-[70vh] flex items-center justify-center px-6">
+
+        <div class="text-center max-w-xl">
+
+            <!-- 404 -->
+            <h1 class="text-[120px] font-bold text-[#FFDC97] leading-none">
+                404
+            </h1>
+
+            <!-- Title -->
+            <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 mt-4">
+                {{ trans('theme::frontend.error_page.not_found') }}
+            </h2>
+
+            <!-- Description -->
+            <p class="text-gray-500 mt-4 leading-relaxed">
+                {{ trans('theme::frontend.error_page.sorry_page') }}. <br>
+                Trang bạn đang tìm có thể đã bị xóa, đổi tên hoặc tạm thời không tồn tại.
+            </p>
+
+            <!-- Buttons -->
+            <div class="flex justify-center gap-4 mt-8 flex-wrap">
+
+                <!-- Home -->
+                <a href="{{ url('/') }}"
+                    class="px-6 py-3 rounded-full bg-[#FFDC97] text-black font-medium hover:opacity-90 transition">
+                    {{ trans('theme::frontend.home') }}
+                </a>
+
+                <!-- Back -->
+                <button onclick="history.back()"
+                    class="px-6 py-3 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+                    Quay lại trang trước
+                </button>
+
+            </div>
+
         </div>
+
     </div>
 @endsection
