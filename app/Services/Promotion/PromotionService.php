@@ -6,11 +6,14 @@ use App\DTO\BookingDTO;
 use App\Models\Booking;
 use App\Models\Promotion;
 use App\Models\PromotionRule;
+use App\Models\PromotionUsage;
 use Carbon\Carbon;
 use Exception;
 
 class PromotionService
 {
+
+
     public function getAvailablePromotions(BookingDTO $booking): array
     {
         $today = now()->toDateString();
@@ -79,8 +82,8 @@ class PromotionService
         if (empty($code)) {
             return $this->emptyResult();
         }
-
-        $promotion = $this->findValidPromotion($code);
+        $phone = $booking->phone;
+        $promotion = $this->findValidPromotion($code, $phone);
 
         $this->validateBase($promotion, $booking);
         $this->validateRules($promotion, $booking);
@@ -127,15 +130,19 @@ class PromotionService
     /**
      * ===== FIND & BASIC VALIDATE =====
      */
-    protected function findValidPromotion(string $code): Promotion
+    protected function findValidPromotion(string $code, $phone): Promotion
     {
         $code = trim($code);
         $promotion = Promotion::active()->where('discount_code', $code)
             ->first();
+        if (!$phone) {
+            throw new Exception('Số điện thoại là bắt buộc để áp dụng mã khuyến mãi');
+        }
 
         if (!$promotion) {
             throw new Exception('Mã khuyến mãi không hợp lệ');
         }
+
 
         if ($promotion->start_date && Carbon::now()->lt($promotion->start_date)) {
             throw new Exception('Mã khuyến mãi chưa bắt đầu');
@@ -143,6 +150,18 @@ class PromotionService
 
         if ($promotion->end_date && Carbon::now()->gt($promotion->end_date)) {
             throw new Exception('Mã khuyến mãi đã hết hạn');
+        }
+
+
+        if ($promotion->discount_max_uses_per_user !== null) {
+
+            $userUses = PromotionUsage::where('promotion_id', $promotion->id)
+                ->where('phone_number', $phone)
+                ->count();
+
+            if ($userUses >= $promotion->discount_max_uses_per_user) {
+                throw new Exception('Bạn đã sử dụng hết số lượt cho mã khuyến mãi này');
+            }
         }
 
         return $promotion;
@@ -286,15 +305,17 @@ class PromotionService
     /**
      * ===== DISCOUNT =====
      */
-    protected function calculateDiscount(Promotion $promotion, $subtotal)
+    protected function calculateDiscount(Promotion $promotion, $eligibleAmount)
     {
         $discount = $promotion->discount_type === 'percent'
-            ? $subtotal * ($promotion->discount_value / 100)
+            ? $eligibleAmount * ($promotion->discount_value / 100)
             : $promotion->discount_value;
 
         if ($promotion->discount_max_value) {
             $discount = min($discount, $promotion->discount_max_value);
         }
+
+        $discount = min($discount, $eligibleAmount);
 
         return round($discount, 2);
     }
@@ -302,5 +323,22 @@ class PromotionService
     protected function emptyResult(): array
     {
         return ['promotion' => null, 'discount' => 0];
+    }
+
+    public function recordUsage(Promotion $promotion, Booking $booking, $discountAmount)
+    {
+        if (!$promotion) {
+            return;
+        }
+
+        $promotion->increment('discount_uses_count');
+
+        PromotionUsage::create([
+            'promotion_id'   => $promotion->id,
+            'phone_number'   => $booking->booker_phone,
+            'booking_id'     => $booking->id,
+            'discount_amount' => $discountAmount,
+            'used_at'        => now(),
+        ]);
     }
 }

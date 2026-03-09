@@ -49,7 +49,7 @@
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
                                 Số điện thoại <span class="text-red-500">*</span>
                             </label>
-                            <input type="tel" name="booker_phone" value="{{ old('booker_phone') }}"
+                            <input type="tel" id="booker_phone" name="booker_phone" value="{{ old('booker_phone') }}"
                                 class="input h-11 @error('booker_phone') border-red-500 @enderror">
 
                             @error('booker_phone')

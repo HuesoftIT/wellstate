@@ -22,7 +22,7 @@
                             <h1 style="color:#ffffff; margin:0; font-size:24px; letter-spacing:1px;">
                                 WELLSTATE SPA
                             </h1>
-                            <p style="color:#d1d5db; margin-top:8px; font-size:14px;">
+                            <p style="color:#d1d5db; margin-top:8px; font-size:16px;">
                                 Xác nhận đặt lịch thành công
                             </p>
                         </td>
@@ -36,7 +36,7 @@
                                 Đặt lịch thành công 🎉
                             </h2>
 
-                            <p style="color:#4b5563; font-size:14px;">
+                            <p style="color:#4b5563; font-size:16px;">
                                 Xin chào, <br>
                                 Cảm ơn bạn đã tin tưởng sử dụng dịch vụ của chúng tôi.
                                 Dưới đây là thông tin chi tiết đặt lịch của bạn:
@@ -44,7 +44,7 @@
 
                             <!-- Booking Info -->
                             <table width="100%" cellpadding="10" cellspacing="0"
-                                style="margin-top:20px; border-collapse:collapse; font-size:14px;">
+                                style="margin-top:20px; border-collapse:collapse; font-size:16px;">
 
                                 <tr style="background:#f9fafb;">
                                     <td width="40%" style="color:#6b7280;">Mã booking</td>
@@ -167,7 +167,7 @@
                             <!-- CTA Button -->
                             {{-- <div style="text-align:center; margin-top:30px;">
                                 <a href="{{ url('/') }}"
-                                    style="display:inline-block; padding:12px 24px; background:#1f2937; color:#ffffff; text-decoration:none; border-radius:6px; font-size:14px;">
+                                    style="display:inline-block; padding:12px 24px; background:#1f2937; color:#ffffff; text-decoration:none; border-radius:6px; font-size:16px;">
                                     Xem chi tiết đặt lịch
                                 </a>
                             </div> --}}

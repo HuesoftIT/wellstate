@@ -31,7 +31,6 @@ class PromotionController extends Controller
 
         $discount_code = $request->discount_code;
         $services = $request->services;
-        $room_fee = $request->room_fee;
         $subtotal = $request->subtotal;
         $branch_id = $request->branch_id;
         $room_type_id = $request->room_type_id;
@@ -41,8 +40,8 @@ class PromotionController extends Controller
 
         $bookingDTO = new BookingDTO(null, null,  $branch_id, $room_type_id, $booking_date, $total_guests, $subtotal, $services, $phone);
 
-
-        return $this->promotionService->apply($discount_code, $bookingDTO, $subtotal);
+     
+        return $this->promotionService->apply($discount_code, $bookingDTO);
     }
 
     public function check(Request $request)

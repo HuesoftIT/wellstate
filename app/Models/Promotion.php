@@ -145,4 +145,9 @@ class Promotion extends Model
     {
         return $query->where('is_active', 1);
     }
+
+    public function usages()
+    {
+        return $this->hasMany(PromotionUsage::class);
+    }
 }

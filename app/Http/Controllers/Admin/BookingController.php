@@ -76,7 +76,6 @@ class BookingController extends Controller
             } else if ($request->discount_code) {
                 $promotion_code = $request->discount_code;
             }
-
             //4. apply promotion
             $promotionResult = $this->promotionService->apply($promotion_code, $bookingDTO);
 

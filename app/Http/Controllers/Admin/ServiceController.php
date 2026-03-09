@@ -133,6 +133,9 @@ class ServiceController extends Controller
             }
         });
 
+        Alert::success('Cập nhật dịch vụ thành công');
+
+
         return redirect()->route('services.index');
     }
 

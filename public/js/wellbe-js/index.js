@@ -7,6 +7,7 @@ function bindMoneyInput() {
 	document.querySelectorAll(".money-input").forEach((input) => {
 		input.addEventListener("input", function () {
 			const raw = this.value.replace(/\./g, "");
+			console.log('value when input: ', this.value);
 			this.value = formatVND(raw);
 
 			const hiddenInput = document.getElementById(

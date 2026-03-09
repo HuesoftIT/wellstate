@@ -778,8 +778,9 @@
             });
         });
 
-        qs('#customer-phone')?.addEventListener('input', e => {
+        qs('#booker_phone')?.addEventListener('input', e => {
             state.phone = e.target.value.trim();
+            console.log(state.phone);
         });
         qs('#booking-date')?.addEventListener('change', e => {
             state.date = e.target.value;
@@ -925,7 +926,7 @@
 
             } catch (err) {
                 resetPromotion();
-
+                console.log('Error nha: ', err?.message);
                 showPromoMessage(
                     err?.message || 'Mã giảm giá không hợp lệ',
                     false
@@ -965,10 +966,15 @@
 
         function showPromoMessage(text, success = true) {
             const el = document.getElementById('promo-message');
-
+            const promoCodeEL = document.getElementById('promo-code');
+            console.log('promoCodeEL:', promoCodeEL)
+            
             el.classList.remove('hidden');
             el.classList.toggle('text-green-600', success);
             el.classList.toggle('text-red-500', !success);
+            if (!success) {
+                promoCodeEL.value = "";
+            }
             el.innerText = text;
         }
     });
@@ -1104,7 +1110,7 @@
             dateInput.addEventListener('change', fetchAvailableTimes);
 
         }
-                
+
     });
 </script>
 

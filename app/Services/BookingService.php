@@ -8,6 +8,7 @@ use App\Models\BookingGuestService;
 use App\Models\BookingGuestServiceRoom;
 use App\Models\BranchRoomType;
 use App\Models\Service;
+use App\Services\Promotion\PromotionService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,6 +16,11 @@ use Str;
 
 class BookingService
 {
+    protected $promotionService;
+    public function __construct(PromotionService $promotionService)
+    {
+        $this->promotionService = $promotionService;
+    }
     public function calculateBookingTime(Request $request)
     {
         if (!$request->booking_date || !$request->booking_time) {
@@ -146,7 +152,7 @@ class BookingService
         Booking $booking,
         float $subtotal,
         int $totalDuration,
-        ?array $promotionResult
+        $promotionResult = null
     ): void {
         $promotion = isset($promotionResult['promotion']) ? $promotionResult['promotion'] : null;
         $discount  = isset($promotionResult['discount']) ? $promotionResult['discount'] : 0;
@@ -159,5 +165,14 @@ class BookingService
             'discount_amount' => $discount,
             'total_amount'    => max(0, $subtotal - $discount),
         ]);
+
+
+        if ($promotion && $discount > 0) {
+            $this->promotionService->recordUsage(
+                $promotion,
+                $booking,
+                $discount
+            );
+        }
     }
 }

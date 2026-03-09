@@ -7,34 +7,28 @@
         </div>
     @endif
 
+
     <table class="table table-condensed">
 
-        {{-- Type --}}
-        <tr class="row {{ $errors->has('type') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('type', 'Loại khuyến mãi', ['class' => 'control-label label-required']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::select(
-                    'type',
-                    [
-                        'promotion' => __('promotions.types.promotion'),
-                        'membership' => __('promotions.types.membership'),
-                    ],
-                    null,
-                    ['class' => 'form-control input-sm', 'required', 'placeholder' => '-- Chọn loại --'],
-                ) !!}
-                {!! $errors->first('type', '<p class="help-block">:message</p>') !!}
+        <tr class="info">
+            <td colspan="2">
+                <strong>1. Thông tin khuyến mãi</strong>
             </td>
         </tr>
 
+      
         {{-- Title --}}
         <tr class="row {{ $errors->has('title') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('title', 'Tên khuyến mãi', ['class' => 'control-label label-required']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
-                {!! Form::text('title', null, ['class' => 'form-control input-sm', 'required']) !!}
+                {!! Form::text('title', old('title', $promotion->title ?? null), [
+                    'class' => 'form-control input-sm',
+                    'required',
+                ]) !!}
+
                 {!! $errors->first('title', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
@@ -42,19 +36,17 @@
         {{-- Code --}}
         <tr class="row {{ $errors->has('discount_code') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_code', 'Code khuyến mãi', ['class' => 'control-label label-required']) !!}
+                {!! Form::label('discount_code', 'Mã khuyến mãi', ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
-                {!! Form::text('discount_code', null, ['class' => 'form-control input-sm']) !!}
+                {!! Form::text('discount_code', old('discount_code', $promotion->discount_code ?? null), [
+                    'class' => 'form-control input-sm',
+                ]) !!}
 
-                <small class="text-muted">
-                    Để trống hệ thống sẽ tự động tạo mã khuyến mãi
-                </small>
-
-                {!! $errors->first('discount_code', '<p class="help-block">:message</p>') !!}
+                <small class="text-muted">Để trống nếu tự động áp dụng</small>
             </td>
         </tr>
-
 
         {{-- Image --}}
         <tr class="row {{ $errors->has('image') ? 'has-error' : '' }}">
@@ -82,27 +74,30 @@
                         <input type="hidden" value="" name="img-hidden" />
                         <img class="img-preview"
                             src="{{ !empty($promotion->image) ? Storage::url($promotion->image) : '' }}"
-                            alt="{{ trans('promotion.image') }}" />
+                            alt="{{ trans('service.image') }}" />
                         <i class="fa fa-trash text-danger"></i>
                     </div>
                 </div>
             </td>
         </tr>
 
-        {{-- content --}}
+        {{-- Content --}}
         <tr class="row {{ $errors->has('content') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('content', 'Nội dung', [
-                    'class' => 'control-label label-required',
-                ]) !!}
+                {!! Form::label('content', 'Mô tả', ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
                 {!! Form::textarea('content', old('content', $promotion->content ?? null), [
                     'class' => 'form-control editor',
-                    'rows' => 8,
-                    'required',
+                    'rows' => 6,
                 ]) !!}
-                {!! $errors->first('content', '<p class="help-block">:message</p>') !!}
+            </td>
+        </tr>
+
+        <tr class="info">
+            <td colspan="2">
+                <strong>2. Thiết lập giảm giá</strong>
             </td>
         </tr>
 
@@ -111,122 +106,196 @@
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('discount_type', 'Loại giảm giá', ['class' => 'control-label label-required']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
                 {!! Form::select(
                     'discount_type',
                     [
-                        'percent' => __('promotions.discount_types.percent'),
-                        'fixed' => __('promotions.discount_types.fixed'),
+                        'percent' => 'Giảm theo %',
+                        'fixed' => 'Giảm số tiền',
                     ],
-                    null,
-                    ['class' => 'form-control input-sm', 'required', 'placeholder' => '-- Chọn loại --'],
+                    old('discount_type', $promotion->discount_type ?? null),
+                    ['class' => 'form-control input-sm', 'required'],
                 ) !!}
-                {!! $errors->first('discount_type', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
 
         {{-- Discount value --}}
         <tr class="row {{ $errors->has('discount_value') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_value', 'Giá trị giảm', ['class' => 'control-label label-required']) !!}
+                {!! Form::label('discount_value_display', 'Giá trị giảm', ['class' => 'control-label label-required']) !!}
             </td>
-            <td class="col-md-8 col-lg-9">
 
-                <input type="text" id="discount_value_display" class="form-control input-sm money-input"
+            <td class="col-md-8 col-lg-9">
+                {{-- {!! Form::number('discount_value', old('discount_value', $promotion->discount_value ?? null), [
+                    'class' => 'form-control input-sm',
+                    'required',
+                ]) !!} --}}
+
+                <input type="text" id="discount_value_display" class="form-control input-sm money-input" required
                     value="{{ old('discount_value', isset($promotion) ? number_format($promotion->discount_value) : '') }}"
                     autocomplete="off">
 
                 <input type="hidden" name="discount_value" id="discount_value"
                     value="{{ old('discount_value', isset($promotion) ? $promotion->discount_value : '') }}">
-
-                {!! $errors->first('discount_value', '<p class="help-block">:message</p>') !!}
-
-            </td>
-        </tr>
-
-        {{-- Discount min order value --}}
-        <tr class="row {{ $errors->has('discount_min_order_value') ? 'has-error' : '' }}"
-            id="discount_min_order_value_row">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_min_order_value', 'Giá trị order tối thiểu', ['class' => 'control-label']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                <input type="text" id="discount_min_order_value_display" class="form-control input-sm money-input"
-                    value="{{ old('discount_min_order_value', isset($promotion) ? number_format($promotion->discount_min_order_value) : '') }}"
-                    autocomplete="off">
-
-                <input type="hidden" name="discount_min_order_value" id="discount_min_order_value"
-                    value="{{ old('discount_min_order_value', isset($promotion) ? $promotion->discount_min_order_value : '') }}">
-
-                {!! $errors->first('discount_min_order_value', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
 
         {{-- Max discount --}}
-        <tr class="row {{ $errors->has('discount_max_value') ? 'has-error' : '' }}" id="discount_max_value_row">
+        <tr id="max_discount_row" class="row {{ $errors->has('discount_max_value') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('discount_max_value', 'Giảm tối đa', ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
-                <input type="text" id="discount_max_value_display" class="form-control input-sm money-input"
+                <input type="text" id="discount_max_value_display" class="form-control input-sm money-input" required
                     value="{{ old('discount_max_value', isset($promotion) ? number_format($promotion->discount_max_value) : '') }}"
                     autocomplete="off">
 
                 <input type="hidden" name="discount_max_value" id="discount_max_value"
                     value="{{ old('discount_max_value', isset($promotion) ? $promotion->discount_max_value : '') }}">
-
-                {!! $errors->first('discount_max_value', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
 
-        {{-- Discount max uses --}}
+        <tr class="info">
+            <td colspan="2">
+                <strong>3. Phạm vi áp dụng</strong>
+            </td>
+        </tr>
+
+        <tr class="row">
+            <td class="col-md-4 col-lg-3">
+                {!! Form::label('apply_scope', 'Áp dụng cho', ['class' => 'control-label']) !!}
+            </td>
+
+            <td class="col-md-8 col-lg-9">
+
+                <label>
+                    {!! Form::radio('apply_scope', 'booking', true) !!}
+                    Toàn bộ booking
+                </label>
+
+                <br>
+
+                <label>
+                    {!! Form::radio('apply_scope', 'room') !!}
+                    Chỉ tiền phòng
+                </label>
+
+                <br>
+
+                <label>
+                    {!! Form::radio('apply_scope', 'service') !!}
+                    Chỉ dịch vụ
+                </label>
+
+            </td>
+        </tr>
+
+        <tr class="info">
+            <td colspan="2">
+                <strong>4. Điều kiện áp dụng</strong>
+            </td>
+        </tr>
+
+        {{-- Min order --}}
+        <tr class="row {{ $errors->has('discount_min_order_value') ? 'has-error' : '' }}">
+            <td class="col-md-4 col-lg-3">
+                {!! Form::label('discount_min_order_value_display', 'Giá trị booking tối thiểu', ['class' => 'control-label']) !!}
+            </td>
+
+            <td class="col-md-8 col-lg-9">
+                <input type="text" id="discount_min_order_value_display" class="form-control input-sm money-input" required
+                    value="{{ old('discount_min_order_value', isset($promotion) ? number_format($promotion->discount_min_order_value) : '') }}"
+                    autocomplete="off">
+
+                <input type="hidden" name="discount_min_order_value" id="discount_min_order_value"
+                    value="{{ old('discount_min_order_value', isset($promotion) ? $promotion->discount_min_order_value : '') }}">
+            </td>
+        </tr>
+
+        {{-- Membership --}}
+        <tr class="row">
+            <td class="col-md-4 col-lg-3">
+                <label class="control-label">Áp dụng cho membership</label>
+            </td>
+
+            <td class="col-md-8 col-lg-9">
+
+                <select name="membership_levels[]" class="form-control select2" multiple>
+
+                    @foreach ($memberships as $membership)
+                        <option value="{{ $membership->id }}">
+                            {{ $membership->name }}
+                        </option>
+                    @endforeach
+
+                </select>
+
+            </td>
+        </tr>
+
+        {{-- Birthday --}}
+        <tr class="row">
+            <td class="col-md-4 col-lg-3">
+                <label class="control-label">Chỉ áp dụng sinh nhật</label>
+            </td>
+
+            <td class="col-md-8 col-lg-9">
+
+                <label>
+                    <input type="checkbox" name="rule_birthday" value="1">
+                    Áp dụng cho khách sinh nhật
+                </label>
+
+            </td>
+        </tr>
+
+        <tr class="info">
+            <td colspan="2">
+                <strong>5. Giới hạn & thời gian</strong>
+            </td>
+        </tr>
+
+        {{-- Max uses --}}
         <tr class="row {{ $errors->has('discount_max_uses') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_max_uses', 'Tổng số lượt sử dụng', ['class' => 'control-label label-required']) !!}
+                {!! Form::label('discount_max_uses', 'Tổng số lượt sử dụng', ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
-                {!! Form::number('discount_max_uses', null, [
+                {!! Form::number('discount_max_uses', old('discount_max_uses', $promotion->discount_max_uses ?? null), [
                     'class' => 'form-control input-sm',
-                    'min' => 1,
-                    'placeholder' => 'Ví dụ: 100',
-                    'required',
                 ]) !!}
-                {!! $errors->first('discount_max_uses', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
 
-
-        {{-- Discount max uses per user --}}
+        {{-- Max uses per user --}}
         <tr class="row {{ $errors->has('discount_max_uses_per_user') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_max_uses_per_user', 'Số lượt tối đa / mỗi khách hàng', [
-                    'class' => 'control-label label-required',
-                ]) !!}
+                {!! Form::label('discount_max_uses_per_user', 'Số lượt / mỗi khách', ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
-                {!! Form::number('discount_max_uses_per_user', null, [
-                    'class' => 'form-control input-sm',
-                    'min' => 1,
-                    'placeholder' => 'Ví dụ: 1',
-                    'required',
-                ]) !!}
-                {!! $errors->first('discount_max_uses_per_user', '<p class="help-block">:message</p>') !!}
+                {!! Form::number(
+                    'discount_max_uses_per_user',
+                    old('discount_max_uses_per_user', $promotion->discount_max_uses_per_user ?? null),
+                    ['class' => 'form-control input-sm'],
+                ) !!}
             </td>
         </tr>
-
-
 
         {{-- Start date --}}
         <tr class="row {{ $errors->has('start_date') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('start_date', 'Ngày bắt đầu', ['class' => 'control-label label-required']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
                 {!! Form::date('start_date', isset($promotion->start_date) ? $promotion->start_date->format('Y-m-d') : null, [
                     'class' => 'form-control input-sm',
                     'required',
                 ]) !!}
-                {!! $errors->first('start_date', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
 
@@ -235,168 +304,28 @@
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('end_date', 'Ngày kết thúc', ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
                 {!! Form::date('end_date', isset($promotion->end_date) ? $promotion->end_date->format('Y-m-d') : null, [
                     'class' => 'form-control input-sm',
                 ]) !!}
-                {!! $errors->first('end_date', '<p class="help-block">:message</p>') !!}
             </td>
         </tr>
-
-
-        @php
-            $serviceRule = $rules['service'] ?? null;
-            $serviceMode = $serviceRule->config['mode'] ?? 'all';
-            $serviceIds = $serviceRule->config['ids'] ?? [];
-        @endphp
-
-        {{-- Điều kiện dịch vụ --}}
-        <tr class="row">
-            <td class="col-md-4 col-lg-3">
-                <label class="control-label label-required">Áp dụng cho dịch vụ</label>
-            </td>
-            <td class="col-md-8 col-lg-9">
-
-                <label>
-                    <input type="radio" name="service_rule" value="all"
-                        {{ $serviceMode === 'all' ? 'checked' : '' }}>
-                    Toàn bộ dịch vụ
-                </label>
-
-                <br>
-
-                <label>
-                    <input type="radio" name="service_rule" value="only"
-                        {{ $serviceMode === 'only' ? 'checked' : '' }}>
-                    Chỉ dịch vụ được chọn
-                </label>
-
-                <div id="service_rule_box" class="mt-2 {{ $serviceMode === 'only' ? '' : 'd-none' }}">
-                    <select name="service_ids[]" class="form-control select2" multiple>
-                        @foreach ($services as $id => $name)
-                            <option value="{{ $id }}" {{ in_array($id, $serviceIds) ? 'selected' : '' }}>
-                                {{ $name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-
-            </td>
-        </tr>
-
-
-        @php
-            $membershipRule = $rules['membership'] ?? null;
-            $membershipIds = $membershipRule->config['ids'] ?? [];
-            $membershipAll = empty($membershipIds);
-        @endphp
-
-        {{-- Điều kiện thành viên --}}
-        {{-- @include('admin.promotions.rules.membership') --}}
-        <tr class="row">
-            <td class="col-md-4 col-lg-3">
-                <label class="control-label label-required">Áp dụng cho thành viên</label>
-            </td>
-            <td class="col-md-8 col-lg-9">
-
-                <label>
-                    <input type="checkbox" name="membership_all" value="1"
-                        {{ $membershipAll ? 'checked' : '' }}>
-                    Toàn bộ thành viên
-                </label>
-
-                <div id="membership_box" class="mt-2 {{ $membershipAll ? 'd-none' : '' }}">
-                    <select name="membership_levels[]" class="form-control select2" multiple>
-                        @foreach ($memberships as $membership)
-                            <option value="{{ $membership->id }}"
-                                {{ in_array($membership->id, $membershipIds) ? 'selected' : '' }}>
-                                {{ $membership->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-
-            </td>
-        </tr>
-
-
-
-        @php
-            $birthdayEnabled = isset($rules['birthday']);
-        @endphp
-
-
-        {{-- @include('admin.promotions.rules.birthday') --}}
-        <tr class="row">
-            <td class="col-md-4 col-lg-3">
-                <label class="control-label">Chỉ áp dụng sinh nhật</label>
-            </td>
-            <td class="col-md-8 col-lg-9">
-                <label>
-                    <input type="checkbox" name="rule_birthday" value="1"
-                        {{ $birthdayEnabled ? 'checked' : '' }}>Áp dụng cho khách sinh nhật
-                </label>
-            </td>
-        </tr>
-
-
-        @php
-            $userRule = $rules['user'] ?? null;
-            $userMode = $userRule->config['mode'] ?? 'all';
-            $userIds = $userRule->config['ids'] ?? [];
-        @endphp
-        {{-- @include('admin.promotions.rules.user') --}}
-        <tr class="row">
-            <td class="col-md-4 col-lg-3">
-                <label class="control-label">Giới hạn khách hàng</label>
-            </td>
-            <td class="col-md-8 col-lg-9">
-
-                <label>
-                    <input type="radio" name="user_rule" value="all"
-                        {{ $userMode === 'all' ? 'checked' : '' }}>Áp dụng cho tất cả khách hàng
-                </label>
-
-                <br>
-
-                <label>
-                    <input type="radio" name="user_rule" value="only"
-                        {{ $userMode === 'only' ? 'checked' : '' }}>
-                    Chỉ áp dụng cho khách hàng được chọn
-                </label>
-
-                <div id="user_box" class="mt-2 {{ $userMode === 'only' ? '' : 'd-none' }}">
-                    <select name="user_ids[]" class="form-control select2 select2-users" multiple>
-                        @foreach ($userIds as $userId)
-                            <option value="{{ $userId }}" selected>
-                                {{ $customers[$userId]->name . ' - ' . $customers[$userId]->phone ?? 'Khách #' . $userId }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-
-
-
-            </td>
-        </tr>
-
-
-
 
         {{-- Active --}}
         <tr class="row">
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('is_active', 'Kích hoạt', ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
+
                 {!! Form::checkbox('is_active', 1, isset($promotion) ? $promotion->is_active : true, ['class' => 'flat-blue']) !!}
+
             </td>
         </tr>
-    </table>
 
+    </table>
 </div>
 
 
@@ -548,24 +477,24 @@
         $(function() {
 
             function toggleMaxDiscount() {
-                let type = $('select[name="discount_type"]').val();
+
+                const type = $('[name="discount_type"]').val()
+                const row = $('#max_discount_row')
+                const input = $('[name="discount_max_value"]')
 
                 if (type === 'percent') {
-                    $('#discount_max_value_row').removeClass('d-none');
+                    row.show()
+                    input.prop('disabled', false)
                 } else {
-                    $('#discount_max_value_row').addClass('d-none');
-
-                    $('#discount_max_value_display').val('');
-                    $('#discount_max_value').val('');
+                    row.hide()
+                    input.prop('disabled', true)
                 }
             }
 
-            toggleMaxDiscount();
+            $('[name="discount_type"]').on('change', toggleMaxDiscount)
 
-            $('select[name="discount_type"]').on('change', function() {
-                toggleMaxDiscount();
-            });
+            toggleMaxDiscount()
 
-        });
+        })
     </script>
 @endsection
