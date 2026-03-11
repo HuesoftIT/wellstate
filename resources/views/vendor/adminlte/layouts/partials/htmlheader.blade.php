@@ -15,7 +15,7 @@
     <link href="{{ url(mix('/css/all.css')) }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/fontawesome-iconpicker.css') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
-    <script src="{{ asset('js/wellbe-js/index.js') }}"></script>
+    <script src="{{ asset('js/wellstate/index.js') }}"></script>
     <script src="{{ asset('js/sweetalert2/sweetalert2@11.js') }}"></script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

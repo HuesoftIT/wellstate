@@ -62,13 +62,13 @@ class BookingController extends Controller
             $bookingDTO = new BookingDTO(
                 $customer ? $customer->id : null,
                 $customer ? $customer->membership_id : null,
-                $booking->branch_id,
-                $booking->room_type_id,
+                $booking->branch_room_type_id,
                 $booking->booking_date,
                 $booking->total_guests,
                 $subtotal,
                 $services,
-                $phone
+                $phone,
+                $booking->apply_scope
             );
             $promotion_code = null;
             if ($request->promotion_id) {

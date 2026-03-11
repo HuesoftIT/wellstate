@@ -118,7 +118,7 @@
                         <th class="text-center" width="4%">{{ __('message.index') }}</th>
 
                         <th>Mã booking</th>
-                        <th>Email người đặt</th>
+                        <th>Tên người đặt</th>
                         <th>Chi nhánh</th>
                         <th>Thời gian</th>
                         <th class="text-center">Số khách</th>
@@ -151,7 +151,7 @@
                             {{-- BOOKER --}}
                             <td>
                                 <div class="font-weight-bold text-dark">
-                                    {{ $item->booker_email }}
+                                    {{ $item->booker_name }}
                                 </div>
 
                                 <div class="d-flex align-items-center mt-1 text-muted cursor-pointer"

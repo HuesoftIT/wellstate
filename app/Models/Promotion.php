@@ -13,12 +13,26 @@ use Str;
 class Promotion extends Model
 {
     use HasFactory, SoftDeletes;
+    const APPLY_SCOPE_BOOKING = 'booking';
+    const APPLY_SCOPE_ROOM = 'room';
+    const APPLY_SCOPE_SERVICE = 'service';
 
+    public const APPLY_SCOPES = [
+        self::APPLY_SCOPE_BOOKING,
+        self::APPLY_SCOPE_ROOM,
+        self::APPLY_SCOPE_SERVICE,
+    ];
+
+    public const APPLY_SCOPE_LABELS = [
+        self::APPLY_SCOPE_BOOKING => 'Toàn bộ booking',
+        self::APPLY_SCOPE_ROOM => 'Phòng',
+        self::APPLY_SCOPE_SERVICE => 'Dịch vụ',
+    ];
     protected $fillable = [
-        'type', // membership / promotion
         'title',
         'image',
         'content',
+        'apply_scope',
         'discount_code',
         'discount_max_uses',
         'discount_uses_count',
@@ -37,7 +51,43 @@ class Promotion extends Model
         'end_date'   => 'date',
     ];
 
+    public function getApplyScopeLabelAttribute()
+    {
+        switch ($this->apply_scope) {
+            case self::APPLY_SCOPE_ROOM:
+                return '<span class="badge badge-info" style="font-size:14px;padding:6px 10px;">
+                        <i class="fa fa-bed" style="font-size:14px;"></i> Room
+                    </span>';
 
+            case self::APPLY_SCOPE_SERVICE:
+                return '<span class="badge badge-warning" style="font-size:14px;padding:6px 10px;">
+                        <i class="fa fa-concierge-bell" style="font-size:14px;"></i> Service
+                    </span>';
+
+            case self::APPLY_SCOPE_BOOKING:
+                return '<span class="badge badge-success" style="font-size:14px;padding:6px 10px;">
+                        <i class="fa fa-calendar-check" style="font-size:14px;"></i> Booking
+                    </span>';
+
+            default:
+                return '<span class="badge badge-secondary" style="font-size:14px;padding:6px 10px;">'
+                    . ucfirst($this->apply_scope) .
+                    '</span>';
+        }
+    }
+
+    public function getDiscountDisplayAttribute()
+    {
+        if ($this->discount_type === 'percent') {
+            return '<span class="badge badge-success">'
+                . number_format($this->discount_value) . '%'
+                . '</span>';
+        }
+
+        return '<span class="text-primary font-weight-bold">'
+            . number_format($this->discount_value) . ' đ'
+            . '</span>';
+    }
     public function rules()
     {
         return $this->hasMany(PromotionRule::class)

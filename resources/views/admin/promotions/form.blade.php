@@ -16,7 +16,7 @@
             </td>
         </tr>
 
-      
+
         {{-- Title --}}
         <tr class="row {{ $errors->has('title') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
@@ -53,31 +53,47 @@
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('image', trans('news.image'), ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
+
                 <div>
-                    <div class="input-group inputfile-wrap ">
+
+                    <div class="input-group inputfile-wrap">
                         <input type="text" class="form-control input-sm" readonly>
+
                         <div class="input-group-btn">
                             <button type="button" class="btn btn-danger btn-sm">
-                                <i class=" fa fa-upload"></i>
+                                <i class="fa fa-upload"></i>
                                 {{ __('message.upload') }}
                             </button>
-                            {!! Form::file(
-                                'image',
-                                array_merge(['id' => 'image', 'class' => 'form-control input-sm', 'accept' => 'image/*']),
-                            ) !!}
+
+                            {!! Form::file('image', [
+                                'id' => 'image',
+                                'class' => 'form-control input-sm',
+                                'accept' => 'image/*',
+                            ]) !!}
                         </div>
+
                         {!! $errors->first('image', '<p class="help-block">:message</p>') !!}
                     </div>
+
                     <div class="clearfix"></div>
-                    <div class="imgprev-wrap" style="display:{{ !empty($promotion->image) ? 'block' : 'none' }}">
-                        <input type="hidden" value="" name="img-hidden" />
-                        <img class="img-preview"
-                            src="{{ !empty($promotion->image) ? Storage::url($promotion->image) : '' }}"
+
+                    @php
+                        $oldImage = old('img-hidden', $promotion->image ?? null);
+                    @endphp
+
+                    <div class="imgprev-wrap" style="display:{{ $oldImage ? 'block' : 'none' }}">
+                        <input type="hidden" name="img-hidden" value="{{ $oldImage }}" />
+
+                        <img class="img-preview" src="{{ $oldImage ? Storage::url($oldImage) : '' }}"
                             alt="{{ trans('service.image') }}" />
+
                         <i class="fa fa-trash text-danger"></i>
                     </div>
+
                 </div>
+
             </td>
         </tr>
 
@@ -148,7 +164,7 @@
             </td>
 
             <td class="col-md-8 col-lg-9">
-                <input type="text" id="discount_max_value_display" class="form-control input-sm money-input" required
+                <input type="text" id="discount_max_value_display" class="form-control input-sm money-input"
                     value="{{ old('discount_max_value', isset($promotion) ? number_format($promotion->discount_max_value) : '') }}"
                     autocomplete="off">
 
@@ -159,34 +175,34 @@
 
         <tr class="info">
             <td colspan="2">
-                <strong>3. Phạm vi áp dụng</strong>
+                <strong>3. Giảm giá cho</strong>
             </td>
         </tr>
 
         <tr class="row">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('apply_scope', 'Áp dụng cho', ['class' => 'control-label']) !!}
+                {!! Form::label('apply_scope', 'Áp dụng giảm giá vào', ['class' => 'control-label']) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
 
+                @php
+                    $applyScope = old('apply_scope', $promotion->apply_scope ?? 'booking');
+                @endphp
+
                 <label>
-                    {!! Form::radio('apply_scope', 'booking', true) !!}
-                    Toàn bộ booking
+                    {!! Form::radio('apply_scope', 'booking', $applyScope === 'booking') !!}
+                    Toàn bộ hóa đơn booking
                 </label>
 
-                <br>
-
                 <label>
-                    {!! Form::radio('apply_scope', 'room') !!}
+                    {!! Form::radio('apply_scope', 'room', $applyScope === 'room') !!}
                     Chỉ tiền phòng
                 </label>
 
-                <br>
-
                 <label>
-                    {!! Form::radio('apply_scope', 'service') !!}
-                    Chỉ dịch vụ
+                    {!! Form::radio('apply_scope', 'service', $applyScope === 'service') !!}
+                    Chỉ tiền dịch vụ
                 </label>
 
             </td>
@@ -205,7 +221,8 @@
             </td>
 
             <td class="col-md-8 col-lg-9">
-                <input type="text" id="discount_min_order_value_display" class="form-control input-sm money-input" required
+                <input type="text" id="discount_min_order_value_display" class="form-control input-sm money-input"
+                    required
                     value="{{ old('discount_min_order_value', isset($promotion) ? number_format($promotion->discount_min_order_value) : '') }}"
                     autocomplete="off">
 
@@ -214,6 +231,35 @@
             </td>
         </tr>
 
+        @php
+            $userIds = old('user_ids', $userIds ?? []);
+            $serviceIds = old('service_ids', $serviceIds ?? []);
+            $membershipIds = old('membership_levels', $membershipIds ?? []);
+        @endphp
+        {{-- Services --}}
+        <tr class="row" id="service_selector" style="display:none;">
+            <td class="col-md-4 col-lg-3">
+                <label class="control-label">Chọn dịch vụ áp dụng</label>
+            </td>
+
+            <td class="col-md-8 col-lg-9">
+
+                <select name="service_ids[]" class="form-control select2" multiple>
+
+                    @foreach ($services as $id => $service)
+                        <option value="{{ $id }}" {{ in_array($id, $serviceIds) ? 'selected' : '' }}>
+                            {{ $service }}
+                        </option>
+                    @endforeach
+
+                </select>
+
+                <small class="text-muted">
+                    Chỉ áp dụng khi chọn "Chỉ tiền dịch vụ"
+                </small>
+
+            </td>
+        </tr>
         {{-- Membership --}}
         <tr class="row">
             <td class="col-md-4 col-lg-3">
@@ -225,7 +271,8 @@
                 <select name="membership_levels[]" class="form-control select2" multiple>
 
                     @foreach ($memberships as $membership)
-                        <option value="{{ $membership->id }}">
+                        <option value="{{ $membership->id }}"
+                            {{ in_array($membership->id, $membershipIds) ? 'selected' : '' }}>
                             {{ $membership->name }}
                         </option>
                     @endforeach
@@ -234,9 +281,37 @@
 
             </td>
         </tr>
+        {{-- Customer --}}
+        <tr class="row">
+            <td class="col-md-4 col-lg-3">
+                <label class="control-label">Áp dụng cho khách hàng</label>
+            </td>
+
+            <td class="col-md-8 col-lg-9">
+
+                <select name="user_ids[]" class="form-control select2 select2-users" multiple>
+
+                    @foreach ($customers as $customer)
+                        <option value="{{ $customer->id }}"
+                            {{ in_array($customer->id, $userIds) ? 'selected' : '' }}>
+
+                            {{ $customer->name }} - {{ $customer->phone }}
+
+                        </option>
+                    @endforeach
+
+                </select>
+
+                <small class="text-muted">
+                    Để trống nếu áp dụng cho tất cả khách
+                </small>
+
+            </td>
+        </tr>
+
 
         {{-- Birthday --}}
-        <tr class="row">
+        {{-- <tr class="row">
             <td class="col-md-4 col-lg-3">
                 <label class="control-label">Chỉ áp dụng sinh nhật</label>
             </td>
@@ -249,7 +324,7 @@
                 </label>
 
             </td>
-        </tr>
+        </tr> --}}
 
         <tr class="info">
             <td colspan="2">
@@ -360,36 +435,57 @@
     <script type="text/javascript">
         $(function() {
             $('#image').change(function() {
+
                 var preview = document.querySelector('img.img-preview');
                 var file = document.querySelector('#image').files[0];
+
+                if (!file) return;
+
                 var reader = new FileReader();
 
-                if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+                if (/\.(jpe?g|png|gif|webp)$/i.test(file.name)) {
 
                     reader.addEventListener("load", function() {
+
                         preview.src = reader.result;
-                        $('.imgprev-wrap').css('display', 'block');
-                        $('.inputfile-wrap').find('input[type=text]').val(file.name);
+
+                        $('.imgprev-wrap').show();
+
+                        $('.inputfile-wrap')
+                            .find('input[type=text]')
+                            .val(file.name);
+
                     }, false);
 
-                    if (file) {
-                        reader.readAsDataURL(file);
-                    }
+                    reader.readAsDataURL(file);
+
                 } else {
-                    document.querySelector('#image').value = '';
-                    $('.imgprev-wrap').find('input[type=hidden]').val('');
+
+                    alert('Chỉ hỗ trợ JPG, PNG, GIF, WEBP');
+
+                    $('#image').val('');
+
+                    $('.imgprev-wrap')
+                        .find('input[type=hidden]')
+                        .val('');
                 }
             });
 
             $('.imgprev-wrap .fa-trash').click(function() {
+
                 var preview = document.querySelector('img.img-preview');
 
                 if (confirm('{{ __('message.confirm_delete') }}')) {
+
                     preview.src = '';
-                    $('.imgprev-wrap').css('display', 'none');
-                    $('.inputfile-wrap').find('input[type=text]').val('');
+
+                    $('.imgprev-wrap').hide();
+
+                    $('.inputfile-wrap')
+                        .find('input[type=text]')
+                        .val('');
                 }
-            })
+            });
         });
     </script>
 
@@ -429,16 +525,22 @@
             const $userSelect = $('.select2-users');
 
             $userSelect.select2({
+                width: '100%',
+                placeholder: 'Chọn khách hàng',
+
                 ajax: {
                     url: '/api/customers/search',
                     dataType: 'json',
                     delay: 300,
+                    cache: true,
+
                     data: function(params) {
                         return {
                             q: params.term,
                             membership_levels: $('select[name="membership_levels[]"]').val()
                         };
                     },
+
                     processResults: function(data) {
                         return {
                             results: data.map(user => ({
@@ -446,29 +548,45 @@
                                 text: `${user.name} - ${user.phone}`
                             }))
                         };
-                    },
-                    error: function(xhr) {
-                        console.log(xhr.responseText);
-                    },
-                    language: {
-                        errorLoading: function() {
-                            return 'Không thể tải dữ liệu';
-                        },
-                        inputTooShort: function() {
-                            return 'Vui lòng nhập ít nhất 1 ký tự';
-                        },
-                        loadingMore: function() {
-                            return 'Đang tải thêm kết quả…';
-                        },
-                        noResults: function() {
-                            return 'Không tìm thấy kết quả phù hợp';
-                        },
-                        searching: function() {
-                            return 'Đang tìm kiếm…';
-                        }
                     }
                 },
-                width: '100%'
+
+                language: {
+                    errorLoading: () => 'Không thể tải dữ liệu',
+                    loadingMore: () => 'Đang tải thêm kết quả…',
+                    noResults: () => 'Không tìm thấy kết quả phù hợp',
+                    searching: () => 'Đang tìm kiếm…'
+                }
+            });
+
+        });
+        $(document).ready(function() {
+
+            function toggleServiceSelector() {
+
+                let scope = $('input[name="apply_scope"]:checked').val();
+
+                if (scope === 'service') {
+
+                    $('#service_selector').show();
+                    $('#service_selector select').prop('disabled', false);
+
+                } else {
+
+                    $('#service_selector').hide();
+
+                    $('#service_selector select')
+                        .prop('disabled', true)
+                        .val(null)
+                        .trigger('change');
+
+                }
+            }
+
+            toggleServiceSelector();
+
+            $('input[name="apply_scope"]').change(function() {
+                toggleServiceSelector();
             });
 
         });
@@ -488,6 +606,7 @@
                 } else {
                     row.hide()
                     input.prop('disabled', true)
+                    input.val(null) 
                 }
             }
 

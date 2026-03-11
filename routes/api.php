@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/services/by-category/{category}', [ServiceController::class, 'getByCategory']);
 Route::get('/customers/search', [CustomerController::class, 'search']);
 
 Route::get('/branches/{id}/room-types', [BookingController::class, 'getRoomTypesByBranch']);

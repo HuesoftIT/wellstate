@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\DTO\BookingDTO;
 use App\Http\Controllers\Controller;
+use App\Models\BranchRoomType;
+use App\Models\Customer;
 use App\Services\Promotion\PromotionService;
 use Illuminate\Http\Request;
 
@@ -31,16 +33,27 @@ class PromotionController extends Controller
 
         $discount_code = $request->discount_code;
         $services = $request->services;
-        $subtotal = $request->subtotal;
         $branch_id = $request->branch_id;
         $room_type_id = $request->room_type_id;
         $booking_date = $request->booking_date;
         $total_guests = $request->total_guests;
         $phone = $request->phone;
+        $apply_scope = $request->apply_scope;
+        $customer = Customer::active()->where('phone', $phone)->first();
+        $customerId = $customer ? $customer->id : null;
 
-        $bookingDTO = new BookingDTO(null, null,  $branch_id, $room_type_id, $booking_date, $total_guests, $subtotal, $services, $phone);
+        $branchRoomType = BranchRoomType::active()
+            ->where('branch_id', $branch_id)
+            ->where('room_type_id', $room_type_id)
+            ->first();
 
-     
+        $branchRoomTypeId = $branchRoomType->id;
+        $roomPrice = $branchRoomType->price;
+
+        $subtotal = $request->subtotal + $roomPrice;
+        $bookingDTO = new BookingDTO($customerId, null, $branchRoomTypeId, $booking_date, $total_guests, $subtotal, $services, $phone, $apply_scope);
+
+
         return $this->promotionService->apply($discount_code, $bookingDTO);
     }
 

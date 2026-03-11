@@ -17,7 +17,7 @@ class PromotionObserver
     public function creating(Promotion $promotion)
     {
         if (empty($promotion->discount_code)) {
-            $promotion->discount_code = $this->generateUniqueSlug($promotion->name);
+            $promotion->discount_code = $this->generateUniqueSlug($promotion->title);
         }
 
         if (request()->hasFile('image')) {
@@ -36,9 +36,9 @@ class PromotionObserver
     public function updating(Promotion $promotion)
     {
         // Nếu đổi tên → đổi slug
-        if ($promotion->isDirty('name')) {
+        if ($promotion->isDirty('title')) {
             $promotion->discount_code = $this->generateUniqueSlug(
-                $promotion->name,
+                $promotion->title,
                 $promotion->id
             );
         }
@@ -58,9 +58,9 @@ class PromotionObserver
         }
     }
 
-    protected function generateUniqueSlug(string $name, $ignoreId = null): string
+    protected function generateUniqueSlug(string $title, $ignoreId = null): string
     {
-        $discount_code = Str::slug($name);
+        $discount_code = Str::slug($title);
         $originalSlug = $discount_code;
 
         $i = 1;

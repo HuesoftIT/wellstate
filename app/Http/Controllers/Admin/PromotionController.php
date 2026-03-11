@@ -40,7 +40,7 @@ class PromotionController extends Controller
             $query->status($request->status);
         }
 
-        $promotions = $query->paginate(config('settings.perpage', 10));
+        $promotions = $query->latest()->paginate(config('settings.perpage', 10));
 
         return view('admin.promotions.index', compact('promotions'));
     }
@@ -56,10 +56,11 @@ class PromotionController extends Controller
             ->pluck('title', 'id');
 
 
-
         $memberships = Membership::where('is_active', true)->get();
-
-        return view('admin.promotions.create', compact('services', 'memberships'));
+        $customers = Customer::active()
+            ->select('id', 'name', 'phone')
+            ->get();
+        return view('admin.promotions.create', compact('services', 'memberships', 'customers'));
     }
 
 
@@ -69,7 +70,6 @@ class PromotionController extends Controller
     public function store(StorePromotionRequest $request)
     {
         DB::transaction(function () use ($request) {
-
             $promotion = $this->createPromotion($request);
             $this->savePromotionRules($promotion, $request);
         });
@@ -95,45 +95,53 @@ class PromotionController extends Controller
         /**
          * 1. Rule dịch vụ
          */
-        if ($request->service_rule === 'only' && $request->filled('service_ids')) {
+        if ($request->filled('service_ids')) {
+
             $promotion->rules()->create([
-                'type'   => 'service',
-                'order'  => 1,
+                'type' => 'service',
+                'order' => 1,
                 'config' => [
                     'mode' => 'include',
-                    'ids'  => array_map('intval', $request->service_ids),
-                ],
+                    'ids' => collect($request->service_ids)
+                        ->map(fn($id) => (int) $id)
+                        ->values()
+                        ->toArray()
+                ]
             ]);
         }
 
         /**
          * 2. Rule membership
-         * Chỉ lưu khi KHÔNG phải "toàn bộ thành viên"
          */
-        if (
-            !$request->boolean('membership_all') &&
-            $request->filled('membership_levels')
-        ) {
+        if ($request->filled('membership_levels')) {
+
             $promotion->rules()->create([
-                'type'   => 'membership',
-                'order'  => 2,
+                'type' => 'membership',
+                'order' => 2,
                 'config' => [
-                    'ids' => array_map('intval', $request->membership_levels),
-                ],
+                    'ids' => collect($request->membership_levels)
+                        ->map(fn($id) => (int) $id)
+                        ->values()
+                        ->toArray()
+                ]
             ]);
         }
 
         /**
          * 3. Rule user
          */
-        if ($request->user_rule === 'only' && $request->filled('user_ids')) {
+        if ($request->filled('user_ids')) {
+
             $promotion->rules()->create([
-                'type'   => 'user',
-                'order'  => 3,
+                'type' => 'user',
+                'order' => 3,
                 'config' => [
                     'mode' => 'only',
-                    'ids'  => array_map('intval', $request->user_ids),
-                ],
+                    'ids' => collect($request->user_ids)
+                        ->map(fn($id) => (int) $id)
+                        ->values()
+                        ->toArray()
+                ]
             ]);
         }
 
@@ -141,12 +149,13 @@ class PromotionController extends Controller
          * 4. Rule sinh nhật
          */
         if ($request->boolean('rule_birthday')) {
+
             $promotion->rules()->create([
-                'type'   => 'birthday',
-                'order'  => 4,
+                'type' => 'birthday',
+                'order' => 4,
                 'config' => [
-                    'enabled' => true,
-                ],
+                    'enabled' => true
+                ]
             ]);
         }
     }
@@ -168,15 +177,26 @@ class PromotionController extends Controller
 
         $rules = $promotion->rules->keyBy('type');
 
+        $serviceIds = $rules['service']->config['ids'] ?? [];
+        $membershipIds = $rules['membership']->config['ids'] ?? [];
         $userIds = $rules['user']->config['ids'] ?? [];
 
         $customers = Customer::whereIn('id', $userIds)
             ->select('id', 'name', 'phone')
             ->get()
             ->keyBy('id');
+
         return view(
             'admin.promotions.edit',
-            compact('promotion', 'services', 'memberships', 'rules', 'customers')
+            compact(
+                'promotion',
+                'services',
+                'memberships',
+                'customers',
+                'serviceIds',
+                'membershipIds',
+                'userIds'
+            )
         );
     }
 
@@ -186,6 +206,7 @@ class PromotionController extends Controller
      */
     public function update(UpdatePromotionRequest $request, $id)
     {
+
         $promotion = Promotion::with('rules')->findOrFail($id);
         DB::transaction(function () use ($request, $promotion) {
 

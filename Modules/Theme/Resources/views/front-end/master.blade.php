@@ -249,6 +249,41 @@
             transition: border-color 0.3s;
 
         }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+
+            width: 45px;
+            height: 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #ffffff;
+            color: #16a34a;
+
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+            cursor: pointer;
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-3px);
+        }
+
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 
     {!! str_replace('<br />', '', $settings['google_analytics']) !!}
@@ -286,6 +321,7 @@
         @section('content')
         @show
         @include('theme::front-end.layouts.footer')
+        @include('theme::front-end.components.scrollToTop')
     </div>
 
     <script>
@@ -318,6 +354,28 @@
 <script src="{{ asset('js/huesoft_js/jquery.js') }}"></script>
 <script src="{{ asset('js/huesoft_js/swiper.js') }}"></script>
 <script src="{{ asset('js/sweetalert2/sweetalert2@11.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const scrollBtn = document.getElementById("scrollToTopBtn");
+
+        window.addEventListener("scroll", function() {
+            if (window.scrollY > 300) {
+                scrollBtn.classList.add("show");
+            } else {
+                scrollBtn.classList.remove("show");
+            }
+        });
+
+        scrollBtn.addEventListener("click", function() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+    });
+</script>
 <script>
     function formatVnd(price) {
         return Number(price).toLocaleString('vi-VN') + 'đ';
@@ -458,119 +516,118 @@
     });
 </script>
 <script>
-    flatpickr("#booking-date", {
-        dateFormat: "d/m/Y",
-        minDate: "today",
-        locale: "vn",
-        disableMobile: true,
-        todayBtn: true,
-        allowInput: false
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-
-        const guestCountInput = document.getElementById('guest-count');
-        const guestContainer = document.getElementById('guest-services');
-        const guestTemplate = document.getElementById('guest-template');
-        const serviceTemplate = document.getElementById('service-template');
+    document.addEventListener("DOMContentLoaded", function() {
+        const guestCountInput = document.getElementById("guest-count");
+        const guestContainer = document.getElementById("guest-services");
+        const guestTemplate = document.getElementById("guest-template");
+        const serviceTemplate = document.getElementById("service-template");
 
         function generateUID() {
-            return 'g_' + Math.random().toString(36).substring(2, 10);
-        };
+            return "g_" + Math.random().toString(36).substring(2, 10);
+        }
 
         function renderGuests(count) {
             if (!guestContainer) return;
 
-            guestContainer.innerHTML = '';
+            guestContainer.innerHTML = "";
 
             for (let i = 0; i < count; i++) {
                 const guestFragment = guestTemplate.content.cloneNode(true);
 
-                guestFragment.querySelector('.guest-index').textContent = i + 1;
-                guestFragment.querySelector('.guest-uid-input').value = generateUID();
+                guestFragment.querySelector(".guest-index").textContent = i + 1;
+                guestFragment.querySelector(".guest-uid-input").value =
+                    generateUID();
 
-                guestFragment.querySelectorAll('[name]').forEach(el => {
-                    el.name = el.name.replace('__index__', i);
+                guestFragment.querySelectorAll("[name]").forEach((el) => {
+                    el.name = el.name.replace("__index__", i);
                 });
 
-                const guestEl = guestFragment.querySelector('.guest-item');
-                const servicesWrapper = guestEl.querySelector('.services-wrapper');
+                const guestEl = guestFragment.querySelector(".guest-item");
+                const servicesWrapper = guestEl.querySelector(".services-wrapper");
 
                 addService(servicesWrapper, i);
 
-                guestEl.querySelector('.add-service')
-                    .addEventListener('click', () => {
+                guestEl
+                    .querySelector(".add-service")
+                    .addEventListener("click", () => {
                         addService(servicesWrapper, i);
                     });
 
                 guestContainer.appendChild(guestFragment);
             }
-        };
+        }
 
         function addService(wrapper, guestIndex) {
             const serviceIndex = wrapper.children.length;
             const serviceFragment = serviceTemplate.content.cloneNode(true);
 
-            serviceFragment.querySelector('.service-select')
-                .addEventListener('change', function() {
+            serviceFragment
+                .querySelector(".service-select")
+                .addEventListener("change", function() {
                     const selectedOption = this.options[this.selectedIndex];
                     const price = selectedOption.dataset.price || 0;
 
-                    const priceInput = this.closest('.service-item')
-                        .querySelector('.service-price');
+                    const priceInput =
+                        this.closest(".service-item").querySelector(
+                            ".service-price",
+                        );
 
                     priceInput.value = price;
                 });
-            serviceFragment.querySelectorAll('[name]').forEach(el => {
+            serviceFragment.querySelectorAll("[name]").forEach((el) => {
                 el.name = el.name.replace(
-                    '__SERVICE_NAME__',
-                    `guests[${guestIndex}][services][${serviceIndex}]`
+                    "__SERVICE_NAME__",
+                    `guests[${guestIndex}][services][${serviceIndex}]`,
                 );
             });
 
-            serviceFragment.querySelector('.remove-service')
-                .addEventListener('click', function() {
-                    const serviceItem = this.closest('.service-item').querySelector('.service-select');
-                    removeService(serviceItem.value, serviceItem.selectedOptions[0]?.dataset.price || 0);
-                    this.closest('.service-item').remove();
+            serviceFragment
+                .querySelector(".remove-service")
+                .addEventListener("click", function() {
+                    const serviceItem =
+                        this.closest(".service-item").querySelector(
+                            ".service-select",
+                        );
+                    removeService(
+                        serviceItem.value,
+                        serviceItem.selectedOptions[0]?.dataset.price || 0,
+                    );
+                    this.closest(".service-item").remove();
                 });
 
             function removeService(serviceId, servicePrice) {
-                state.services = state.services.filter(s => s.id !== serviceId);
+                state.services = state.services.filter((s) => s.id !== serviceId);
                 state.subtotal -= +servicePrice;
 
                 renderSummary();
             }
 
             wrapper.appendChild(serviceFragment);
-        };
+        }
 
         renderGuests(parseInt(guestCountInput?.value) || 1);
 
         if (!guestCountInput) return;
 
-        guestCountInput.addEventListener('input', function() {
+        guestCountInput.addEventListener("input", function() {
             const count = Math.max(1, parseInt(this.value, 10) || 1);
             renderGuests(count);
         });
-
     });
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.remove-service')) return;
+    document.addEventListener("click", function(e) {
+        if (!e.target.closest(".remove-service")) return;
 
-        const button = e.target.closest('.remove-service');
-    })
+        const button = e.target.closest(".remove-service");
+    });
 </script>
-
-
 <script>
-    document.addEventListener('change', function(e) {
-        if (!e.target.classList.contains('service-category')) return;
+    document.addEventListener("change", function(e) {
+        if (!e.target.classList.contains("service-category")) return;
 
         const categorySelect = e.target;
-        const serviceItem = categorySelect.closest('.service-item');
-        const serviceSelect = serviceItem.querySelector('.service-select');
+        const serviceItem = categorySelect.closest(".service-item");
+        const serviceSelect = serviceItem.querySelector(".service-select");
 
         const categoryId = categorySelect.value;
 
@@ -582,15 +639,12 @@
             return;
         }
 
-
-
-
         fetch(`/api/services?service_category_id=${categoryId}`)
-            .then(res => res.json())
-            .then(services => {
+            .then((res) => res.json())
+            .then((services) => {
                 let options = '<option value="">Chọn dịch vụ</option>';
 
-                services.data.forEach(service => {
+                services.data.forEach((service) => {
                     const price = service.sale_price ?? service.price;
 
                     options += `
@@ -603,19 +657,17 @@
                         `;
                 });
 
-
                 serviceSelect.innerHTML = options;
                 serviceSelect.disabled = false;
             });
     });
 </script>
-
 <script>
-    document.addEventListener('change', function(e) {
-        if (e.target.name !== 'branch_id') return;
+    document.addEventListener("change", function(e) {
+        if (e.target.name !== "branch_id") return;
 
         const branchId = e.target.value;
-        const container = document.getElementById('room-type-container');
+        const container = document.getElementById("room-type-container");
 
         container.innerHTML = `
         <div class="flex items-center justify-center h-24 text-slate-400 text-sm">
@@ -624,8 +676,8 @@
         `;
 
         fetch(`/api/ajax/branches/${branchId}/room-types`)
-            .then(res => res.json())
-            .then(res => {
+            .then((res) => res.json())
+            .then((res) => {
                 const roomTypes = res.data;
 
                 if (!roomTypes.length) {
@@ -639,7 +691,7 @@
 
                 container.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    ${roomTypes.map(rt => renderRoomType(rt)).join('')}
+                    ${roomTypes.map((rt) => renderRoomType(rt)).join("")}
                 </div>
             `;
             })
@@ -653,9 +705,8 @@
     });
 
     function renderRoomType(room) {
-        const priceText = room.price > 0 ?
-            `+${room.price.toLocaleString()}đ` :
-            '0đ';
+        const priceText =
+            room.price > 0 ? `+${room.price.toLocaleString()}đ` : "0đ";
 
         return `
         <label
@@ -674,7 +725,7 @@
 
                 <div>
                     <p class="font-medium text-gray-800">${room.name}</p>
-                   
+
                 </div>
             </div>
 
@@ -685,6 +736,174 @@
     `;
     }
 </script>
+<script>
+    const state = {
+        branch: null,
+        date: null,
+        time: null,
+        guests: 1,
+        room: null,
+        roomFee: 0,
+        subtotal: 0,
+        total: 0,
+        discount: 0,
+        promotionId: null,
+        services: [],
+        branchId: null,
+        branchRoomTypeId: null,
+        phone: null,
+        apply_scope: null,
+    };
+    const qs = (s, p = document) => p.querySelector(s);
+    const qsa = (s, p = document) => [...p.querySelectorAll(s)];
+    const money = (v) => new Intl.NumberFormat("vi-VN").format(v) + "đ";
+
+    function setText(selector, value) {
+        const el = qs(selector);
+        if (el) el.textContent = value;
+    }
+
+
+
+    function renderSummary() {
+        setText("#summary-branch", state.branch || "-");
+        setText("#summary-date", state.date || "-");
+        setText("#summary-time", state.time || "-");
+        setText("#summary-guests", state.guests + " khách");
+        setText("#summary-room", state.room || "-");
+
+        setText("#summary-subtotal", money(state.subtotal));
+        setText(
+            "#summary-room-fee",
+            state.roomFee ? `+${money(state.roomFee)}` : "0đ",
+        );
+
+        setText(
+            "#summary-discount",
+            state.discount ? `-${money(state.discount)}` : "0đ",
+        );
+
+        let total = state.subtotal + state.roomFee;
+
+        if (state.discount) {
+
+            if (state.apply_scope === "booking") {
+                const discount = Math.min(state.discount + state.roomFee, total);
+                total = total - discount;
+            }
+
+            if (state.apply_scope === "room") {
+                const discount = Math.min(state.discount, state.roomFee);
+                total = state.subtotal + (state.roomFee - discount);
+            }
+
+            if (state.apply_scope === "service") {
+                const discount = Math.min(state.discount, state.subtotal);
+                total = (state.subtotal - discount) + state.roomFee;
+            }
+        }
+
+        state.total = total;
+        setText("#summary-total", money(state.total));
+    }
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        qsa("input[name='branch_id']").forEach((radio) => {
+            radio.addEventListener("change", () => {
+                const label = radio
+                    .closest(".branch-item")
+                    .querySelector("span")
+                    .innerText.trim();
+
+                state.branch = label;
+                state.branchId = radio.value;
+                invalidatePromotion();
+                renderSummary();
+            });
+        });
+
+        qs("#booker_phone")?.addEventListener("input", (e) => {
+            state.phone = e.target.value.trim();
+            invalidatePromotion();
+
+        });
+        qs("#booking-date")?.addEventListener("change", (e) => {
+            state.date = e.target.value;
+
+            invalidatePromotion();
+            renderSummary();
+        });
+
+        qs("#time-slots")?.addEventListener("click", (e) => {
+            const slot = e.target.closest("[data-time]");
+            if (!slot) return;
+
+            qsa("[data-time]").forEach((el) => el.classList.remove("active"));
+            slot.classList.add("active");
+
+            state.time = slot.dataset.time;
+            qs("#booking-time").value = state.time;
+
+            invalidatePromotion();
+            renderSummary();
+        });
+
+        qs("#guest-count")?.addEventListener("change", (e) => {
+            state.guests = parseInt(e.target.value, 10) || 1;
+            invalidatePromotion();
+            renderSummary();
+        });
+
+        document.addEventListener("change", (e) => {
+            if (!e.target.classList.contains("service-select")) return;
+
+            let subtotal = 0;
+            state.services = [];
+            qsa(".service-select").forEach((select) => {
+                const opt = select.selectedOptions[0];
+                const servicePrice = opt.dataset.price;
+
+                if (opt && opt.dataset.price) {
+                    state.services.push({
+                        id: opt.value,
+                        price: +servicePrice,
+                    });
+                    const price = Number(opt?.dataset?.price || 0);
+                    subtotal += price;
+                }
+            });
+
+            if (state.subtotal !== subtotal) {
+                state.subtotal = subtotal;
+
+                invalidatePromotion();
+                renderSummary();
+            }
+        });
+
+        qs("#room-type-container")?.addEventListener("change", (e) => {
+            if (!e.target.matches("input[name='room_type_id']")) return;
+
+            state.room = e.target.dataset.name;
+            state.roomFee = Number(e.target.dataset.fee || 0);
+            state.branchRoomTypeId = e.target.value;
+            console.log('state.branchRooomTypeId: ', state.branchRoomTypeId);
+            invalidatePromotion();
+            renderSummary();
+        });
+
+        qs("#apply-promo")?.addEventListener("click", () => {
+            state.discount = 0;
+            renderSummary();
+        });
+
+        renderSummary();
+    });
+</script>
+
+
+
 @if (session('success_booking'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -717,141 +936,39 @@
 
 
 <script>
-    const state = {
-        branch: null,
-        date: null,
-        time: null,
-        guests: 1,
-        room: null,
-        roomFee: 0,
-        subtotal: 0,
-        total: 0,
-        discount: 0,
-        promotionId: null,
-        services: [],
-        branchId: null,
-        branchRoomTypeId: null,
-        phone: null,
-    };
-    const qs = (s, p = document) => p.querySelector(s);
-    const qsa = (s, p = document) => [...p.querySelectorAll(s)];
-    const money = v =>
-        new Intl.NumberFormat('vi-VN').format(v) + 'đ';
-
-    function setText(selector, value) {
-        const el = qs(selector);
-        if (el) el.textContent = value;
-    }
-
-    function renderSummary() {
-        setText('#summary-branch', state.branch || '-');
-        setText('#summary-date', state.date || '-');
-        setText('#summary-time', state.time || '-');
-        setText('#summary-guests', state.guests + ' khách');
-        setText('#summary-room', state.room || '-');
-
-        setText('#summary-subtotal', money(state.subtotal));
-        setText('#summary-room-fee',
-            state.roomFee ? `+${money(state.roomFee)}` : '0đ'
-        );
-
-        setText('#summary-discount',
-            state.discount ? `-${money(state.discount)}` : '0đ'
-        );
-
-        const total = (state.subtotal - state.discount) > 0 ? (state.subtotal - state.discount + state.roomFee) : state
-            .roomFee;
-        state.total = total;
-        setText('#summary-total', money(state.total));
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-
-        qsa("input[name='branch_id']").forEach(radio => {
-            radio.addEventListener('change', () => {
-                const label = radio.closest('.branch-item')
-                    .querySelector('span').innerText.trim();
-
-                state.branch = label;
-                state.branchId = radio.value;
-                renderSummary();
-            });
-        });
-
-        qs('#booker_phone')?.addEventListener('input', e => {
-            state.phone = e.target.value.trim();
-            console.log(state.phone);
-        });
-        qs('#booking-date')?.addEventListener('change', e => {
-            state.date = e.target.value;
-            renderSummary();
-        });
-
-        qs('#time-slots')?.addEventListener('click', e => {
-            const slot = e.target.closest('[data-time]');
-            if (!slot) return;
-
-            qsa('[data-time]').forEach(el => el.classList.remove('active'));
-            slot.classList.add('active');
-
-            state.time = slot.dataset.time;
-            qs('#booking-time').value = state.time;
-
-            renderSummary();
-        });
-
-        qs('#guest-count')?.addEventListener('change', e => {
-            state.guests = parseInt(e.target.value, 10) || 1;
-            renderSummary();
-        });
-
-        document.addEventListener('change', e => {
-            if (!e.target.classList.contains('service-select')) return;
-
-            let subtotal = 0;
-            state.services = [];
-            qsa('.service-select').forEach(select => {
-                const opt = select.selectedOptions[0];
-                const servicePrice = opt.dataset.price;
-
-                if (opt && opt.dataset.price) {
-
-                    state.services.push({
-                        id: opt.value,
-                        price: +servicePrice
-                    });
-                    const price = Number(opt?.dataset?.price || 0);
-                    subtotal += price;
-                }
-            });
-
-            if (state.subtotal !== subtotal) {
-                state.subtotal = subtotal;
-                renderSummary();
-            }
-
-        });
-
-        qs('#room-type-container')?.addEventListener('change', e => {
-            if (!e.target.matches("input[name='room_type_id']")) return;
-
-            state.room = e.target.dataset.name;
-            state.roomFee = Number(e.target.dataset.fee || 0);
-            state.branchRoomTypeId = e.target.value;
-
-            renderSummary();
-        });
-
-        qs('#apply-promo')?.addEventListener('click', () => {
-            state.discount = 0;
-            renderSummary();
-        });
-
-        renderSummary();
+    flatpickr("#booking-date", {
+        dateFormat: "d/m/Y",
+        minDate: "today",
+        locale: "vn",
+        disableMobile: true,
+        todayBtn: true,
+        allowInput: false,
     });
 </script>
 
 <script>
+    function showPromoMessage(text, success = true) {
+        const el = document.getElementById('promo-message');
+        const promoCodeEL = document.getElementById('promo-code');
+
+        if (!el) return;
+
+        el.classList.remove('hidden');
+
+        el.classList.remove('text-green-600', 'text-red-500');
+
+        if (success) {
+            el.classList.add('text-green-600');
+        } else {
+            el.classList.add('text-red-500');
+        }
+
+        if (!success && promoCodeEL) {
+            promoCodeEL.value = "";
+        }
+
+        el.textContent = text;
+    }
     document.addEventListener('DOMContentLoaded', function() {
         const applyPromoBtn = document.getElementById('apply-promo');
         const codeInput = document.getElementById('promo-code');
@@ -907,18 +1024,20 @@
                         room_type_id: state.branchRoomTypeId,
                         booking_date: state.date,
                         total_guests: state.guests,
-                        phone: state.phone,
+                        phone: state.phone || document.querySelector('.booker_phone')
+                            ?.value || null,
                     })
                 });
 
 
                 const data = await res.json();
-                console.log('data apply promo', data);
+                console.log(data);
                 if (!res.ok) throw data;
 
                 state.discount = data.discount;
-                state.promotionId = data.promotion_id;
-                state.total = data.total_after_discount;
+                state.apply_scope = data.promotion.apply_scope;
+                // state.promotionId = data.promotion_id;
+                // state.total = data.total_after_discount;
 
                 renderSummary();
 
@@ -947,41 +1066,14 @@
 
         }
 
-        const bookingTriggers = [
-            '#guest-count',
-            'input[name="branch_id"]',
-            '#booking-date',
-            '#booking-time',
-            '#room-type-container'
-        ];
-
-        bookingTriggers.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => {
-                el.addEventListener('change', () => {
-                    resetPromotion(false);
-                });
-            });
-        });
 
 
-        function showPromoMessage(text, success = true) {
-            const el = document.getElementById('promo-message');
-            const promoCodeEL = document.getElementById('promo-code');
-            console.log('promoCodeEL:', promoCodeEL)
-            
-            el.classList.remove('hidden');
-            el.classList.toggle('text-green-600', success);
-            el.classList.toggle('text-red-500', !success);
-            if (!success) {
-                promoCodeEL.value = "";
-            }
-            el.innerText = text;
-        }
+
+
     });
 
     function invalidatePromotion() {
-        if (!state.promotionId) return;
-        console.log('reset lại promo')
+        if (!state.discount) return;
         state.discount = 0;
         state.promotionId = null;
         state.total = state.subtotal + state.roomFee;

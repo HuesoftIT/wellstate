@@ -61,8 +61,8 @@
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
                                 Email
                             </label>
-                            <input type="email" name="booker_email" value="{{ old('booker_email') }}" 
-                                autocomplete="email" placeholder="Ví dụ: example@gmail.com"
+                            <input type="email" name="booker_email" value="{{ old('booker_email') }}" autocomplete="email"
+                                placeholder="Ví dụ: example@gmail.com"
                                 class="input h-11 @error('booker_email') border-red-500 @enderror">
                             @error('booker_email')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -196,7 +196,7 @@
                                         Nhóm dịch vụ
                                     </label>
                                     <select name="__SERVICE_NAME__[service_category_id]"
-                                        class="service-category select h-11 w-full">
+                                        class="service-category select h-11 w-full border-1 border-[#ccc] rounded-md border">
                                         <option value="">Chọn nhóm</option>
                                         @foreach ($serviceCategories as $category)
                                             <option value="{{ $category->id }}">
@@ -211,7 +211,8 @@
                                     <label class="block text-sm font-medium text-slate-600 mb-1">
                                         Dịch vụ
                                     </label>
-                                    <select name="__SERVICE_NAME__[service_id]" class="service-select select h-11 w-full"
+                                    <select name="__SERVICE_NAME__[service_id]"
+                                        class="service-select select h-11 w-full border-1 border-[#ccc] rounded-md border"
                                         disabled>
                                         <option value="">Chọn dịch vụ</option>
                                     </select>

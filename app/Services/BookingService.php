@@ -53,6 +53,7 @@ class BookingService
             ->first();
         return Booking::create([
             'booking_code'   => $this->generateBookingCode(),
+            'apply_scope'    => $request->apply_scope,
             'customer_id' => auth('customer')->check()
                 ? auth('customer')->id()
                 : null,
@@ -99,7 +100,9 @@ class BookingService
     ): array {
         $subtotal = 0;
         $totalDuration = 0;
-
+        $roomType = BranchRoomType::active()->where('branch_id', $request->branch_id)
+            ->where('room_type_id', $request->room_type_id)
+            ->firstOrFail();
         foreach ($request->guests as $guestData) {
 
             $guest = BookingGuest::create([
@@ -125,9 +128,7 @@ class BookingService
                     'status'           => 'pending',
                 ]);
 
-                $roomType = BranchRoomType::active()->where('branch_id', $request->branch_id)
-                    ->where('room_type_id', $request->room_type_id)
-                    ->firstOrFail();
+              
 
                 BookingGuestServiceRoom::create([
                     'booking_guest_service_id' => $guestService->id,
@@ -137,7 +138,7 @@ class BookingService
                     'price'                    => $roomType->price,
                 ]);
 
-                $price = $service->sale_price ?: $service->price;
+                $price = $service->sale_price ? $service->sale_price: $service->price;
 
                 $subtotal += $price;
                 $totalDuration += $service->duration;

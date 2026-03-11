@@ -4,10 +4,12 @@ namespace App\Services\Promotion;
 
 use App\DTO\BookingDTO;
 use App\Models\Booking;
+use App\Models\BranchRoomType;
 use App\Models\Promotion;
 use App\Models\PromotionRule;
 use App\Models\PromotionUsage;
 use Carbon\Carbon;
+use Error;
 use Exception;
 
 class PromotionService
@@ -82,18 +84,19 @@ class PromotionService
         if (empty($code)) {
             return $this->emptyResult();
         }
-        $phone = $booking->phone;
-        $promotion = $this->findValidPromotion($code, $phone);
+        
+        $promotion = $this->findValidPromotion($code);
 
         $this->validateBase($promotion, $booking);
         $this->validateRules($promotion, $booking);
         $this->validateUserUsage($promotion, $booking);
 
         $eligibleAmount = $this->getEligibleAmount($promotion, $booking);
-
+        
         if ($eligibleAmount <= 0) {
-            throw new Exception('Không có dịch vụ hợp lệ để áp dụng khuyến mãi');
+            throw new Error('Khuyến mãi không áp dụng cho đơn đặt lịch này');
         }
+
         $discount = $this->calculateDiscount($promotion, $eligibleAmount);
 
         return [
@@ -102,27 +105,62 @@ class PromotionService
             'eligible_amount' => $eligibleAmount,
         ];
     }
-    protected function getEligibleAmount(Promotion $promotion, BookingDTO $booking)
+    protected function getEligibleAmount(Promotion $promotion, BookingDTO $booking): float
+    {
+        switch ($promotion->apply_scope) {
+
+            case Promotion::APPLY_SCOPE_BOOKING:
+                return $this->getBookingAmount($booking);
+
+            case Promotion::APPLY_SCOPE_ROOM:
+                return $this->getRoomAmount($booking);
+
+            case Promotion::APPLY_SCOPE_SERVICE:
+                return $this->getServiceAmount($promotion, $booking);
+
+            default:
+                return 0;
+        }
+    }
+
+    protected function getBookingAmount(BookingDTO $booking): float
+    {
+        return $booking->subtotal;
+    }
+
+    protected function getRoomAmount(BookingDTO $booking): float
+    {   
+        $price = BranchRoomType::active()->where('id', $booking->branchRoomTypeId)->value('price');
+        return $price ?? 0;
+    }
+
+    protected function getServiceAmount(Promotion $promotion, BookingDTO $booking): float
     {
         $amount = 0;
 
-        foreach ($promotion->rules as $rule) {
-            if ($rule->type === 'service') {
+        $serviceRules = $promotion->rules
+            ->where('type', 'service');
 
-                $config = $rule->config ?? [];
-                $ruleIds = $config['ids'] ?? [];
+        if ($serviceRules->isEmpty()) {
 
-                foreach ($booking->services as $service) {
-                    if (in_array($service['id'], $ruleIds)) {
-                        $amount += $service['price'];
-                    }
-                }
+            foreach ($booking->services as $service) {
+                $amount += $service['price'];
             }
+
+            return $amount;
         }
 
-        // Nếu không có service rule -> áp cho toàn bộ booking
-        if ($amount == 0) {
-            return $booking->subtotal;
+        foreach ($serviceRules as $rule) {
+
+            $config = $rule->config ?? [];
+            $ruleIds = $config['ids'] ?? [];
+
+            foreach ($booking->services as $service) {
+
+                if (in_array($service['id'], $ruleIds)) {
+                    $amount += $service['price'];
+                }
+            }
         }
 
         return $amount;
@@ -130,39 +168,19 @@ class PromotionService
     /**
      * ===== FIND & BASIC VALIDATE =====
      */
-    protected function findValidPromotion(string $code, $phone): Promotion
+    protected function findValidPromotion(string $code): Promotion
     {
         $code = trim($code);
-        $promotion = Promotion::active()->where('discount_code', $code)
+
+        $promotion = Promotion::with('rules')->active()
+            ->where('discount_code', $code)
             ->first();
-        if (!$phone) {
-            throw new Exception('Số điện thoại là bắt buộc để áp dụng mã khuyến mãi');
-        }
 
         if (!$promotion) {
             throw new Exception('Mã khuyến mãi không hợp lệ');
         }
 
 
-        if ($promotion->start_date && Carbon::now()->lt($promotion->start_date)) {
-            throw new Exception('Mã khuyến mãi chưa bắt đầu');
-        }
-
-        if ($promotion->end_date && Carbon::now()->gt($promotion->end_date)) {
-            throw new Exception('Mã khuyến mãi đã hết hạn');
-        }
-
-
-        if ($promotion->discount_max_uses_per_user !== null) {
-
-            $userUses = PromotionUsage::where('promotion_id', $promotion->id)
-                ->where('phone_number', $phone)
-                ->count();
-
-            if ($userUses >= $promotion->discount_max_uses_per_user) {
-                throw new Exception('Bạn đã sử dụng hết số lượt cho mã khuyến mãi này');
-            }
-        }
 
         return $promotion;
     }
@@ -174,6 +192,7 @@ class PromotionService
         Promotion $promotion,
         BookingDTO $booking
     ) {
+
         if (
             $promotion->discount_min_order_value &&
             $booking->subtotal < $promotion->discount_min_order_value
@@ -187,6 +206,18 @@ class PromotionService
         ) {
             throw new Exception('Mã khuyến mãi đã hết lượt sử dụng');
         }
+
+        if ($booking->bookingDate) {
+            $bookingDate = $booking->bookingDate;
+          
+            if ($promotion->start_date && $bookingDate->lt($promotion->start_date)) {
+                throw new Exception('Ngày đặt lịch chưa nằm trong thời gian áp dụng khuyến mãi');
+            }
+
+            if ($promotion->end_date && $bookingDate->gt($promotion->end_date)) {
+                throw new Exception('Ngày đặt lịch đã vượt quá thời gian khuyến mãi');
+            }
+        }
     }
 
 
@@ -196,13 +227,16 @@ class PromotionService
      */
     protected function validateUserUsage(Promotion $promotion, BookingDTO $booking)
     {
-        if (! $promotion->discount_max_uses_per_user || ! $booking->customerId || !$booking->phone) {
+        if (!$promotion->discount_max_uses_per_user) {
             return;
         }
 
-        $usedCount = Booking::active()
-            ->where('customer_id', $booking->customerId)
-            ->where('promotion_id', $promotion->id)
+        if (!$booking->phone) {
+            throw new Exception('Số điện thoại là bắt buộc để áp dụng khuyến mãi');
+        }
+
+        $usedCount = PromotionUsage::where('promotion_id', $promotion->id)
+            ->where('phone_number', $booking->phone)
             ->count();
 
         if ($usedCount >= $promotion->discount_max_uses_per_user) {

@@ -131,7 +131,7 @@
                             <td style="cursor: pointer;" onclick="copyDiscountCode('{{ $item->discount_code }}')"> <i
                                     class="fa fa-copy"></i>
                                 {{ $item->discount_code }}</td>
-                            <td>{{ ucfirst($item->type) }}</td>
+                            <td>{!! $item->apply_scope_label !!}</td>
                             <td>
                                 @if ($item->discount_type === 'fixed')
                                     Giảm tiền cố định
@@ -142,9 +142,7 @@
                                 @endif
                             </td>
 
-                            <td class="text-right">
-                                {{ number_format($item->discount_value) }}
-                            </td>
+                            <td class="text-right">{!! $item->discount_display !!}</td>
                             <td class="text-right">
                                 {{ $item->discount_max_value ? number_format($item->discount_max_value) : '-' }}
                             </td>

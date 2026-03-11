@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
-// routes/web.php hoặc api.php
+
 Route::get(
     '/ajax/branches/{id}/room-types',
     [BranchRoomTypeController::class, 'getRoomTypesById']
