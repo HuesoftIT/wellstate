@@ -974,8 +974,12 @@
         const codeInput = document.getElementById('promo-code');
         const messageEl = document.getElementById('promo-message');
         let debounceTimer = null;
+        let isApplyingPromo = false;
         if (applyPromoBtn) {
-            applyPromoBtn.addEventListener('click', applyPromotion);
+            applyPromoBtn.addEventListener('click', function() {
+                clearTimeout(debounceTimer);
+                applyPromotion();
+            });
         }
 
         if (codeInput) {
@@ -992,18 +996,22 @@
 
                 debounceTimer = setTimeout(() => {
                     applyPromotion();
-                }, 800);
+                }, 2000);
             });
         }
 
 
         async function applyPromotion() {
-            const code = codeInput.value.trim();
+            clearTimeout(debounceTimer);
 
+            const code = codeInput.value.trim();
             if (!code) {
                 showPromoMessage('Vui lòng nhập mã giảm giá', false);
                 return;
             }
+            if (isApplyingPromo) return;
+            isApplyingPromo = true;
+
 
             try {
                 const res = await fetch('/api/ajax/promotions/apply', {
@@ -1050,6 +1058,8 @@
                     err?.message || 'Mã giảm giá không hợp lệ',
                     false
                 );
+            } finally {
+                isApplyingPromo = false;
             }
         }
 

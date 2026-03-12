@@ -49,7 +49,7 @@
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
                                 Số điện thoại <span class="text-red-500">*</span>
                             </label>
-                            <input type="tel" id="booker_phone" name="booker_phone" value="{{ old('booker_phone') }}"
+                            <input type="tel" id="booker_phone" name="booker_phone" value="{{ old('booker_phone') }}" required
                                 class="input h-11 @error('booker_phone') border-red-500 @enderror">
 
                             @error('booker_phone')
@@ -169,7 +169,7 @@
                                 <label class="mb-1 block text-sm font-medium text-slate-600">
                                     Tên khách
                                 </label>
-                                <input type="text" name="guests[__index__][name]" placeholder="Tên khách (tuỳ chọn)"
+                                <input type="text" name="guests[__index__][name]" required placeholder="Tên khách (tuỳ chọn)"
                                     class="input h-11">
                             </div>
 
@@ -196,7 +196,7 @@
                                         Nhóm dịch vụ
                                     </label>
                                     <select name="__SERVICE_NAME__[service_category_id]"
-                                        class="service-category select h-11 w-full border-1 border-[#ccc] rounded-md border">
+                                        class="service-category select h-11 w-full border-1 border-[#ccc] rounded-md border" required>
                                         <option value="">Chọn nhóm</option>
                                         @foreach ($serviceCategories as $category)
                                             <option value="{{ $category->id }}">
@@ -212,7 +212,7 @@
                                         Dịch vụ
                                     </label>
                                     <select name="__SERVICE_NAME__[service_id]"
-                                        class="service-select select h-11 w-full border-1 border-[#ccc] rounded-md border"
+                                        class="service-select select h-11 w-full border-1 border-[#ccc] rounded-md border" required
                                         disabled>
                                         <option value="">Chọn dịch vụ</option>
                                     </select>

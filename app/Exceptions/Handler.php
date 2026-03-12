@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Exceptions;
+
 use Throwable;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -49,5 +51,14 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         return parent::render($request, $exception);
+    }
+
+    protected function invalidJson($request, ValidationException $exception)
+    {
+        return response()->json([
+            'success' => false,
+            'message' => collect($exception->errors())->first()[0],
+            'errors'  => $exception->errors(),
+        ], $exception->status);
     }
 }
