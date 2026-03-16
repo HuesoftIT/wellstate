@@ -124,12 +124,31 @@ class PromotionController extends Controller
 
         return $this->promotionService->apply($discount_code, $bookingDTO);
     }
-    public function check(Request $request)
+    public function loadPromotionsAvailable(Request $request, PromotionService $promotionService)
     {
+        $validated = $request->validate([
+            'branch_id' => 'required|integer',
+            'room_type_id' => 'required|integer',
+        ]);
+
+        $branchRoomTypeId = BranchRoomType::active()
+            ->where('branch_id', $validated['branch_id'])
+            ->where('room_type_id', $validated['room_type_id'])
+            ->value('id');
+
+        if (!$branchRoomTypeId) {
+            return response()->json([
+                'message' => 'Không tìm thấy loại phòng trong chi nhánh này'
+            ], 404);
+        }
+
+        $request->merge([
+            'branch_room_type_id' => $branchRoomTypeId
+        ]);
+
         $bookingData = BookingDTO::fromRequest($request);
 
-        $promotions = app(PromotionService::class)
-            ->getAvailablePromotions($bookingData);
+        $promotions = $promotionService->getAvailablePromotions($bookingData);
 
         return response()->json($promotions);
     }

@@ -25,5 +25,5 @@ return [
 
     'no_item' => 'Không có hình ảnh nào',
     "total_images" => "Tổng số hình ảnh",
-    'category_name' => "Tìm kiếm loại hình ảnh",
+    'category_name' => "Tên loại hình ảnh",
 ];

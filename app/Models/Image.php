@@ -15,9 +15,7 @@ class Image extends Model
 
     protected $fillable = [
         'image_category_id',
-        'title',
         'image',
-        'link',
         'order',
         'is_active',
     ];
@@ -26,6 +24,24 @@ class Image extends Model
         'is_active' => 'boolean',
 
     ];
+    const CORPORATE_CULTURE = [
+        [
+            'title' => 'Chuyên nghiệp',
+        ],
+        [
+            'title' => 'Chân thành',
+        ],
+        [
+            'title' => 'Tôn trọng',
+        ],
+        [
+            'title' => 'Biết ơn',
+        ],
+        [
+            'title' => 'Đoàn kết',
+        ],
+    ];
+
     public function category()
     {
         return $this->belongsTo(ImageCategory::class, 'image_category_id');

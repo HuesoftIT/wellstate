@@ -15,37 +15,31 @@ class ImageController extends Controller
 
     public function index(Request $request)
     {
-        $query = Image::query()->with('category');
+        $query = ImageCategory::query()->with(['images' => function ($q) use ($request) {
+
+            if ($request->filled('is_active')) {
+                $q->where('is_active', $request->is_active);
+            }
+
+            $q->orderBy('order')
+                ->orderByDesc('id');
+        }]);
 
 
+        // search theo tên category
         if ($request->filled('search')) {
-            $search = $request->search;
-
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhereHas('category', function ($qc) use ($search) {
-                        $qc->where('name', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-
-        if ($request->filled('is_active')) {
-            $query->where('is_active', $request->is_active);
+            $query->where('name', 'like', "%{$request->search}%");
         }
 
         if ($request->filled('image_category_id')) {
-            $query->where('image_category_id', $request->image_category_id);
+            $query->where('id', $request->image_category_id);
         }
 
-        $images = $query
-            ->orderBy('order')
-            ->orderByDesc('id')
-            ->paginate(config('settings.perpage', 10));
+        $categories = $query->paginate(config('settings.perpage', 10));
 
-        $categories = ImageCategory::pluck('name', 'id');
+        $filterCategories = ImageCategory::pluck('name', 'id');
 
-        return view('admin.images.index', compact('images', 'categories'));
+        return view('admin.images.index', compact('categories', 'filterCategories'));
     }
 
     public function create()
@@ -60,7 +54,18 @@ class ImageController extends Controller
      */
     public function store(StoreImageRequest $request)
     {
-        Image::create($request->validated());
+        $maxOrder = Image::where('image_category_id', $request->image_category_id)
+            ->max('order') ?? 0;
+
+        foreach ($request->file('images') as $index => $file) {
+
+            Image::create([
+                'image_category_id' => $request->image_category_id,
+                'image' => $file, // observer xử lý upload + resize
+                'order' => $maxOrder + $index + 1,
+                'is_active' => $request->is_active
+            ]);
+        }
 
         Alert::success('Tạo image thành công');
 
@@ -94,7 +99,25 @@ class ImageController extends Controller
     public function update(UpdateImageRequest $request, $id)
     {
         $image = Image::findOrFail($id);
-        $image->update($request->validated());
+
+        $data = [
+            'image_category_id' => $request->image_category_id,
+            'is_active' => $request->is_active
+        ];
+
+        // Nếu có upload ảnh mới → replace
+        if ($request->hasFile('image')) {
+
+            // xóa ảnh cũ nếu có
+            if ($image->image && \Storage::disk('public')->exists($image->image)) {
+                \Storage::disk('public')->delete($image->image);
+            }
+
+            // gán ảnh mới (observer sẽ resize + upload)
+            $data['image'] = $request->file('image');
+        }
+
+        $image->update($data);
 
         Alert::success('Cập nhật image thành công');
 

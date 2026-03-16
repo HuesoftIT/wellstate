@@ -21,4 +21,4 @@ Route::get('/customers/search', [CustomerController::class, 'search']);
 
 Route::get('/branches/{id}/room-types', [BookingController::class, 'getRoomTypesByBranch']);
 Route::get('/services', [ServiceController::class, 'byCategory']);
-Route::post('/promotions/available', [PromotionController::class, 'check']);
+Route::post('/promotions/available', [PromotionController::class, 'loadPromotionsAvailable']);

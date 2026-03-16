@@ -4,6 +4,16 @@
         .select2 {
             width: 250px;
         }
+
+        .small-box {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .small-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
     </style>
 @endsection
 @section('htmlheader_title')
@@ -33,7 +43,108 @@
             @endcan
 
         </div>
+        <div class="row mb-3">
 
+            {{-- BOOKING HÔM NAY --}}
+            <div class="col-md-2">
+                <a href="{{ route('bookings.index', ['booking_date' => now()->format('Y-m-d')]) }}">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>{{ $stats['today_bookings'] }}</h3>
+                            <p>Booking hôm nay</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-calendar-day"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+            {{-- HÔM NAY CHƯA THANH TOÁN --}}
+            <div class="col-md-2">
+                <a
+                    href="{{ route('bookings.index', [
+                        'booking_date' => now()->format('Y-m-d'),
+                        'payment_status' => \App\Models\Booking::PAYMENT_UNPAID,
+                    ]) }}">
+                    <div class="small-box bg-maroon">
+                        <div class="inner">
+                            <h3>{{ $stats['today_unpaid'] }}</h3>
+                            <p>Hôm nay chưa thanh toán</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+            {{-- CHỜ XÁC NHẬN --}}
+            <div class="col-md-2">
+                <a href="{{ route('bookings.index', ['status' => \App\Models\Booking::STATUS_PENDING]) }}">
+                    <div class="small-box bg-yellow">
+                        <div class="inner">
+                            <h3>{{ $stats['pending'] }}</h3>
+                            <p>Chờ xác nhận</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-clock"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+            {{-- CHƯA THANH TOÁN --}}
+            <div class="col-md-2">
+                <a href="{{ route('bookings.index', ['payment_status' => \App\Models\Booking::PAYMENT_UNPAID]) }}">
+                    <div class="small-box bg-red">
+                        <div class="inner">
+                            <h3>{{ $stats['unpaid'] }}</h3>
+                            <p>Tổng chưa thanh toán</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-credit-card"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+            {{-- ĐANG DIỄN RA --}}
+            <div class="col-md-2">
+                <a href="{{ route('bookings.index', ['filter' => 'running']) }}">
+                    <div class="small-box bg-blue">
+                        <div class="inner">
+                            <h3>{{ $stats['running'] }}</h3>
+                            <p>Đang diễn ra</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-play"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+            {{-- SẮP DIỄN RA --}}
+            <div class="col-md-2">
+                <a href="{{ route('bookings.index', ['filter' => 'upcoming']) }}">
+                    <div class="small-box bg-purple">
+                        <div class="inner">
+                            <h3>{{ $stats['upcoming'] }}</h3>
+                            <p>Sắp diễn ra</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
         <div class="box-header">
             <div class="box-tools">
                 {!! Form::open([
@@ -101,9 +212,6 @@
             </div>
         </div>
 
-
-
-
         @php
             $index = ($bookings->currentPage() - 1) * $bookings->perPage();
         @endphp
@@ -120,7 +228,7 @@
                         <th>Mã booking</th>
                         <th>Tên người đặt</th>
                         <th>Chi nhánh</th>
-                        <th>Thời gian</th>
+                        <th> @sortablelink('booking_date', 'Thời gian')</th>
                         <th class="text-center">Số khách</th>
                         <th class="text-right">Tổng tiền</th>
                         <th class="text-center">Trạng thái</th>
@@ -143,7 +251,7 @@
 
                             {{-- BOOKING CODE --}}
                             <td>
-                                <a href="{{ route('bookings.show', $item->id)}}" class="text-primary text-bold">
+                                <a href="{{ route('bookings.show', $item->id) }}" class="text-primary text-bold">
                                     {{ $item->booking_code }}
                                 </a>
                             </td>
@@ -171,14 +279,72 @@
                                 {{ optional($item->branch)->name ?? '—' }}
                             </td>
 
-                            {{-- TIME --}}
-                            <td>
-                                <div>
-                                    {{ \Carbon\Carbon::parse($item->booking_date)->format('d/m/Y') }}
+                            <td style="min-width:180px">
+
+                                @php
+                                    $bookingStart = \Carbon\Carbon::parse(
+                                        $item->booking_date . ' ' . $item->start_time,
+                                    );
+                                    $bookingEnd = \Carbon\Carbon::parse($item->booking_date . ' ' . $item->end_time);
+                                    $now = now();
+
+                                    $isToday = $bookingStart->isToday();
+                                    $isTomorrow = $bookingStart->isTomorrow();
+                                @endphp
+
+                                <div class="booking-time">
+
+                                    {{-- DATE --}}
+                                    <div class="text-bold">
+                                        @if ($isToday)
+                                            <span class="text-primary">
+                                                Hôm nay
+                                            </span>
+                                        @elseif($isTomorrow)
+                                            <span class="text-info">
+                                                Ngày mai
+                                            </span>
+                                        @else
+                                            {{ $bookingStart->translatedFormat('l, d/m/Y') }}
+                                        @endif
+                                    </div>
+
+                                    {{-- TIME --}}
+                                    <div class="text-muted">
+                                        <i class="fa fa-clock"></i>
+                                        {{ $bookingStart->format('H:i') }}
+                                        →
+                                        {{ $bookingEnd->format('H:i') }}
+                                    </div>
+
+                                    {{-- STATUS TIME --}}
+                                    <div class="mt-1">
+
+                                        {{-- SẮP DIỄN RA --}}
+                                        @if ($now->lt($bookingStart) && $now->diffInMinutes($bookingStart) <= 30)
+                                            <span class="label label-warning">
+                                                ⏰ Sắp diễn ra
+                                            </span>
+                                        @endif
+
+                                        {{-- ĐANG DIỄN RA --}}
+                                        @if ($now->between($bookingStart, $bookingEnd))
+                                            <span class="label label-primary">
+                                                🔵 Đang diễn ra
+                                            </span>
+                                        @endif
+
+                                        {{-- QUÁ GIỜ --}}
+                                        @if ($now->gt($bookingEnd) && $item->status !== \App\Models\Booking::STATUS_COMPLETED)
+                                            <span class="label label-danger">
+                                                ⚠ Quá giờ
+                                            </span>
+                                        @endif
+
+                                    </div>
+
                                 </div>
-                                <small class="text-muted">
-                                    {{ $item->start_time }} - {{ $item->end_time }}
-                                </small>
+
                             </td>
 
                             {{-- GUESTS --}}

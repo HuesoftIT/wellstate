@@ -21,102 +21,90 @@
                     'class' => 'control-label label-required',
                 ]) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
+
                 {!! Form::select('image_category_id', $categories, old('image_category_id', $image->image_category_id ?? null), [
                     'class' => 'form-control input-sm',
                     'placeholder' => __('images.choose'),
                     'required',
                 ]) !!}
+
                 {!! $errors->first('image_category_id', '<p class="help-block">:message</p>') !!}
+
             </td>
         </tr>
 
-        {{-- TITLE --}}
-        <tr class="row {{ $errors->has('title') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('title', __('images.title'), [
-                    'class' => 'control-label label-required',
-                ]) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::text('title', old('title', $image->title ?? null), [
-                    'class' => 'form-control input-sm',
-                    'required',
-                ]) !!}
-                {!! $errors->first('title', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr>
-
-        {{-- LINK --}}
-        <tr class="row {{ $errors->has('link') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('link', __('images.link'), ['class' => 'control-label']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::text('link', old('link', $image->link ?? null), [
-                    'class' => 'form-control input-sm',
-                    'placeholder' => 'https://...',
-                ]) !!}
-                {!! $errors->first('link', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr>
-
-        {{-- ORDER --}}
-        <tr class="row {{ $errors->has('order') ? 'has-error' : '' }}">
-            <td class="col-md-4 col-lg-3">
-                {!! Form::label('order', __('images.order'), ['class' => 'control-label']) !!}
-            </td>
-            <td class="col-md-8 col-lg-9">
-                {!! Form::number('order', old('order', $image->order ?? 0), [
-                    'class' => 'form-control input-sm',
-                    'min' => 0,
-                ]) !!}
-                {!! $errors->first('order', '<p class="help-block">:message</p>') !!}
-            </td>
-        </tr>
 
         {{-- IMAGE --}}
-        <tr class="row {{ $errors->has('image') ? 'has-error' : '' }}">
+        <tr class="row">
+
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('image', __('images.image'), ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
+
+                <div class="imgprev-wrap" style="display:{{ isset($image->image) ? 'block' : 'none' }}">
+
+                    <img class="img-preview" src="{{ isset($image->image) ? Storage::url($image->image) : '' }}"
+                        style="max-height:120px;border-radius:6px">
+
+                    <i class="fa fa-trash text-danger" style="cursor:pointer"></i>
+
+                </div>
+
+
                 <div class="input-group inputfile-wrap">
-                    <input type="text" class="form-control input-sm" readonly>
+
+                    <input type="text" class="form-control input-sm" readonly id="file-name-display">
+
                     <div class="input-group-btn">
+
                         <button type="button" class="btn btn-danger btn-sm">
-                            <i class="fa fa-upload"></i> {{ __('message.upload') }}
+                            <i class="fa fa-upload"></i>
+                            {{ __('message.upload') }}
                         </button>
-                        {!! Form::file('image', [
-                            'id' => 'image',
-                            'class' => 'form-control input-sm',
-                            'accept' => 'image/*',
-                        ]) !!}
+
+                        @if (isset($image))
+                            <input type="file" name="image" id="image" class="form-control input-sm"
+                                accept="image/*">
+                        @else
+                            <input type="file" name="images[]" id="images" class="form-control input-sm"
+                                accept="image/*" multiple>
+                        @endif
+
                     </div>
+
                 </div>
 
-                {!! $errors->first('image', '<p class="help-block">:message</p>') !!}
-
-                <div class="imgprev-wrap mt-2" style="display:{{ !empty($image->image) ? 'block' : 'none' }}">
-                    <img class="img-preview" src="{{ !empty($image->image) ? Storage::url($image->image) : '' }}"
-                        style="max-height:120px">
-                    <i class="fa fa-trash text-danger"></i>
+                <div id="image-preview-list" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:10px">
                 </div>
+
             </td>
+
         </tr>
+
 
         {{-- IS ACTIVE --}}
         <tr class="row {{ $errors->has('is_active') ? 'has-error' : '' }}">
+
             <td class="col-md-4 col-lg-3">
                 {!! Form::label('is_active', __('images.active'), ['class' => 'control-label']) !!}
             </td>
+
             <td class="col-md-8 col-lg-9">
+
                 {!! Form::hidden('is_active', 0) !!}
+
                 {!! Form::checkbox('is_active', 1, old('is_active', isset($image) ? (bool) $image->is_active : true), [
                     'class' => 'flat-blue',
                 ]) !!}
+
                 {!! $errors->first('is_active', '<p class="help-block">:message</p>') !!}
+
             </td>
+
         </tr>
 
     </table>
@@ -186,5 +174,81 @@
                 }
             })
         });
+    </script>
+
+    <script>
+        let selectedFiles = [];
+
+        const input = document.getElementById('images');
+        const previewContainer = document.getElementById('image-preview-list');
+
+        if (input && previewContainer) {
+
+            input.addEventListener('change', function(e) {
+
+                const files = Array.from(e.target.files);
+
+                files.forEach(file => {
+
+                    const index = selectedFiles.length;
+                    selectedFiles.push(file);
+
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+
+                        const div = document.createElement('div');
+                        div.classList.add('preview-item');
+                        div.dataset.index = index;
+
+                        div.innerHTML = `
+                    <span class="remove-image" style="cursor:pointer;color:white; background-color:red;">&times;</span>
+                    <img src="${event.target.result}" style="height:80px;border-radius:6px">
+                `;
+
+                        previewContainer.appendChild(div);
+                    };
+
+                    reader.readAsDataURL(file);
+
+                });
+
+                updateInputFiles();
+
+            });
+
+
+            previewContainer.addEventListener('click', function(e) {
+
+                if (e.target.classList.contains('remove-image')) {
+
+                    const item = e.target.closest('.preview-item');
+                    const index = item.dataset.index;
+
+                    selectedFiles.splice(index, 1);
+
+                    item.remove();
+
+                    updateInputFiles();
+                }
+
+            });
+
+        }
+
+
+        function updateInputFiles() {
+
+            if (!input) return;
+
+            const dataTransfer = new DataTransfer();
+
+            selectedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+
+            input.files = dataTransfer.files;
+
+        }
     </script>
 @endsection

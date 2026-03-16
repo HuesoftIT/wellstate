@@ -3,8 +3,8 @@
 
         {{-- LEFT IMAGE --}}
         <div class="lg:col-span-5 relative">
-            <img src="{{ asset('images/featured_services.jpg') }}" alt="Sana Spa"
-                class="absolute inset-0 w-full h-full object-cover" />
+            <img src="{{ $images_featured_service->first() ? Storage::url($images_featured_service->first()->image) : asset('images/featured_services.jpg') }}"
+                alt="Sana Spa" class="absolute inset-0 w-full h-full object-cover" />
             <div class="absolute inset-0 bg-black/20"></div>
         </div>
 
@@ -45,9 +45,9 @@
                     <div class="relative">
                         <span
                             class="absolute top-3 left-3
-           text-5xl md:text-4xl
-           font-extrabold
-           text-white leading-none tracking-tight">
+                            text-5xl md:text-4xl
+                            font-extrabold
+                            text-white leading-none tracking-tight">
                             01
                         </span>
 
@@ -69,9 +69,9 @@
                     <div class="relative">
                         <span
                             class="absolute top-3 left-3
-           text-5xl md:text-4xl
-           font-extrabold
-           text-white leading-none tracking-tight">
+                            text-5xl md:text-4xl
+                            font-extrabold
+                            text-white leading-none tracking-tight">
                             01
                         </span>
 
@@ -93,9 +93,9 @@
                     <div class="relative">
                         <span
                             class="absolute top-3 left-3
-           text-5xl md:text-4xl
-           font-extrabold
-           text-white leading-none tracking-tight">
+                            text-5xl md:text-4xl
+                            font-extrabold
+                            text-white leading-none tracking-tight">
                             01
                         </span>
 

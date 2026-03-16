@@ -18,63 +18,101 @@ class PromotionService
 
     public function getAvailablePromotions(BookingDTO $booking): array
     {
-        $today = now()->toDateString();
+        $bookingDate = $booking->bookingDate?->toDateString();
 
         $promotions = Promotion::with('rules')
-            ->where('is_active', 1)
-            ->where('start_date', '<=', $today)
-            ->where(function ($q) use ($today) {
-                $q->whereNull('end_date')
-                    ->orWhere('end_date', '>=', $today);
-            })
-            ->where(function ($q) use ($booking) {
-                $q->whereNull('discount_min_order_value')
-                    ->orWhere('discount_min_order_value', '<=', $booking->subtotal);
+            ->active()
+            ->when($bookingDate, function ($q) use ($bookingDate) {
+                $q->where(function ($query) use ($bookingDate) {
+                    $query->whereNull('start_date')
+                        ->orWhere('start_date', '<=', $bookingDate);
+                })
+                    ->where(function ($query) use ($bookingDate) {
+                        $query->whereNull('end_date')
+                            ->orWhere('end_date', '>=', $bookingDate);
+                    });
             })
             ->get();
 
-        $validPromotions = [];
+        if ($promotions->isEmpty()) {
+            return [];
+        }
+
+        $roomPrice = $this->getRoomAmount($booking);
+
+        $serviceTotal = array_sum(
+            array_column($booking->services ?? [], 'price')
+        );
+
+        $results = [];
 
         foreach ($promotions as $promotion) {
 
-            try {
-
-                // 🔥 tái sử dụng toàn bộ engine apply
-                $this->validateBase($promotion, $booking);
-                $this->validateRules($promotion, $booking);
-                $this->validateUserUsage($promotion, $booking);
-
-                $eligibleAmount = $this->getEligibleAmount($promotion, $booking);
-
-                if ($eligibleAmount <= 0) {
-                    continue;
-                }
-
-                $discount = $this->calculateDiscount($promotion, $eligibleAmount);
-
-                $validPromotions[] = [
-                    'id' => $promotion->id,
-                    'title' => $promotion->title,
-                    "discount_code" => $promotion->discount_code,
-                    'discount_type' => $promotion->discount_type,
-                    'discount_value' => $promotion->discount_value,
-                    'eligible_amount' => $eligibleAmount,
-                    'discount_amount' => $discount,
-                    'final_total' => max(0, $booking->subtotal - $discount),
-                ];
-            } catch (\Throwable $e) {
-                // ❌ Không làm gì cả
-                // Promotion không hợp lệ thì bỏ qua
+            if (! $this->isPromotionApplicable($promotion, $booking)) {
                 continue;
             }
+
+            $eligibleAmount = $this->getEligibleAmount($promotion, $booking);
+
+            if ($eligibleAmount <= 0) {
+                continue;
+            }
+
+            $discount = $this->calculateDiscount($promotion, $eligibleAmount);
+
+            // clamp discount theo scope
+            switch ($promotion->apply_scope) {
+
+                case Promotion::APPLY_SCOPE_BOOKING:
+                    $effectiveDiscount = min($discount, $booking->subtotal);
+                    break;
+
+                case Promotion::APPLY_SCOPE_ROOM:
+                    $effectiveDiscount = min($discount, $roomPrice);
+                    break;
+
+                case Promotion::APPLY_SCOPE_SERVICE:
+                    $effectiveDiscount = min($discount, $serviceTotal);
+                    break;
+
+                default:
+                    $effectiveDiscount = 0;
+            }
+
+            $results[] = [
+                'id' => $promotion->id,
+                'title' => $promotion->title,
+                'discount_code' => $promotion->discount_code,
+                'discount_type' => $promotion->discount_type,
+                'discount_value' => $promotion->discount_value,
+                'apply_scope' => $promotion->apply_scope,
+
+                'eligible_amount' => $eligibleAmount,
+
+                // discount sau khi clamp
+                'discount_amount' => $effectiveDiscount,
+            ];
         }
 
-        // Optional: sort theo discount lớn nhất
-        usort($validPromotions, function ($a, $b) {
-            return $b['discount_amount'] <=> $a['discount_amount'];
-        });
+        return collect($results)
+            ->sortByDesc('discount_amount')
+            ->values()
+            ->toArray();
+    }
 
-        return $validPromotions;
+    protected function isPromotionApplicable(Promotion $promotion, BookingDTO $booking): bool
+    {
+        try {
+
+            $this->validateBase($promotion, $booking);
+            $this->validateRules($promotion, $booking);
+            $this->validateUserUsage($promotion, $booking);
+
+            return true;
+        } catch (\Throwable $e) {
+
+            return false;
+        }
     }
     /**
      * ENTRY POINT
@@ -84,7 +122,7 @@ class PromotionService
         if (empty($code)) {
             return $this->emptyResult();
         }
-        
+
         $promotion = $this->findValidPromotion($code);
 
         $this->validateBase($promotion, $booking);
@@ -92,7 +130,7 @@ class PromotionService
         $this->validateUserUsage($promotion, $booking);
 
         $eligibleAmount = $this->getEligibleAmount($promotion, $booking);
-        
+
         if ($eligibleAmount <= 0) {
             throw new Error('Khuyến mãi không áp dụng cho đơn đặt lịch này');
         }
@@ -129,7 +167,7 @@ class PromotionService
     }
 
     protected function getRoomAmount(BookingDTO $booking): float
-    {   
+    {
         $price = BranchRoomType::active()->where('id', $booking->branchRoomTypeId)->value('price');
         return $price ?? 0;
     }
@@ -209,7 +247,7 @@ class PromotionService
 
         if ($booking->bookingDate) {
             $bookingDate = $booking->bookingDate;
-          
+
             if ($promotion->start_date && $bookingDate->lt($promotion->start_date)) {
                 throw new Exception('Ngày đặt lịch chưa nằm trong thời gian áp dụng khuyến mãi');
             }

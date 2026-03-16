@@ -22,7 +22,7 @@ return [
     'branch'             => 'Chi nhánh',
     'booking_date'       => 'Ngày đặt',
     'status'             => 'Trạng thái',
-    'payment_status'     => 'Thanh toán',
+    'payment_status'     => 'Trạng thái thanh toán',
 
     /*
     |--------------------------------------------------------------------------

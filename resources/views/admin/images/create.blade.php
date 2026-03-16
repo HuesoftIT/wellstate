@@ -1,4 +1,34 @@
 @extends('adminlte::layouts.app')
+@section('style')
+    <style>
+        .preview-item {
+            position: relative;
+            display: inline-block;
+        }
+
+        .preview-item img {
+            max-height: 120px;
+            border: 1px solid #ddd;
+            padding: 4px;
+            background: #fff;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: red;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            text-align: center;
+            line-height: 20px;
+            cursor: pointer;
+        }
+    </style>
+@endsection
 @section('htmlheader_title')
     {{ __('images.images') }}
 @endsection
@@ -21,7 +51,8 @@
         <div class="box-header ">
             <h3 class="box-title">{{ __('message.new_add') }}</h3>
             <div class="box-tools">
-                <a href="{{ url('/admin/images') }}" class="btn btn-default"><i class="fa fa-arrow-left" aria-hidden="true"></i> <span class="hidden-xs">
+                <a href="{{ url('/admin/images') }}" class="btn btn-default"><i class="fa fa-arrow-left"
+                        aria-hidden="true"></i> <span class="hidden-xs">
                         {{ __('message.lists') }}</span></a>
             </div>
         </div>

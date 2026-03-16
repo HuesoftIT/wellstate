@@ -26,7 +26,7 @@
                 <label class="control-label label-required">Số điện thoại</label>
             </td>
             <td>
-                <input type="text" name="booker_phone" class="form-control input-sm"
+                <input id="booker_phone" type="text" name="booker_phone" class="form-control input-sm"
                     value="{{ old('booker_phone') }}" required>
             </td>
         </tr>
@@ -306,534 +306,7 @@
             allowInput: false
         });
     </script>
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let bookingState = {
-                roomPrice: 0,
-                subtotal: 0,
-                finalTotal: 0,
-                discount: 0
-            };
-            const branchSelect = document.getElementById('branch_id');
-            const roomTypeSelect = document.getElementById('room_type_id');
 
-            branchSelect.addEventListener('change', function() {
-                const branchId = this.value;
-
-                roomTypeSelect.innerHTML = '<option value="">Đang tải...</option>';
-
-                if (!branchId) {
-                    roomTypeSelect.innerHTML = '<option value="">-- Chọn loại phòng --</option>';
-                    return;
-                }
-
-                fetch(`/api/ajax/branches/${branchId}/room-types`)
-                    .then(res => res.json())
-                    .then(data => {
-
-                        roomTypeSelect.innerHTML = '<option value="">-- Chọn loại phòng --</option>';
-                        data = data.data || [];
-                        data.forEach(room => {
-                            const option = document.createElement('option');
-                            option.value = room.id;
-                            option.textContent =
-                                `${room.name} - ${room.price.toLocaleString()}đ`;
-                            option.dataset.price = room.price;
-                            roomTypeSelect.appendChild(option);
-                        });
-
-                    })
-                    .catch(() => {
-                        roomTypeSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
-                    });
-            });
-            roomTypeSelect.addEventListener('change', function() {
-                const selected = this.options[this.selectedIndex];
-                roomPrice = parseInt(selected?.dataset.price || 0);
-                bookingState.roomPrice = roomPrice;
-                updateSummary();
-            });
-
-
-            const container = document.getElementById('time-slots');
-            const input = document.getElementById('booking_time');
-            const dateInput = document.getElementById('booking_date');
-            // const branchSelect = document.getElementById('branch_id');
-
-            const step = 15;
-
-            function pad(n) {
-                return n.toString().padStart(2, '0');
-            }
-
-            function timeToMinutes(time) {
-                const [h, m] = time.split(':').map(Number);
-                return h * 60 + m;
-            }
-
-            function isToday(selectedDate) {
-                if (!selectedDate) return false;
-
-                const today = new Date();
-                const [d, m, y] = selectedDate.split('/');
-                const selected = new Date(y, m - 1, d);
-
-                return (
-                    selected.getFullYear() === today.getFullYear() &&
-                    selected.getMonth() === today.getMonth() &&
-                    selected.getDate() === today.getDate()
-                );
-            }
-
-            function getCurrentMinutes() {
-                const now = new Date();
-                return now.getHours() * 60 + now.getMinutes();
-            }
-
-            function render(openTime, closeTime, disabledTimes = []) {
-
-                container.innerHTML = '';
-
-                const startMinutes = timeToMinutes(openTime);
-                const endMinutes = timeToMinutes(closeTime);
-
-                const isTodaySelected = isToday(dateInput.value);
-                const currentMinutes = getCurrentMinutes();
-
-                for (let minutes = startMinutes; minutes <= endMinutes; minutes += step) {
-
-                    const h = Math.floor(minutes / 60);
-                    const m = minutes % 60;
-                    const time = `${pad(h)}:${pad(m)}`;
-
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.textContent = time;
-                    btn.dataset.time = time;
-
-                    let disabled = disabledTimes.includes(time);
-
-                    if (isTodaySelected && minutes <= currentMinutes) {
-                        disabled = true;
-                    }
-
-                    btn.className =
-                        'border rounded-lg py-2 text-sm font-medium text-center transition ' +
-                        (disabled ?
-                            'bg-slate-100 text-slate-300 cursor-not-allowed' :
-                            'text-slate-600 hover:border-blue-500 hover:text-blue-600');
-
-                    btn.disabled = disabled;
-
-                    if (!disabled) {
-                        btn.addEventListener('click', () => {
-                            document.querySelectorAll('[data-time]').forEach(b => {
-                                b.classList.remove('bg-primary', 'text-white', 'border-blue-600');
-                            });
-
-                            btn.classList.add('bg-primary', 'text-white', 'border-blue-600');
-                            input.value = time;
-                            updateSummary();
-                        });
-                    }
-
-                    container.appendChild(btn);
-                }
-            }
-
-            function fetchAvailableTimes() {
-
-                const branch = branchSelect.value;
-                const date = dateInput.value;
-
-                if (!branch || !date) {
-                    container.innerHTML = '';
-                    return;
-                }
-
-                fetch(`/api/ajax/branch-available-times?branch_id=${branch}&date=${date}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        render(data.open_time, data.close_time, data.disabled_times);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-            }
-
-            branchSelect.addEventListener('change', fetchAvailableTimes);
-            dateInput.addEventListener('change', fetchAvailableTimes);
-
-
-
-            const guestsContainer = document.getElementById('guests-container');
-            const guestTemplate = document.getElementById('guest-template');
-            const serviceTemplate = document.getElementById('service-template');
-            const addGuestBtn = document.getElementById('add-guest');
-            const guestCountInput = document.getElementById('guest_count');
-
-            const bookerName = document.querySelector('input[name="booker_name"]');
-            bookerName.addEventListener('input', updateSummary);
-
-            const bookerPhone = document.querySelector('input[name="booker_phone"]');
-            bookerPhone.addEventListener('input', updateSummary);
-
-            const bookerEmail = document.querySelector('input[name="booker_email"]');
-            bookerEmail.addEventListener('input', updateSummary);
-
-
-            function updateIndexes() {
-                const guests = guestsContainer.querySelectorAll('.guest-item');
-
-                guests.forEach((guest, gIndex) => {
-
-                    guest.querySelector('.guest-index').innerText = gIndex + 1;
-
-                    const nameInput = guest.querySelector('.guest-name');
-                    nameInput.name = `guests[${gIndex}][name]`;
-
-                    guest.querySelectorAll('.service-item').forEach((service, sIndex) => {
-
-                        service.querySelector('.service-category')
-                            .name = `guests[${gIndex}][services][${sIndex}][service_category_id]`;
-
-                        service.querySelector('.service-select')
-                            .name = `guests[${gIndex}][services][${sIndex}][service_id]`;
-
-                    });
-                });
-
-                guestCountInput.value = guests.length || 1;
-            }
-
-            function addGuest() {
-                const clone = guestTemplate.content.cloneNode(true);
-                guestsContainer.appendChild(clone);
-                updateIndexes();
-            }
-
-            function removeLastGuest() {
-                const guests = guestsContainer.querySelectorAll('.guest-item');
-                if (guests.length > 1) {
-                    guests[guests.length - 1].remove();
-                    updateIndexes();
-                }
-            }
-
-            function syncGuestToCount(count) {
-                const current = guestsContainer.querySelectorAll('.guest-item').length;
-
-                if (count > current) {
-                    for (let i = current; i < count; i++) {
-                        addGuest();
-                    }
-                }
-
-                if (count < current) {
-                    for (let i = current; i > count; i--) {
-                        removeLastGuest();
-                    }
-                }
-            }
-
-            guestCountInput.addEventListener('input', function() {
-                let count = parseInt(this.value) || 1;
-
-                if (count < 1) count = 1;
-
-                syncGuestToCount(count);
-            });
-
-            addGuestBtn.addEventListener('click', function() {
-                addGuest();
-            });
-
-            guestsContainer.addEventListener('click', function(e) {
-
-                if (e.target.closest('.remove-guest')) {
-                    const guests = guestsContainer.querySelectorAll('.guest-item');
-
-                    if (guests.length > 1) {
-                        e.target.closest('.guest-item').remove();
-                        updateIndexes();
-                    }
-                }
-
-                if (e.target.closest('.add-service')) {
-                    const guestItem = e.target.closest('.guest-item');
-                    const clone = serviceTemplate.content.cloneNode(true);
-                    guestItem.querySelector('.services-container').appendChild(clone);
-                    updateIndexes();
-                }
-
-                if (e.target.closest('.remove-service')) {
-                    e.target.closest('.service-item').remove();
-                    updateIndexes();
-                }
-
-            });
-
-            guestsContainer.addEventListener('change', function(e) {
-
-                if (e.target.classList.contains('service-category')) {
-
-                    const categoryId = e.target.value;
-                    const serviceSelect = e.target
-                        .closest('.service-item')
-                        .querySelector('.service-select');
-
-                    serviceSelect.innerHTML = '<option value="">Đang tải...</option>';
-
-                    if (!categoryId) {
-                        serviceSelect.innerHTML = '<option value="">Chọn dịch vụ</option>';
-                        return;
-                    }
-
-                    fetch(`/api/services?service_category_id=${categoryId}`)
-                        .then(response => response.json())
-                        .then(res => {
-
-                            if (!res.success) {
-                                serviceSelect.innerHTML = '<option value="">Không có dịch vụ</option>';
-                                return;
-                            }
-
-                            let options = '<option value="">Chọn dịch vụ</option>';
-
-                            res.data.forEach(service => {
-                                servicesCache[service.id] = service;
-                                options += `
-                                    <option value="${service.id}">
-                                        ${service.title} 
-                                        (${service.duration} phút) - ${formatMoney(service.sale_price || service.price || 0)})
-                                    </option>
-                                `;
-                            });
-
-                            serviceSelect.innerHTML = options;
-                        })
-                        .catch(() => {
-                            serviceSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
-                        });
-                }
-            });
-
-            syncGuestToCount(parseInt(guestCountInput.value) || 1);
-
-
-
-            const summaryContent = document.getElementById('summary-content');
-            const summaryTotal = document.getElementById('summary-total');
-            // const roomTypeSelect = document.getElementById('room_type_id');
-
-            let roomPrice = bookingState.roomPrice;
-            let servicesCache = {};
-
-            function formatMoney(price) {
-                return Number(price).toLocaleString('vi-VN') + 'đ';
-            }
-
-            function updateSummaryFinalTotal() {
-
-                const subtotal = bookingState.subtotal;
-                const finalTotal = bookingState.finalTotal || (subtotal - bookingState.discount);
-                console.log('finalTotal line 639:', finalTotal)
-                if (finalTotal !== null) {
-                    summaryTotal.innerText = formatMoney(finalTotal);
-                } else {
-                    summaryTotal.innerText = formatMoney(subtotal);
-                }
-            }
-
-            function updateSummary() {
-                const bookerName = document.querySelector('input[name="booker_name"]').value || '';
-                const bookerPhone = document.querySelector('input[name="booker_phone"]').value || '';
-                const bookerEmail = document.querySelector('input[name="booker_email"]').value || '-';
-                const branchText = branchSelect.options[branchSelect.selectedIndex]?.text || '';
-                const roomText = roomTypeSelect.options[roomTypeSelect.selectedIndex]?.text || '';
-                const date = dateInput.value;
-                const time = document.getElementById('booking_time').value;
-                const guests = guestsContainer.querySelectorAll('.guest-item');
-
-                let total = bookingState.subtotal;
-                let html = '';
-
-                if (roomPrice) total += roomPrice;
-                bookingState.subtotal = total;
-
-                html += `
-                    <p><strong>Tên:</strong> ${bookerName}</p>
-                    <p><strong>SĐT:</strong> ${bookerPhone}</p>
-                    <p><strong>Email:</strong> ${bookerEmail}</p>
-                    <p><strong>Chi nhánh:</strong> ${branchText}</p>
-                    <p><strong>Ngày:</strong> ${date}</p>
-                    <p><strong>Giờ:</strong> ${time}</p>
-                    <p><strong>Loại phòng:</strong> ${roomText}</p>
-                    <p><strong>Số khách:</strong> ${guests.length}</p>
-                   
-                    <hr>
-                `;
-
-                guests.forEach((guest, index) => {
-
-                    const guestName = guest.querySelector('.guest-name').value || `Khách ${index+1}`;
-                    html += `<p><strong>${guestName}</strong></p><ul>`;
-
-                    guest.querySelectorAll('.service-select').forEach(select => {
-
-                        const serviceId = select.value;
-                        if (!serviceId || !servicesCache[serviceId]) return;
-
-                        const service = servicesCache[serviceId];
-                        const price = service.sale_price || service.price || 0;
-
-                        total += parseInt(price);
-
-                        html += `<li>${service.title} - ${formatMoney(price)}</li>`;
-                    });
-
-                    html += `</ul>`;
-                });
-                bookingState.subtotal = total;
-
-                summaryContent.innerHTML = html;
-                updateSummaryFinalTotal();
-
-            }
-
-
-            branchSelect.addEventListener('change', function() {
-                updateSummary();
-                loadPromotions();
-            });
-
-            dateInput.addEventListener('change', function() {
-                updateSummary();
-                loadPromotions();
-            });
-
-            guestsContainer.addEventListener('change', function(e) {
-                if (e.target.classList.contains('service-select') ||
-                    e.target.classList.contains('service-category')) {
-                    updateSummary();
-                    loadPromotions();
-                }
-            });
-            guestsContainer.addEventListener('input', updateSummary);
-            document.getElementById('booking_time')
-                .addEventListener('change', function() {
-                    updateSummary();
-                    loadPromotions();
-                });
-
-            function getBookingData() {
-
-                const guests = guestsContainer.querySelectorAll('.guest-item');
-
-                let services = [];
-                let subtotal = bookingState.subtotal;
-
-                if (roomPrice) {
-                    subtotal += parseInt(roomPrice);
-                    bookingState.subtotal = subtotal;
-                }
-
-                guests.forEach(guest => {
-
-                    guest.querySelectorAll('.service-select').forEach(select => {
-
-                        const serviceId = select.value;
-                        if (!serviceId || !servicesCache[serviceId]) return;
-
-                        const service = servicesCache[serviceId];
-                        const price = parseInt(service.sale_price || service.price || 0);
-
-                        subtotal += price;
-
-                        services.push({
-                            id: parseInt(serviceId),
-                            price: price
-                        });
-                    });
-
-                });
-
-                bookingState.subtotal = subtotal;
-                return {
-                    branch_id: branchSelect.value || null,
-                    booking_date: dateInput.value || null,
-                    booking_time: document.getElementById('booking_time').value || null,
-
-                    booker_name: document.querySelector('input[name="booker_name"]').value || null,
-                    phone: document.querySelector('input[name="booker_phone"]').value || null,
-                    email: document.querySelector('input[name="booker_email"]').value || null,
-
-                    room_type_id: roomTypeSelect.value || null,
-
-                    services: services,
-                    subtotal: subtotal,
-
-                    customerId: null,
-                    membershipId: null
-                };
-            }
-
-            function loadPromotions() {
-                fetch('/api/promotions/available', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify(getBookingData())
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log('Available promotions:', data);
-                        let select = document.getElementById('promotion_id');
-                        select.innerHTML = '<option value="">-- Không áp dụng --</option>';
-                        select.value = '';
-                        promotionInfo.style.display = 'none';
-                        data.forEach(promo => {
-                            select.innerHTML += `
-                                <option value="${promo.id}"
-                                        data-discount="${promo.discount_amount}"
-                                    ${promo.title} - Giảm ${promo.discount_amount.toLocaleString()}đ
-                                </option>
-                            `;
-                        });
-                    });
-            }
-
-
-            const promotionSelect = document.getElementById('promotion_id');
-            const promotionInfo = document.getElementById('promotion-info');
-            const discountAmountEl = document.getElementById('discount-amount');
-            const finalTotalEl = document.getElementById('final-total');
-
-            promotionSelect.addEventListener('change', function() {
-
-                const selectedOption = this.options[this.selectedIndex];
-                console.log('Selected promotion:', selectedOption.value, selectedOption.dataset);
-                if (!this.value) {
-                    promotionInfo.style.display = 'none';
-                    updateSummaryFinalTotal();
-                    return;
-                }
-
-                bookingState.discount = parseInt(selectedOption.dataset.discount || 0);
-                bookingState.finalTotal = bookingState.subtotal - bookingState.discount;
-                console.log('finalTotal:', finalTotal)
-
-                discountAmountEl.innerText = formatMoney(bookingState.discount);
-                finalTotalEl.innerText = formatMoney(bookingState.finalTotal);
-                promotionInfo.style.display = 'block';
-
-                updateSummaryFinalTotal();
-            });
-
-        });
-    </script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -846,11 +319,14 @@
                 servicesTotal: 0,
                 subtotal: 0,
                 discount: 0,
-                finalTotal: 0
+                finalTotal: 0,
+                discountScope: null,
+
             };
 
             let servicesCache = {};
 
+            const bookerPhone = document.getElementById('booker_phone');
             const branchSelect = document.getElementById('branch_id');
             const roomTypeSelect = document.getElementById('room_type_id');
             const container = document.getElementById('time-slots');
@@ -869,6 +345,14 @@
             const promotionInfo = document.getElementById('promotion-info');
             const discountAmountEl = document.getElementById('discount-amount');
             const finalTotalEl = document.getElementById('final-total');
+
+            bookerPhone.addEventListener('blur', function() {
+                loadPromotions();
+            });
+            dateInput.addEventListener('change', function() {
+                loadPromotions();
+            })
+            branchSelect.addEventListener('change', loadPromotions);
 
             const step = 15;
 
@@ -1049,8 +533,7 @@
                     btn.dataset.time = time;
 
                     let disabled = disabledTimes.includes(time);
-                    console.log('today selected:', todaySelected, 'currentMinutes:', currentMinutes, 'time:', time,
-                        'disabledTimes:', disabledTimes);
+
                     if (todaySelected && minutes <= currentMinutes) {
                         disabled = true;
                     }
@@ -1285,11 +768,18 @@
             promotionSelect.addEventListener('change', function() {
 
                 if (!this.value) {
+
                     bookingState.discount = 0;
+                    bookingState.discountScope = null;
+
                 } else {
-                    bookingState.discount = parseInt(
-                        this.options[this.selectedIndex].dataset.discount || 0
-                    );
+
+                    const option = this.options[this.selectedIndex];
+
+                    bookingState.discount = parseInt(option.dataset.discount || 0);
+                    bookingState.discountScope = option.dataset.scope;
+
+                    console.log('bookingState: ', bookingState.discount);
                 }
 
                 recalculateTotals();
@@ -1311,6 +801,7 @@
                 });
 
                 return {
+                    booker_phone: bookerPhone.value || null,
                     branch_id: branchSelect.value || null,
                     booking_date: dateInput.value || null,
                     booking_time: timeInput.value || null,
@@ -1332,14 +823,15 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-
+                        console.log('data: ', data);
                         promotionSelect.innerHTML =
                             '<option value="">-- Không áp dụng --</option>';
 
                         data.forEach(promo => {
                             promotionSelect.innerHTML += `
                     <option value="${promo.id}"
-                            data-discount="${promo.discount_amount}">
+                        data-discount="${promo.discount_amount}"
+                        data-scope="${promo.apply_scope}">
                         ${promo.title} - 
                         Giảm ${promo.discount_amount.toLocaleString()}đ
                     </option>

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Kyslik\ColumnSortable\Sortable;
 
 class Booking extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Sortable;
 
     const STATUS_PENDING   = 'pending';
     const STATUS_CONFIRMED = 'confirmed';
@@ -17,6 +18,9 @@ class Booking extends Model
     const PAYMENT_UNPAID = 'unpaid';
     const PAYMENT_PAID   = 'paid';
 
+    public $sortable = [
+        'booking_date',
+    ];
 
     protected static $statusMap = [
         self::STATUS_PENDING => [

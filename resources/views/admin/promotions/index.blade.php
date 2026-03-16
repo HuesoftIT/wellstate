@@ -92,7 +92,7 @@
 
                         <th>@sortablelink('name', __('promotions.name'))</th>
                         <th>{{ __('promotions.code') }}</th>
-                        <th>{{ __('promotions.type') }}</th>
+                        <th>{{ __('promotions.apply_code') }}</th>
                         <th>{{ __('promotions.discount_type') }}</th>
                         <th class="text-right">{{ __('promotions.discount_value') }}</th>
                         <th class="text-right">{{ __('promotions.max_discount') }}</th>

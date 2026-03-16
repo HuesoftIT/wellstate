@@ -16,6 +16,7 @@
         <div class="flex flex-wrap justify-center gap-8">
 
             @foreach ($culture_images as $item)
+                @php($culture = \App\Models\Image::CORPORATE_CULTURE[$loop->index] ?? null)
                 <div class="group relative w-[220px] h-[320px] rounded-2xl overflow-hidden">
 
                     {{-- Image --}}
@@ -32,7 +33,7 @@
                     {{-- Title --}}
                     <div class="absolute bottom-4 left-0 right-0 text-center z-10">
                         <p class="text-white font-semibold text-sm drop-shadow text-[16px] font-inter">
-                            {{ $item->title }}
+                            {{ $culture['title'] ?? '' }}
                         </p>
                     </div>
                 </div>

@@ -101,15 +101,28 @@ class BookingController extends Controller
             'branch'
         ]);
 
+        /*
+        ======================
+        SEARCH
+        ======================
+        */
         if ($request->filled('search')) {
+
             $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
                 $q->where('booking_code', 'like', "%{$search}%")
-                    ->orWhere('booker_email', 'like', "%{$search}%")
-                    ->orWhere('booker_phone', 'like', "%{$search}%");
+                    ->orWhere('booker_name', 'like', "%{$search}%")
+                    ->orWhere('booker_phone', 'like', "%{$search}%")
+                    ->orWhere('booker_email', 'like', "%{$search}%");
             });
         }
+
+        /*
+        ======================
+        FILTER
+        ======================
+        */
 
         if ($request->filled('booking_date')) {
             $query->whereDate('booking_date', $request->booking_date);
@@ -127,13 +140,137 @@ class BookingController extends Controller
             $query->where('payment_status', $request->payment_status);
         }
 
+        if ($request->filled('filter')) {
+
+            switch ($request->filter) {
+
+                case 'running':
+
+                    $query->whereRaw("
+                NOW() BETWEEN 
+                CONCAT(booking_date,' ',start_time) 
+                AND CONCAT(booking_date,' ',end_time)
+            ");
+
+                    break;
+
+
+                case 'upcoming':
+
+                    $query->whereRaw("
+                CONCAT(booking_date,' ',start_time) > NOW()
+            ");
+
+                    break;
+            }
+        }
+
+        /*
+        ======================
+        PRIORITY SORT
+        ======================
+        */
+
+        if (!$request->has('sort')) {
+
+            $query->orderByRaw("
+            CASE
+
+                -- ĐANG DIỄN RA
+                WHEN NOW() BETWEEN 
+                    CONCAT(booking_date,' ',start_time) 
+                    AND CONCAT(booking_date,' ',end_time)
+                THEN 1
+
+                -- SẮP DIỄN RA (TRONG 5H)
+                WHEN CONCAT(booking_date,' ',start_time) 
+                    BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 300 MINUTE)
+                THEN 2
+
+                -- BOOKING TƯƠNG LAI
+                WHEN CONCAT(booking_date,' ',start_time) > NOW()
+                THEN 3
+
+                -- QUÁ GIỜ NHƯNG CHƯA COMPLETE
+                WHEN CONCAT(booking_date,' ',end_time) < NOW()
+                     AND status != '" . Booking::STATUS_COMPLETED . "'
+                THEN 4
+
+                -- COMPLETED
+                WHEN status = '" . Booking::STATUS_COMPLETED . "'
+                THEN 5
+
+                -- CANCELLED
+                WHEN status = '" . Booking::STATUS_CANCELLED . "'
+                THEN 6
+
+                ELSE 7
+            END
+        ");
+        }
+
+        /*
+        ======================
+        PAGINATION
+        ======================
+        */
+
         $bookings = $query
-            ->orderByDesc('booking_date')
-            ->orderBy('start_time')
-            ->paginate(15);
+            ->sortable()
+            ->paginate(15)
+            ->withQueryString();
+
+        /*
+        ======================
+        FILTER DATA
+        ======================
+        */
+
         $branches = Branch::active()->pluck('name', 'id');
 
-        return view('admin.bookings.index', compact('bookings', 'branches'));
+        /*
+        ======================
+        DASHBOARD STATS
+        ======================
+        */
+
+        $today = Carbon::today();
+
+        $stats = [
+
+            // tổng booking hôm nay
+            'today_bookings' => Booking::whereDate('booking_date', $today)->count(),
+
+            // hôm nay chưa thanh toán
+            'today_unpaid' => Booking::whereDate('booking_date', $today)
+                ->where('payment_status', Booking::PAYMENT_UNPAID)
+                ->count(),
+
+            // chờ xác nhận
+            'pending' => Booking::where('status', Booking::STATUS_PENDING)->count(),
+
+            // tổng chưa thanh toán
+            'unpaid' => Booking::where('payment_status', Booking::PAYMENT_UNPAID)->count(),
+
+            // đang diễn ra
+            'running' => Booking::whereRaw("
+            NOW() BETWEEN 
+            CONCAT(booking_date,' ',start_time) 
+            AND CONCAT(booking_date,' ',end_time)
+        ")->count(),
+
+            // sắp diễn ra
+            'upcoming' => Booking::whereRaw("
+            CONCAT(booking_date,' ',start_time) > NOW()
+        ")->count(),
+
+        ];
+
+        return view('admin.bookings.index', compact(
+            'bookings',
+            'branches',
+            'stats'
+        ));
     }
 
     public function create(Request $request)

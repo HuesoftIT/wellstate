@@ -35,16 +35,25 @@
         </div>
 
         <div class="box-header">
-            <div class="box-tools">
-                {!! Form::open(['method' => 'GET', 'url' => route('images.index'), 'class' => 'pull-left']) !!}
-                <div class="input-group" style="display:flex; gap:8px;">
 
-                    {!! Form::select('image_category_id', $categories, request('image_category_id'), [
+            <div class="box-tools">
+
+                {!! Form::open([
+                    'method' => 'GET',
+                    'url' => route('images.index'),
+                    'class' => 'form-inline',
+                ]) !!}
+
+                <div class="input-group" style="display:flex; gap:8px; align-items:center;">
+
+                    {{-- CATEGORY --}}
+                    {!! Form::select('image_category_id', $filterCategories, request('image_category_id'), [
                         'class' => 'form-control input-sm',
                         'placeholder' => __('images.category'),
                         'style' => 'width:200px',
                     ]) !!}
 
+                    {{-- STATUS --}}
                     {!! Form::select(
                         'is_active',
                         [
@@ -59,141 +68,168 @@
                         ],
                     ) !!}
 
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control input-sm"
-                        placeholder="{{ __('message.search_keyword') }}" style="width:250px;">
-
-                    <button class="btn btn-secondary btn-sm" type="submit">
-                        <i class="fa fa-search"></i> {{ __('message.search') }}
+                 
+                    {{-- SEARCH BUTTON --}}
+                    <button class="btn btn-primary btn-sm" type="submit">
+                        <i class="fa fa-search"></i>
+                        {{ __('message.search') }}
                     </button>
+
+                  
+
                 </div>
+
                 {!! Form::close() !!}
+
             </div>
+
         </div>
 
 
-        @php($index = ($images->currentPage() - 1) * $images->perPage())
+        @php($index = 0)
 
-        {{-- TABLE --}}
         <div class="box-body no-padding">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th class="text-center" width="3%">
-                            <input type="checkbox" id="chkAll">
-                        </th>
-                        <th class="text-center" width="4%">{{ __('message.index') }}</th>
-                        <th>{{ __('images.title') }}</th>
 
-                        {{-- CATEGORY --}}
-                        <th>{{ __('images.category') }}</th>
+            @forelse ($categories as $category)
+                <div class="p-2 bg-light border-bottom">
+                    <strong>{{ $category->name }}</strong>
+                </div>
 
-                        <th class="text-center">{{ __('images.image') }}</th>
-                        <th class="text-center">{{ __('images.order') }}</th>
-                        <th class="text-center">{{ __('message.active') }}</th>
-                        <th>{{ __('news.created_at') }}</th>
-                        <th>{{ __('news.updated_at') }}</th>
-                        <th width="7%"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($images as $item)
+                <table class="table table-bordered table-hover">
+                    <thead>
                         <tr>
-                            <td class="text-center">
-                                <input type="checkbox" name="chkId" value="{{ $item->id }}">
-                            </td>
+                            <th class="text-center" width="3%">
+                                <input type="checkbox" class="chkAllCategory">
+                            </th>
 
-                            <td class="text-center">{{ ++$index }}</td>
+                            <th class="text-center" width="4%">
+                                {{ __('message.index') }}
+                            </th>
 
-                            {{-- TITLE --}}
-                            <td>
-                                @can('ImageController@show')
-                                    <a href="{{ route('images.show', $item->id) }}" style="color:blue">
-                                        {{ $item->title }}
-                                    </a>
-                                @else
-                                    {{ $item->title }}
-                                @endcan
-                            </td>
+                            <th class="text-center">
+                                {{ __('images.image') }}
+                            </th>
 
-                            {{-- CATEGORY --}}
-                            <td>
-                                {{ $item->category->name ?? '-' }}
-                            </td>
+                            <th class="text-center">
+                                {{ __('images.order') }}
+                            </th>
 
-                            {{-- IMAGE --}}
-                            <td class="text-center" style="width:120px;">
-                                @if ($item->image)
-                                    <img src="{{ Storage::url($item->image) }}" alt="{{ $item->title }}"
-                                        style="max-width:100%; height:auto;">
-                                @endif
-                            </td>
+                            <th class="text-center">
+                                {{ __('message.active') }}
+                            </th>
 
-                            {{-- ORDER --}}
-                            <td class="text-center">
-                                {{ $item->order ?? '-' }}
-                            </td>
+                            <th>{{ __('news.created_at') }}</th>
+                            <th>{{ __('news.updated_at') }}</th>
 
-                            {{-- ACTIVE --}}
-                            <td class="text-center">
-                                {!! $item->is_active ? '<i class="fa fa-check text-primary"></i>' : '<i class="fa fa-times text-danger"></i>' !!}
-                            </td>
-
-                            {{-- CREATED --}}
-                            <td>
-                                {{ $item->created_at->format(config('settings.format.date')) }}
-                            </td>
-
-                            {{-- UPDATED --}}
-                            <td>
-                                {{ $item->updated_at->format(config('settings.format.date')) }}
-                            </td>
-
-                            {{-- ACTION --}}
-                            <td class="dropdown">
-                                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                    <i class="fal fa-tools"></i>
-                                </button>
-
-                                <div class="dropdown-menu p-0">
-                                    @can('ImageController@show')
-                                        <a href="{{ route('images.show', $item->id) }}"
-                                            class="btn btn-info btn-sm dropdown-item">
-                                            <i class="fas fa-eye"></i> {{ __('message.view') }}
-                                        </a>
-                                    @endcan
-
-                                    @can('ImageController@update')
-                                        <a href="{{ route('images.edit', $item->id) }}"
-                                            class="btn btn-primary btn-sm dropdown-item">
-                                            <i class="far fa-edit"></i> {{ __('message.edit') }}
-                                        </a>
-                                    @endcan
-
-                                    @can('ImageController@destroy')
-                                        {!! Form::open([
-                                            'method' => 'DELETE',
-                                            'route' => ['images.destroy', $item->id],
-                                            'style' => 'display:inline',
-                                        ]) !!}
-                                        {!! Form::button('<i class="far fa-trash-alt"></i> ' . __('message.delete'), [
-                                            'type' => 'submit',
-                                            'class' => 'btn btn-danger btn-sm dropdown-item show_confirm',
-                                        ]) !!}
-                                        {!! Form::close() !!}
-                                    @endcan
-                                </div>
-                            </td>
+                            <th width="7%"></th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" class="text-center">
-                                {{ __('images.no_item') }}
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
+                    </thead>
 
-            </table>
+                    <tbody>
+
+                        @forelse ($category->images as $item)
+                            <tr>
+
+                                <td class="text-center">
+                                    <input type="checkbox" name="chkId" value="{{ $item->id }}">
+                                </td>
+
+                                <td class="text-center">
+                                    {{ ++$index }}
+                                </td>
+
+                                {{-- IMAGE --}}
+                                <td class="text-center" style="width:120px;">
+                                    @if ($item->image)
+                                        <img src="{{ Storage::url($item->image) }}" style="max-width:100%; height:auto;">
+                                    @endif
+                                </td>
+
+                                {{-- ORDER --}}
+                                <td class="text-center">
+                                    {{ $item->order ?? '-' }}
+                                </td>
+
+                                {{-- ACTIVE --}}
+                                <td class="text-center">
+                                    {!! $item->is_active ? '<i class="fa fa-check text-primary"></i>' : '<i class="fa fa-times text-danger"></i>' !!}
+                                </td>
+
+                                {{-- CREATED --}}
+                                <td>
+                                    {{ $item->created_at->format(config('settings.format.date')) }}
+                                </td>
+
+                                {{-- UPDATED --}}
+                                <td>
+                                    {{ $item->updated_at->format(config('settings.format.date')) }}
+                                </td>
+
+                                {{-- ACTION --}}
+                                <td class="dropdown">
+
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                        <i class="fal fa-tools"></i>
+                                    </button>
+
+                                    <div class="dropdown-menu p-0">
+
+                                        @can('ImageController@show')
+                                            <a href="{{ route('images.show', $item->id) }}"
+                                                class="btn btn-info btn-sm dropdown-item">
+                                                <i class="fas fa-eye"></i>
+                                                {{ __('message.view') }}
+                                            </a>
+                                        @endcan
+
+                                        @can('ImageController@update')
+                                            <a href="{{ route('images.edit', $item->id) }}"
+                                                class="btn btn-primary btn-sm dropdown-item">
+                                                <i class="far fa-edit"></i>
+                                                {{ __('message.edit') }}
+                                            </a>
+                                        @endcan
+
+                                        @can('ImageController@destroy')
+                                            {!! Form::open([
+                                                'method' => 'DELETE',
+                                                'route' => ['images.destroy', $item->id],
+                                                'style' => 'display:inline',
+                                            ]) !!}
+
+                                            {!! Form::button('<i class="far fa-trash-alt"></i> ' . __('message.delete'), [
+                                                'type' => 'submit',
+                                                'class' => 'btn btn-danger btn-sm dropdown-item show_confirm',
+                                            ]) !!}
+
+                                            {!! Form::close() !!}
+                                        @endcan
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    {{ __('images.no_item') }}
+                                </td>
+                            </tr>
+                        @endforelse
+
+                    </tbody>
+                </table>
+
+            @empty
+
+                <div class="text-center p-4">
+                    {{ __('images.no_item') }}
+                </div>
+            @endforelse
+
         </div>
 
         {{-- FOOTER --}}
@@ -215,7 +251,7 @@
             </div>
 
             <div class="page-footer pull-right">
-                {!! $images->appends(Request::except('page'))->render() !!}
+                {!! $categories->appends(Request::except('page'))->render() !!}
             </div>
         </div>
     </div>

@@ -9,6 +9,7 @@ return [
         'promotion'  => 'Promotion',
         'membership' => 'Membership',
     ],
+    'apply_code' => "Áp dụng cho",
     'code' => "Mã khuyến mãi",
     'image'          => 'Ảnh',
     'description'    => 'Mô tả',

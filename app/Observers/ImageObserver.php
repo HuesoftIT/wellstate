@@ -4,66 +4,50 @@ namespace App\Observers;
 
 use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class ImageObserver
 {
     /**
-     * Khi tạo mới image
+     * Khi tạo image
      */
     public function creating(Image $image)
     {
-        if (request()->hasFile('image')) {
+        if ($image->image instanceof UploadedFile) {
+
             $image->image = Image::uploadAndResize(
-                request()->file('image'),
+                $image->image,
                 450
             );
         }
     }
 
     /**
-     * Khi cập nhật image
+     * Khi update image
      */
     public function updating(Image $image)
     {
-        if (request()->hasFile('image')) {
+        if ($image->image instanceof UploadedFile) {
 
-            // Xóa ảnh cũ nếu có
             if ($image->getOriginal('image')) {
                 Storage::disk('public')->delete($image->getOriginal('image'));
             }
 
-            // Upload ảnh mới
             $image->image = Image::uploadAndResize(
-                request()->file('image'),
+                $image->image,
                 450
             );
         }
     }
 
     /**
-     * Khi xóa mềm
+     * Khi delete
      */
     public function deleting(Image $image)
     {
-        // Chỉ xóa file khi force delete
         if ($image->isForceDeleting() && $image->image) {
+
             Storage::disk('public')->delete($image->image);
         }
-    }
-
-    /**
-     * Khi khôi phục
-     */
-    public function restored(Image $image)
-    {
-        // Nếu cần xử lý gì khi restore thì thêm ở đây
-    }
-
-    /**
-     * Khi xóa vĩnh viễn
-     */
-    public function forceDeleted(Image $image)
-    {
-        // Đã xử lý trong deleting()
     }
 }

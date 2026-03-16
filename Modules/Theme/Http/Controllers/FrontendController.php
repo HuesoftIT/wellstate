@@ -38,7 +38,16 @@ class FrontendController extends Controller
             }])
             ->orderBy('order')
             ->get();
-        $branches = Branch::active()->get();
+        $images_about_us = Image::whereHas('category', function ($q) {
+            $q->where('slug', 've-chung-toi');
+        })
+            ->orderBy('order')
+            ->get();
+        $images_featured_service =  Image::whereHas('category', function ($q) {
+            $q->where('slug', 'dich-vu-noi-bat');
+        })
+            ->orderBy('order')
+            ->get();
         \View::share([
             'mainMenus' => $mainMenus,
             'settings' => $settings,
@@ -46,6 +55,8 @@ class FrontendController extends Controller
             'service_categories' => $service_categories,
             'post_categories' => $post_categories,
             'company_phone' => $company_phone,
+            'images_about_us' => $images_about_us,
+            'images_featured_service' => $images_featured_service
         ]);
     }
 
@@ -73,12 +84,12 @@ class FrontendController extends Controller
             }
         ])
             ->where('is_active', 1)
-            ->where('image_category_id', 2)
             ->whereHas('category', function ($q) {
-                $q->where('is_active', 1);
+                $q->where('slug', 'khoanh-khac-khach-hang')
+                    ->where('is_active', 1);
             })
             ->orderBy('order', 'DESC')
-            ->get(['image', 'title']);
+            ->get(['image']);
 
         $customer_google_review_images = Image::with([
             'category' => function ($q) {
@@ -86,13 +97,12 @@ class FrontendController extends Controller
             }
         ])
             ->where('is_active', 1)
-            ->where('image_category_id', 3)
             ->whereHas('category', function ($q) {
-                $q->where('is_active', 1);
+                $q->where('slug', 'google-review')
+                    ->where('is_active', 1);
             })
             ->orderBy('order', 'DESC')
-            ->get(['image', 'title']);
-
+            ->get(['image']);
 
 
         $promotion_images = Promotion::where('is_active', 1)->whereNotNull('image')->orderBy('created_at', 'DESC')->take(5)->get('image', 'name');
@@ -116,7 +126,7 @@ class FrontendController extends Controller
                 $q->where('is_active', 1);
             })
             ->orderBy('order', 'DESC')
-            ->get(['image', 'title']);
+            ->get(['image']);
         return view('theme::front-end.pages.introduce', compact('culture_images'));
     }
 
