@@ -68,6 +68,7 @@ class UpdatePromotionRequest extends FormRequest
 
             // ===== STATUS =====
             'is_active' => 'boolean',
+            'is_visible' => "boolean",
 
             'is_auto' => 'boolean',
 

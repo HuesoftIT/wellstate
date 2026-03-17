@@ -38,11 +38,11 @@
             {!! Form::open(['method' => 'GET', 'url' => route('promotions.index'), 'class' => 'pull-left']) !!}
             <div class="input-group" style="display:flex; gap:5px">
 
-                {{-- Search by name --}}
+                {{-- Search --}}
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control input-sm"
                     placeholder="Nhập tên khuyến mãi / mã khuyến mãi" style="width:150px">
 
-                {{-- Promotion Type --}}
+                {{-- Type --}}
                 {!! Form::select(
                     'type',
                     ['promotion' => __('promotions.promotion'), 'membership' => __('promotions.membership')],
@@ -66,13 +66,23 @@
                     ['class' => 'form-control input-sm', 'placeholder' => __('message.status')],
                 ) !!}
 
+                {{-- Is Visible --}}
+                {!! Form::select(
+                    'is_visible',
+                    [
+                        '1' => 'Hiển thị',
+                        '0' => 'Không hiển thị',
+                    ],
+                    request('is_visible'),
+                    [
+                        'class' => 'form-control input-sm',
+                        'placeholder' => 'Hiển thị FE',
+                    ],
+                ) !!}
 
                 <button class="btn btn-secondary btn-sm" type="submit">
                     <i class="fa fa-search"></i> {{ __('message.search') }}
                 </button>
-                {{-- <a href="{{ route('promotions.index') }}" class="btn btn-default btn-sm">
-                    <i class="fa fa-refresh"></i>Làm mới
-                </a> --}}
 
             </div>
             {!! Form::close() !!}

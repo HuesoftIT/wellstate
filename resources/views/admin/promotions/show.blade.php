@@ -227,7 +227,20 @@
                             @endswitch
                         </td>
                     </tr>
-
+                    <tr>
+                        <th>Hiển thị frontend</th>
+                        <td>
+                            @if ($promotion->is_visible)
+                                <span class="label label-success">
+                                    Có hiển thị
+                                </span>
+                            @else
+                                <span class="label label-default">
+                                    Không hiển thị
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
                     <tr>
                         <th>Mô tả</th>
                         <td>

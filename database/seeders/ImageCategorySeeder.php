@@ -17,6 +17,7 @@ class ImageCategorySeeder extends Seeder
             'Văn hóa doanh nghiệp',
             'Về chúng tôi',
             'Dịch vụ nổi bật',
+            'Đội ngũ',
         ];
 
         foreach ($categories as $name) {

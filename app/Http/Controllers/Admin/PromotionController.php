@@ -41,6 +41,11 @@ class PromotionController extends Controller
             $query->status($request->status);
         }
 
+        if ($request->filled('is_visible')) {
+            $query->where('is_visible', $request->is_visible);
+        }
+
+
         $promotions = $query->latest()->paginate(config('settings.perpage', 10));
 
         return view('admin.promotions.index', compact('promotions'));
@@ -71,7 +76,6 @@ class PromotionController extends Controller
      */
     public function store(StorePromotionRequest $request)
     {
-        dd($request->all());
         DB::transaction(function () use ($request) {
             $promotion = $this->createPromotion($request);
             $this->savePromotionRules($promotion, $request);
@@ -217,6 +221,9 @@ class PromotionController extends Controller
              * 1. Update promotion info
              */
             $data = $request->validated();
+
+            $data['is_active'] = $request->boolean('is_active');
+            $data['is_visible'] = $request->boolean('is_visible');
 
             unset(
                 $data['service_ids'],

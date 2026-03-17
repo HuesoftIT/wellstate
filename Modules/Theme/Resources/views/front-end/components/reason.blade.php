@@ -8,11 +8,28 @@
 
         <!-- IMAGE -->
         <div class="order-1">
-            <img src="{{ asset('images/doi-ngu.jpeg') }}" alt="Wellstate"
-                class="w-full h-[300px] md:h-[400px] lg:h-full
-                       object-cover rounded-xl shadow-lg">
-        </div>
 
+            {{-- Không có ảnh --}}
+            @if ($images_team_photo->isEmpty())
+                <img src="{{ Storage::url('images/doi-ngu.jpeg') }}" alt="Default Team"
+                    class="w-full h-[300px] md:h-[400px] lg:h-full object-cover rounded-2xl shadow-lg border border-gray-200">
+
+                {{-- Có đúng 1 ảnh --}}
+            @elseif($images_team_photo->count() == 1)
+                <img src="{{ Storage::url($images_team_photo->first()->image) }}" alt="Team Photo"
+                    class="w-full h-[300px] md:h-[400px] lg:h-full object-cover rounded-2xl shadow-lg border border-gray-200">
+
+                {{-- Có nhiều ảnh --}}
+            @else
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    @foreach ($images_team_photo as $image)
+                        <img src="{{ Storage::url($image->image) }}" alt="Team Photo"
+                            class="w-full h-[200px] object-cover rounded-2xl shadow-lg border border-gray-200">
+                    @endforeach
+                </div>
+            @endif
+
+        </div>
         <!-- CONTENT -->
         <div class="order-2 px-4 py-8 md:px-8 md:py-10 lg:px-[30px] lg:py-[50px]">
 

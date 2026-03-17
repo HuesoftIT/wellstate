@@ -16,6 +16,8 @@ class PromotionObserver
      */
     public function creating(Promotion $promotion)
     {
+        $promotion->is_active = request()->has('is_active') ? 1 : 0;
+        $promotion->is_visible = request()->has('is_visible') ? 1 : 0;
         if (empty($promotion->discount_code)) {
             $promotion->discount_code = $this->generateUniqueSlug($promotion->title);
         }
@@ -35,6 +37,9 @@ class PromotionObserver
      */
     public function updating(Promotion $promotion)
     {
+        $promotion->is_active = request()->has('is_active') ? 1 : 0;
+        $promotion->is_visible = request()->has('is_visible') ? 1 : 0;
+
         // Nếu đổi tên → đổi slug
         if ($promotion->isDirty('title')) {
             $promotion->discount_code = $this->generateUniqueSlug(

@@ -48,6 +48,12 @@ class FrontendController extends Controller
         })
             ->orderBy('order')
             ->get();
+
+        $images_team_photo =  Image::whereHas('category', function ($q) {
+            $q->where('slug', 'doi-ngu');
+        })
+            ->orderBy('order')
+            ->get();
         \View::share([
             'mainMenus' => $mainMenus,
             'settings' => $settings,
@@ -56,7 +62,8 @@ class FrontendController extends Controller
             'post_categories' => $post_categories,
             'company_phone' => $company_phone,
             'images_about_us' => $images_about_us,
-            'images_featured_service' => $images_featured_service
+            'images_featured_service' => $images_featured_service,
+            'images_team_photo' => $images_team_photo,
         ]);
     }
 
@@ -105,7 +112,7 @@ class FrontendController extends Controller
             ->get(['image']);
 
 
-        $promotion_images = Promotion::where('is_active', 1)->whereNotNull('image')->orderBy('created_at', 'DESC')->take(5)->get('image', 'name');
+        $promotion_images = Promotion::where('is_active', 1)->where("is_visible", 1)->whereNotNull('image')->orderBy('created_at', 'DESC')->get('image', 'name');
         $branches = Branch::where('is_active', 1)->orderBy('created_at', 'DESC')->get();
         $posts = Post::published()->orderBy('published_at', 'DESC')->take(5)->get();
 

@@ -1,4 +1,3 @@
-
 <div class="box-body">
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -218,7 +217,9 @@
         {{-- Min order --}}
         <tr class="row {{ $errors->has('discount_min_order_value') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_min_order_value_display', 'Giá trị booking tối thiểu', ['class' => 'control-label label-required']) !!}
+                {!! Form::label('discount_min_order_value_display', 'Giá trị booking tối thiểu', [
+                    'class' => 'control-label label-required',
+                ]) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
@@ -349,7 +350,9 @@
         {{-- Max uses per user --}}
         <tr class="row {{ $errors->has('discount_max_uses_per_user') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_max_uses_per_user', 'Số lượt / mỗi khách', ['class' => 'control-label label-required']) !!}
+                {!! Form::label('discount_max_uses_per_user', 'Số lượt / mỗi khách', [
+                    'class' => 'control-label label-required',
+                ]) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
@@ -385,6 +388,19 @@
                 {!! Form::date('end_date', isset($promotion->end_date) ? $promotion->end_date->format('Y-m-d') : null, [
                     'class' => 'form-control input-sm',
                 ]) !!}
+            </td>
+        </tr>
+
+        {{-- Active --}}
+        <tr class="row">
+            <td class="col-md-4 col-lg-3">
+                {!! Form::label('is_visible', 'Hiển thị frontend', ['class' => 'control-label']) !!}
+            </td>
+
+            <td class="col-md-8 col-lg-9">
+
+                {!! Form::checkbox('is_visible', 1, isset($promotion) ? $promotion->is_visible : true, ['class' => 'flat-blue']) !!}
+
             </td>
         </tr>
 
@@ -607,7 +623,7 @@
                 } else {
                     row.hide()
                     input.prop('disabled', true)
-                    input.val(null) 
+                    input.val(null)
                 }
             }
 
