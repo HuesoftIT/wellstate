@@ -80,19 +80,6 @@
                     value="{{ old('booking_date') }}" class="form-control input-sm" required>
             </td>
         </tr>
-
-        {{-- Giờ --}}
-        <tr>
-            <td>
-                <label class="control-label label-required">Giờ</label>
-            </td>
-            <td>
-                <div id="time-slots" class="grid grid-cols-4 sm:grid-cols-6 gap-3"></div>
-
-                <input type="hidden" name="booking_time" id="booking_time" value="{{ old('booking_time') }}">
-            </td>
-        </tr>
-
         {{-- Loại phòng --}}
         <tr>
             <td class="align-middle">
@@ -116,6 +103,19 @@
                 </select>
             </td>
         </tr>
+        {{-- Giờ --}}
+        <tr>
+            <td>
+                <label class="control-label label-required">Giờ</label>
+            </td>
+            <td>
+                <div id="time-slots" class="grid grid-cols-4 sm:grid-cols-6 gap-3"></div>
+
+                <input type="hidden" name="booking_time" id="booking_time" value="{{ old('booking_time') }}">
+            </td>
+        </tr>
+
+
 
         {{-- Dịch vụ theo khách --}}
         <tr id="guest-services-row">
@@ -568,22 +568,36 @@
 
                 const branch = branchSelect.value;
                 const date = dateInput.value;
+                const roomTypeId = roomTypeSelect.value;
 
                 if (!branch || !date) {
                     container.innerHTML = '';
                     return;
                 }
 
-                fetch(`/api/ajax/branch-available-times?branch_id=${branch}&date=${date}`)
+                fetch(`/api/branches/available-slots?branch_id=${branch}&date=${date}&&room_type_id=${roomTypeId}`)
                     .then(res => res.json())
                     .then(data => {
                         render(data.open_time, data.close_time, data.disabled_times);
                     });
             }
 
-            branchSelect.addEventListener('change', fetchAvailableTimes);
-            dateInput.addEventListener('change', fetchAvailableTimes);
+            document.addEventListener('change', function(e) {
+                if (e.target.name === 'room_type_id') {
+                    fetchAvailableTimes()
+                }
+            })
+     
 
+            if (dateInput) {
+                dateInput.addEventListener('change', function() {
+                    const roomType = document.querySelector('input[name="room_type_id"]:checked')
+
+                    if (roomType) {
+                        fetchAvailableTimes();
+                    }
+                })
+            }
             /* =====================================================
                 ROOM TYPE LOAD
             ===================================================== */
@@ -598,7 +612,7 @@
                     return;
                 }
 
-                fetch(`/api/ajax/branches/${branchId}/room-types`)
+                fetch(`/api/branches/${branchId}/room-types`)
                     .then(res => res.json())
                     .then(data => {
 
@@ -823,7 +837,6 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        console.log('data: ', data);
                         promotionSelect.innerHTML =
                             '<option value="">-- Không áp dụng --</option>';
 

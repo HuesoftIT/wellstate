@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePromotionRequest;
 use App\Http\Requests\UpdatePromotionRequest;
+use App\Models\BranchRoomType;
 use App\Models\Customer;
 use App\Models\Membership;
 use App\Models\Promotion;
@@ -54,13 +55,14 @@ class PromotionController extends Controller
         $services = Service::where('is_active', true)
             ->orderBy('title')
             ->pluck('title', 'id');
-
-
+        $branchRoomTypes = BranchRoomType::active()
+            ->with(['branch', 'roomType'])
+            ->get();
         $memberships = Membership::where('is_active', true)->get();
         $customers = Customer::active()
             ->select('id', 'name', 'phone')
             ->get();
-        return view('admin.promotions.create', compact('services', 'memberships', 'customers'));
+        return view('admin.promotions.create', compact('services', 'memberships', 'customers', 'branchRoomTypes'));
     }
 
 
@@ -69,6 +71,7 @@ class PromotionController extends Controller
      */
     public function store(StorePromotionRequest $request)
     {
+        dd($request->all());
         DB::transaction(function () use ($request) {
             $promotion = $this->createPromotion($request);
             $this->savePromotionRules($promotion, $request);

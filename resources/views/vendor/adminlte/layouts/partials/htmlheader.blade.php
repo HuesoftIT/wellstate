@@ -24,6 +24,12 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     @yield('css')
+    <style>
+        .label-required::after {
+            content: " *";
+            color: red;
+        }
+    </style>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

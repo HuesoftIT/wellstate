@@ -38,7 +38,14 @@ class BookingController extends Controller
         $booking = DB::transaction(function () use ($request) {
             //1. Count time
             [$startTime, $endTime, $maxDuration] = $this->bookingService->calculateBookingTime($request);
-
+            $this->bookingService->validateSlotAvailability(
+                $request->branch_id,
+                $request->room_type_id,
+                $request->booking_date,
+                $startTime,
+                $endTime,
+                $request->guest_count
+            );
             //2. Create booking
             $booking = $this->bookingService->createBookingSkeleton($request, $startTime, $endTime, $maxDuration);
 

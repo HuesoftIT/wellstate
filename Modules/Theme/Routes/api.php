@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get(
-    '/ajax/branches/{id}/room-types',
+    '/branches/{id}/room-types',
     [BranchRoomTypeController::class, 'getRoomTypesById']
 )->name('ajax.branch.room-types');
-Route::post('/ajax/promotions/apply', [PromotionController::class, 'apply']);
-Route::get('/ajax/branch-available-times', [BranchController::class, 'getAvailableTimes']);
+Route::post('/promotions/apply', [PromotionController::class, 'apply']);
+Route::get('/branches/available-slots', [BranchController::class, 'getAvailableTimes']); // branch_id & date & room_type_id

@@ -675,7 +675,7 @@
         </div>
         `;
 
-        fetch(`/api/ajax/branches/${branchId}/room-types`)
+        fetch(`/api/branches/${branchId}/room-types`)
             .then((res) => res.json())
             .then((res) => {
                 const roomTypes = res.data;
@@ -1014,7 +1014,7 @@
 
 
             try {
-                const res = await fetch('/api/ajax/promotions/apply', {
+                const res = await fetch('/api/promotions/apply', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1111,6 +1111,8 @@
         const input = document.getElementById('booking-time');
         const dateInput = document.getElementById('booking-date');
         const branchInputs = document.querySelectorAll('input[name="branch_id"]');
+        const roomTypeInputs = document.querySelectorAll('input[name="room_type_id"]');
+        console.log('roomTypeInputs:', roomTypeInputs)
 
         const step = 15;
 
@@ -1193,23 +1195,38 @@
         function fetchAvailableTimes() {
 
             const branch = document.querySelector('input[name="branch_id"]:checked');
+            const roomType = document.querySelector('input[name="room_type_id"]:checked')
             const date = dateInput.value;
 
-            if (!branch || !date) return;
+            if (!branch || !date || !roomType) return;
 
-            fetch(`/api/ajax/branch-available-times?branch_id=${branch.value}&date=${date}`)
+            fetch(`/api/branches/available-slots?date=${date}&room_type_id=${roomType.value}&branch_id=${branch.value}`)
                 .then(res => res.json())
                 .then(data => {
                     render(data.open_time, data.close_time, data.disabled_times);
                 });
         }
 
-        branchInputs.forEach(input => {
-            input.addEventListener('change', fetchAvailableTimes);
+        document.addEventListener('change', function(e) {
+
+            if (e.target.name === 'room_type_id') {
+                fetchAvailableTimes();
+            }
+
         });
 
+
         if (dateInput) {
-            dateInput.addEventListener('change', fetchAvailableTimes);
+
+            dateInput.addEventListener('change', function() {
+
+                const roomType = document.querySelector('input[name="room_type_id"]:checked');
+
+                if (roomType) {
+                    fetchAvailableTimes();
+                }
+
+            });
 
         }
 

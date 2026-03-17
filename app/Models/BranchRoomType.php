@@ -35,8 +35,8 @@ class BranchRoomType extends Model
         'updated_at',
     ];
 
-    public function scopeActive($request) {
-        return $request->where('is_active', 1);
+    public function scopeActive($query) {
+        return $query->where('is_active', 1);
     }
     // ===== RELATIONS =====
 

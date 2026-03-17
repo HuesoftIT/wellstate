@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Str;
+use Illuminate\Validation\ValidationException;
 
 class BookingService
 {
@@ -88,6 +89,34 @@ class BookingService
         ]);
     }
 
+    public function validateSlotAvailability($branchId, $roomTypeId, $date, $startTime, $endTime, $guests)
+    {
+        $branchRoomType = BranchRoomType::where('branch_id', $branchId)
+            ->where('room_type_id', $roomTypeId)
+            ->firstOrFail();
+
+        $capacity = $branchRoomType->capacity;
+        $date = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
+        $startTime = Carbon::parse($startTime)->format('H:i:s');
+        $endTime   = Carbon::parse($endTime)->format('H:i:s');
+        
+        // dd($startTime, $endTime, $date);
+        $existingGuests = Booking::where('branch_room_type_id', $branchRoomType->id)
+            ->whereDate('booking_date', $date)
+            ->whereNotIn('status', ['cancelled'])
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where('start_time', '<', $endTime)
+                    ->where('end_time', '>', $startTime);
+            })
+            ->sum('total_guests');
+
+        if (($existingGuests + $guests) > $capacity) {
+            throw ValidationException::withMessages([
+                'time' => 'Khung giờ này đã hết chỗ.'
+            ]);
+        }
+    }
+
     protected function generateBookingCode()
     {
         return 'BK-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
@@ -128,7 +157,7 @@ class BookingService
                     'status'           => 'pending',
                 ]);
 
-              
+
 
                 BookingGuestServiceRoom::create([
                     'booking_guest_service_id' => $guestService->id,
@@ -138,7 +167,7 @@ class BookingService
                     'price'                    => $roomType->price,
                 ]);
 
-                $price = $service->sale_price ? $service->sale_price: $service->price;
+                $price = $service->sale_price ? $service->sale_price : $service->price;
 
                 $subtotal += $price;
                 $totalDuration += $service->duration;

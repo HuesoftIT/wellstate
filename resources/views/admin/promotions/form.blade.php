@@ -1,3 +1,4 @@
+
 <div class="box-body">
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -36,7 +37,7 @@
         {{-- Code --}}
         <tr class="row {{ $errors->has('discount_code') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_code', 'Mã khuyến mãi', ['class' => 'control-label']) !!}
+                {!! Form::label('discount_code', 'Mã khuyến mãi', ['class' => 'control-label label-required']) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
@@ -181,7 +182,7 @@
 
         <tr class="row">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('apply_scope', 'Áp dụng giảm giá vào', ['class' => 'control-label']) !!}
+                {!! Form::label('apply_scope', 'Áp dụng giảm giá vào', ['class' => 'control-label label-required']) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
@@ -217,7 +218,7 @@
         {{-- Min order --}}
         <tr class="row {{ $errors->has('discount_min_order_value') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_min_order_value_display', 'Giá trị booking tối thiểu', ['class' => 'control-label']) !!}
+                {!! Form::label('discount_min_order_value_display', 'Giá trị booking tối thiểu', ['class' => 'control-label label-required']) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
@@ -335,7 +336,7 @@
         {{-- Max uses --}}
         <tr class="row {{ $errors->has('discount_max_uses') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_max_uses', 'Tổng số lượt sử dụng', ['class' => 'control-label']) !!}
+                {!! Form::label('discount_max_uses', 'Tổng số lượt sử dụng', ['class' => 'control-label label-required']) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
@@ -348,7 +349,7 @@
         {{-- Max uses per user --}}
         <tr class="row {{ $errors->has('discount_max_uses_per_user') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('discount_max_uses_per_user', 'Số lượt / mỗi khách', ['class' => 'control-label']) !!}
+                {!! Form::label('discount_max_uses_per_user', 'Số lượt / mỗi khách', ['class' => 'control-label label-required']) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
@@ -377,7 +378,7 @@
         {{-- End date --}}
         <tr class="row {{ $errors->has('end_date') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('end_date', 'Ngày kết thúc', ['class' => 'control-label']) !!}
+                {!! Form::label('end_date', 'Ngày kết thúc', ['class' => 'control-label label-required']) !!}
             </td>
 
             <td class="col-md-8 col-lg-9">
