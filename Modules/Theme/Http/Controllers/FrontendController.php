@@ -112,7 +112,21 @@ class FrontendController extends Controller
             ->get(['image']);
 
 
-        $promotion_images = Promotion::where('is_active', 1)->where("is_visible", 1)->whereNotNull('image')->orderBy('created_at', 'DESC')->get('image', 'name');
+        $now = now();
+
+        $promotion_images = Promotion::where('is_active', 1)
+            ->where('is_visible', 1)
+            ->whereNotNull('image')
+            ->where(function ($q) use ($now) {
+                $q->whereNull('start_date')
+                    ->orWhere('start_date', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_date')
+                    ->orWhere('end_date', '>=', $now);
+            })
+            ->orderBy('created_at', 'DESC')
+            ->get(['image', 'title']);
         $branches = Branch::where('is_active', 1)->orderBy('created_at', 'DESC')->get();
         $posts = Post::published()->orderBy('published_at', 'DESC')->take(5)->get();
 

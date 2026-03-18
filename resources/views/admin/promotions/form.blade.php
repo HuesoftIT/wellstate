@@ -280,7 +280,9 @@
                     @endforeach
 
                 </select>
-
+                <small class="text-muted">
+                    Để trống nếu áp dụng cho tất cả hạng thành viên
+                </small>
             </td>
         </tr>
         {{-- Customer --}}

@@ -92,7 +92,12 @@ class BookingController extends Controller
             return $booking;
         });
         if ($booking && $booking->booker_email) {
-            Mail::to($booking->booker_email)->send(new BookingSuccessMail($booking));
+            try {
+                Mail::to($booking->booker_email)
+                    ->send(new BookingSuccessMail($booking));
+            } catch (\Exception $e) {
+                \Log::warning('Mail failed but ignored: ' . $e->getMessage());
+            }
         }
         return redirect()
             ->route('page.booking')
