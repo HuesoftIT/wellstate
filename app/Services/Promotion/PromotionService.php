@@ -18,7 +18,11 @@ class PromotionService
 
     public function getAvailablePromotions(BookingDTO $booking): array
     {
-        $bookingDate = $booking->bookingDate?->toDateString();
+        $bookingDate = null;
+
+        if ($booking->bookingDate) {
+            $bookingDate = $booking->bookingDate->toDateString();
+        }
 
         $promotions = Promotion::with('rules')
             ->active()
@@ -41,14 +45,14 @@ class PromotionService
         $roomPrice = $this->getRoomAmount($booking);
 
         $serviceTotal = array_sum(
-            array_column($booking->services ?? [], 'price')
+            array_column($booking->services ? $booking->services : [], 'price')
         );
 
         $results = [];
 
         foreach ($promotions as $promotion) {
 
-            if (! $this->isPromotionApplicable($promotion, $booking)) {
+            if (!$this->isPromotionApplicable($promotion, $booking)) {
                 continue;
             }
 
@@ -60,7 +64,6 @@ class PromotionService
 
             $discount = $this->calculateDiscount($promotion, $eligibleAmount);
 
-            // clamp discount theo scope
             switch ($promotion->apply_scope) {
 
                 case Promotion::APPLY_SCOPE_BOOKING:
@@ -86,10 +89,7 @@ class PromotionService
                 'discount_type' => $promotion->discount_type,
                 'discount_value' => $promotion->discount_value,
                 'apply_scope' => $promotion->apply_scope,
-
                 'eligible_amount' => $eligibleAmount,
-
-                // discount sau khi clamp
                 'discount_amount' => $effectiveDiscount,
             ];
         }

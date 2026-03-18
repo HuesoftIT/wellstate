@@ -358,7 +358,6 @@
     document.addEventListener("DOMContentLoaded", function() {
 
         const scrollBtn = document.getElementById("scrollToTopBtn");
-
         window.addEventListener("scroll", function() {
             if (window.scrollY > 300) {
                 scrollBtn.classList.add("show");
@@ -888,7 +887,6 @@
             state.room = e.target.dataset.name;
             state.roomFee = Number(e.target.dataset.fee || 0);
             state.branchRoomTypeId = e.target.value;
-            console.log('state.branchRooomTypeId: ', state.branchRoomTypeId);
             invalidatePromotion();
             renderSummary();
         });
@@ -1030,9 +1028,9 @@
                         room_fee: state.roomFee,
                         branch_id: state.branchId,
                         room_type_id: state.branchRoomTypeId,
-                        booking_date: state.date,
+                        booking_date: state.date || document.getElementById('booking-date')?.value || null,
                         total_guests: state.guests,
-                        phone: state.phone || document.querySelector('.booker_phone')
+                        phone: state.phone || document.getElementById('booker_phone')
                             ?.value || null,
                     })
                 });
@@ -1112,7 +1110,6 @@
         const dateInput = document.getElementById('booking-date');
         const branchInputs = document.querySelectorAll('input[name="branch_id"]');
         const roomTypeInputs = document.querySelectorAll('input[name="room_type_id"]');
-        console.log('roomTypeInputs:', roomTypeInputs)
 
         const step = 15;
 

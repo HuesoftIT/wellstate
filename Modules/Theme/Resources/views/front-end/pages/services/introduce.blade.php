@@ -2,7 +2,7 @@
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
 
         <!-- Left Image -->
-        <div class="md:col-span-3 w-full">
+        <div class="md:col-span-3 w-full slide-left opacity-0">
             <img src="http://127.0.0.1:8000/images/service-introduce-1.png" alt="Spa hallway"
                 class="w-full max-w-full h-auto object-cover rounded-md">
         </div>
@@ -20,7 +20,7 @@
         </div>
 
         <!-- Right Images -->
-        <div class="md:col-span-3 flex flex-col items-center gap-6 w-full">
+        <div class="md:col-span-3 flex flex-col items-center gap-6 w-full slide-right opacity-0">
             <img src="{{ asset($logo)}}" alt="Wellstate Logo" class="w-32 md:w-40 h-auto">
 
             <img src="http://127.0.0.1:8000/images/service-introduce-2.jpg" alt="Spa interior"

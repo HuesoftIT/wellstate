@@ -5,7 +5,9 @@
         @if ($data->image)
             <div class="mb-12">
                 <img src="{{ Storage::url($data->image) }}" alt="{{ $data->title }}"
-                    class="w-full rounded-2xl shadow object-contain max-h-[520px]">
+                    class="w-full h-auto max-h-[70vh] object-contain rounded-2xl 
+                   transition-transform duration-500 ease-out hover:scale-[1.01]"
+                    loading="lazy" decoding="async">
             </div>
         @endif
 

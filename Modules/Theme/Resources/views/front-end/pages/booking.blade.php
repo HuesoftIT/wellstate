@@ -37,7 +37,7 @@
                             <label class="block text-[16px] font-medium text-slate-600 mb-1">
                                 Họ và tên <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="booker_name" value="{{ old('booker_name') }}" required
+                            <input type="text" id="booker_name" name="booker_name" value="{{ old('booker_name') }}" required
                                 autocomplete="name" placeholder="Ví dụ: Nguyễn Văn A"
                                 class="input h-11 @error('booker_name') border-red-500 @enderror">
                             @error('booker_name')

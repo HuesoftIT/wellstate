@@ -40,6 +40,9 @@ class PostController extends Controller
             ->with('parent')
             ->orderBy('name')
             ->get()
+            ->filter(function ($item) {
+                return $item->parent !== null;
+            })
             ->mapWithKeys(function ($item) {
                 return [
                     $item->id => $item->parent->name . ' → ' . $item->name
@@ -57,6 +60,7 @@ class PostController extends Controller
     {
         $categories = PostCategory::active()
             ->child()
+            ->whereHas('parent')
             ->with('parent')
             ->orderBy('name')
             ->get();
