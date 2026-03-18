@@ -97,7 +97,7 @@ class PromotionController extends Controller
         return Promotion::create($data);
     }
 
-    protected function savePromotionRules(Promotion $promotion, FormRequest $request): void
+    protected function savePromotionRules(Promotion $promotion, FormRequest $request)
     {
         /**
          * 1. Rule dịch vụ
@@ -110,7 +110,9 @@ class PromotionController extends Controller
                 'config' => [
                     'mode' => 'include',
                     'ids' => collect($request->service_ids)
-                        ->map(fn($id) => (int) $id)
+                        ->map(function ($id) {
+                            return (int) $id;
+                        })
                         ->values()
                         ->toArray()
                 ]
@@ -127,7 +129,9 @@ class PromotionController extends Controller
                 'order' => 2,
                 'config' => [
                     'ids' => collect($request->membership_levels)
-                        ->map(fn($id) => (int) $id)
+                        ->map(function ($id) {
+                            return (int) $id;
+                        })
                         ->values()
                         ->toArray()
                 ]
@@ -145,7 +149,9 @@ class PromotionController extends Controller
                 'config' => [
                     'mode' => 'only',
                     'ids' => collect($request->user_ids)
-                        ->map(fn($id) => (int) $id)
+                        ->map(function ($id) {
+                            return (int) $id;
+                        })
                         ->values()
                         ->toArray()
                 ]

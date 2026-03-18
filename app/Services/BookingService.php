@@ -12,7 +12,7 @@ use App\Services\Promotion\PromotionService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
-use Str;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class BookingService
