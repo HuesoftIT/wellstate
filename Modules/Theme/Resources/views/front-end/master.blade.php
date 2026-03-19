@@ -787,7 +787,7 @@
         if (state.discount) {
 
             if (state.apply_scope === "booking") {
-                const discount = Math.min(state.discount + state.roomFee, total);
+                const discount = Math.min(state.discount, total)
                 total = total - discount;
             }
 
@@ -1028,7 +1028,8 @@
                         room_fee: state.roomFee,
                         branch_id: state.branchId,
                         room_type_id: state.branchRoomTypeId,
-                        booking_date: state.date || document.getElementById('booking-date')?.value || null,
+                        booking_date: state.date || document.getElementById('booking-date')
+                            ?.value || null,
                         total_guests: state.guests,
                         phone: state.phone || document.getElementById('booker_phone')
                             ?.value || null,
@@ -1067,16 +1068,9 @@
             state.discount = 0;
             state.promotionId = null;
             state.total = state.subtotal + state.roomFee;
-
             renderSummary();
-
             messageEl.classList.add('hidden');
-
         }
-
-
-
-
 
     });
 
@@ -1197,7 +1191,8 @@
 
             if (!branch || !date || !roomType) return;
 
-            fetch(`/api/branches/available-slots?date=${date}&room_type_id=${roomType.value}&branch_id=${branch.value}`)
+            fetch(
+                    `/api/branches/available-slots?date=${date}&room_type_id=${roomType.value}&branch_id=${branch.value}`)
                 .then(res => res.json())
                 .then(data => {
                     render(data.open_time, data.close_time, data.disabled_times);

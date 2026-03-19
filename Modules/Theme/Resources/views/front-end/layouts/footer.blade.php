@@ -22,8 +22,9 @@
                     </p>
 
                     <div class="mt-6 space-y-2">
-                        <p>📞 Hotline: (+84) 365 318 639</p>
-                        <p>⏰ 09:00 – 22:00 mỗi ngày</p>
+                        @if (!empty($company_phone))
+                            <span>Hotline: {{ $company_phone }}</span>
+                        @endif
                     </div>
 
                     <h4 class="mt-8 font-semibold uppercase tracking-wide">
@@ -31,14 +32,16 @@
                     </h4>
 
                     <ul class="mt-4 space-y-4">
-                        <li>
-                            <p class="font-medium">Wellstate Spa – Huế</p>
-                            <p class="text-sm opacity-90">08 Hùng Vương, TP. Huế</p>
-                        </li>
-                        <li>
-                            <p class="font-medium">Wellstate Spa – Hội An</p>
-                            <p class="text-sm opacity-90">224 Lý Thái Tổ, Hội An</p>
-                        </li>
+                        @forelse ($branches as $branch)
+                            <li>
+                                <p class="font-medium">{{ $branch->name }}</p>
+                                <p class="text-sm opacity-90">{{ $branch->address }}</p>
+                            </li>
+                        @empty
+                        @endforelse
+
+
+
                     </ul>
                 </div>
 
@@ -67,15 +70,14 @@
                     </h4>
 
                     <div class="flex gap-3 mb-6">
-                        <a
-                            class="w-10 h-10 bg-[#8aa24a] rounded flex items-center justify-center
-                              hover:bg-[#9fb85a] transition">FB</a>
-                        <a
-                            class="w-10 h-10 bg-[#8aa24a] rounded flex items-center justify-center
-                              hover:bg-[#9fb85a] transition">IG</a>
-                        <a
-                            class="w-10 h-10 bg-[#8aa24a] rounded flex items-center justify-center
-                              hover:bg-[#9fb85a] transition">TT</a>
+                        @if (!empty($fb_link))
+                            <a href="{{ $fb_link }}"
+                                class="w-10 h-10 rounded flex items-center justify-center transition">
+                                <img src="{{ asset('images/fb.png') }}" alt="Facebook">
+                            </a>
+                        @else
+
+                        @endif
                     </div>
 
                 </div>
@@ -86,7 +88,9 @@
                 class="mt-16 pt-6 border-t border-white/20
                     flex flex-col md:flex-row justify-between gap-4">
                 <span>© 2025 Wellstate</span>
-                <span>Hotline: 0365 318 639</span>
+                @if (!empty($company_phone))
+                    <span>Hotline: {{ $company_phone }}</span>
+                @endif
             </div>
 
         </div>

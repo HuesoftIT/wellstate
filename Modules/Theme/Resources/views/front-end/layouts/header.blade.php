@@ -301,12 +301,11 @@
 
             <!-- Info -->
             <div class="mt-8 text-white text-sm leading-relaxed flex flex-col items-center gap-1 text-center">
-                <p class="font-semibold">
-                    CONTACT FOR BOOKING +84 3653 1863
-                </p>
-                <p class="text-xs">
-                    OPERATING HOURS 9:00 AM - 11:00 PM DAILY
-                </p>
+                @if (!empty($company_phone))
+                    <p class="font-semibold">
+                        Liên hệ để đặt phòng {{ $company_phone }}
+                    </p>
+                @endif
             </div>
 
             <!-- CTA -->

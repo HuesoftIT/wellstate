@@ -54,6 +54,8 @@ class FrontendController extends Controller
         })
             ->orderBy('order')
             ->get();
+        $branches = Branch::where('is_active', 1)->orderBy('created_at', 'DESC')->get();
+        $fb_link = Setting::where('key' , 'follow_facebook')->value('value');
         \View::share([
             'mainMenus' => $mainMenus,
             'settings' => $settings,
@@ -64,6 +66,8 @@ class FrontendController extends Controller
             'images_about_us' => $images_about_us,
             'images_featured_service' => $images_featured_service,
             'images_team_photo' => $images_team_photo,
+            'branches' => $branches,
+            'fb_link' => $fb_link,
         ]);
     }
 
@@ -127,11 +131,10 @@ class FrontendController extends Controller
             })
             ->orderBy('created_at', 'DESC')
             ->get(['image', 'title']);
-        $branches = Branch::where('is_active', 1)->orderBy('created_at', 'DESC')->get();
         $posts = Post::published()->orderBy('published_at', 'DESC')->take(5)->get();
 
 
-        return view('theme::front-end.pages.home', compact('slides', 'customer_review_images', 'promotion_images', 'branches', 'posts', 'customer_google_review_images'));
+        return view('theme::front-end.pages.home', compact('slides', 'customer_review_images', 'promotion_images', 'posts', 'customer_google_review_images'));
     }
 
     public function getIntroduce(Request $request)

@@ -29,7 +29,7 @@ Menu::macro('sidebar', function ($user, $arLink) {
 					}
 				}
 			} else {
-				$htmlLink = Html::raw('<a href="' . url($link['href']) . '"><i class="' . $link['icon'] . '"></i><span>' . $link['title'] . '</span></a>');
+				$htmlLink = Html::raw('<a href="' . url($link['href']) . '"><i style="margin-right: 8px; display: inline-block;" class="' . $link['icon'] . '"></i><span>' . $link['title'] . '</span></a>');
 				if (\request()->is($link['href']) || \request()->is($link['href'] . "/*")) {
 					$htmlLink->setActive()->addParentClass('selected');
 				}
@@ -39,7 +39,7 @@ Menu::macro('sidebar', function ($user, $arLink) {
 				$menu->add($htmlLink);
 			}
 			if ($groupActive) {
-				$mn = Menu::adminlteSubmenu('<i class="' . $link['icon'] . '"></i><span>' . $link['title'] . '</span>');
+				$mn = Menu::adminlteSubmenu('<i style="display: inline-block; margin-right: 8px;" class="' . $link['icon'] . '"></i><span>' . $link['title'] . '</span>');
 				if (!empty($link['child'])) {
 					foreach ($link['child'] as $lchild) {
 						if (!isset($lchild['permission']) || $user->can($lchild['permission']) == true) {

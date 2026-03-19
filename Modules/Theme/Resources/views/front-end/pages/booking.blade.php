@@ -169,7 +169,7 @@
                                 <label class="mb-1 block text-sm font-medium text-slate-600">
                                     Tên khách
                                 </label>
-                                <input type="text" name="guests[__index__][name]" required placeholder="Tên khách (tuỳ chọn)"
+                                <input type="text" name="guests[__index__][name]" placeholder="Tên khách (tuỳ chọn)"
                                     class="input h-11">
                             </div>
 

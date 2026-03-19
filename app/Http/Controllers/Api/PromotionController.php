@@ -8,6 +8,7 @@ use App\Models\BranchRoomType;
 use App\Models\Customer;
 use App\Services\Promotion\PromotionService;
 use Illuminate\Http\Request;
+use Exception;
 
 class PromotionController extends Controller
 {
@@ -102,7 +103,7 @@ class PromotionController extends Controller
             ->first();
 
         if (!$branchRoomType) {
-            abort(404, 'Branch room type not found.');
+           throw new Exception('Không tồn tại loại phòng này');
         }
 
         $branchRoomTypeId = $branchRoomType->id;
@@ -149,7 +150,7 @@ class PromotionController extends Controller
         $bookingData = BookingDTO::fromRequest($request);
 
         $promotions = $promotionService->getAvailablePromotions($bookingData);
-
+       
         return response()->json($promotions);
     }
 }

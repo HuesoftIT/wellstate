@@ -91,7 +91,7 @@
 
         <tr class="row {{ $errors->has('description') ? 'has-error' : '' }}">
             <td class="col-md-4 col-lg-3">
-                {!! Form::label('description', trans('news.description'), ['class' => 'control-label']) !!}
+                {!! Form::label('description', trans('services.description'), ['class' => 'control-label']) !!}
             </td>
             <td class="col-md-8 col-lg-9">
                 {!! Form::textarea('description', null, ['class' => 'form-control input-sm ', 'rows' => 5]) !!}
