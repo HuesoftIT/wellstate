@@ -34,11 +34,13 @@
         <div class="order-2 px-4 py-8 md:px-8 md:py-10 lg:px-[30px] lg:py-[50px]">
 
             <div class=" flex flex-col justify-center">
-                <p class="text-[16px] tracking-widest text-gray-500 mb-3">
+                <p class="text-[16px] tracking-widest text-gray-500 mb-3 font-bold">
                     WELLSTATE
                 </p>
 
-                <h2 class="text-[45px] font-open-sans  font-semibold text-[#7a8f2c] mb-4">
+                <h2
+                    class="text-[45px] font-open-sans  font-semibold bg-gradient-to-r from-[#a3c163] to-[#3f4b2a]
+    bg-clip-text text-transparent mb-4">
                     Lý do nên lựa chọn WELLSTATE
                 </h2>
 

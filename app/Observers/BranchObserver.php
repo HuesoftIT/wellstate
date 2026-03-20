@@ -14,7 +14,6 @@ class BranchObserver
                 request()->file('image')
             );
 
-            dd($branch->image);
         }
     }
 

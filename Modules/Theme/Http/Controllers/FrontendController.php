@@ -54,6 +54,13 @@ class FrontendController extends Controller
         })
             ->orderBy('order')
             ->get();
+
+        $images_space =  Image::whereHas('category', function ($q) {
+            $q->where('slug', 'khong-gian');
+        })
+            ->orderBy('order')
+            ->get();
+
         $branches = Branch::where('is_active', 1)->orderBy('created_at', 'DESC')->get();
         $fb_link = Setting::where('key' , 'follow_facebook')->value('value');
         \View::share([
@@ -68,25 +75,18 @@ class FrontendController extends Controller
             'images_team_photo' => $images_team_photo,
             'branches' => $branches,
             'fb_link' => $fb_link,
+            'images_space' => $images_space
         ]);
     }
 
 
     public function index()
     {
-        $slides = Image::with([
-            'category' => function ($q) {
-                $q->where('is_active', 1);
-            }
-        ])
-            ->where('is_active', 1)
-            ->where('image_category_id', 1)
-            ->whereHas('category', function ($q) {
-                $q->where('is_active', 1);
-            })
-            ->orderBy('order', 'ASC')
+        $slides =  Image::whereHas('category', function ($q) {
+            $q->where('slug', 'slide');
+        })
+            ->orderBy('order')
             ->get();
-
 
 
         $customer_review_images = Image::with([
@@ -145,12 +145,13 @@ class FrontendController extends Controller
             }
         ])
             ->where('is_active', 1)
-            ->where('image_category_id', 5)
             ->whereHas('category', function ($q) {
-                $q->where('is_active', 1);
+                $q->where('slug', 'van-hoa-doanh-nghiep')
+                    ->where('is_active', 1);
             })
             ->orderBy('order', 'DESC')
             ->get(['image']);
+
         return view('theme::front-end.pages.introduce', compact('culture_images'));
     }
 

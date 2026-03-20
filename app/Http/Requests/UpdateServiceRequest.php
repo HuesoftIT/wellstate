@@ -31,10 +31,10 @@ class UpdateServiceRequest extends FormRequest
                 'max:255',
                 Rule::unique('services', 'title')
                     ->ignore($this->route('service'))
-                    ->where(
-                        fn($q) =>
-                        $q->where('service_category_id', $this->service_category_id)
-                    ),
+                    ->where(function ($q) {
+                        return $q->where('service_category_id', $this->service_category_id)
+                            ->whereNull('deleted_at');
+                    }),
             ],
 
             'description' => 'nullable|string',

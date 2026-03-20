@@ -18,7 +18,7 @@
                     tinh tế và bền vững.
                 </p>
 
-                <div class="grid md:grid-cols-2 gap-8">
+                <div class="grid md:grid-cols-2 gap-8 text-[18px]">
 
                     {{-- Tinh tế --}}
                     <div class="flex gap-4">

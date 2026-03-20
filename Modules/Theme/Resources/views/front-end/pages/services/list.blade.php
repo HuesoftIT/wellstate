@@ -13,7 +13,7 @@
 
                     <!-- TITLE -->
                     <h3
-                        class="uppercase text-[14px] md:text-[18px] lg:text-[22px] font-open-sans text-[#3b4a2f] mb-1 line-clamp-2">
+                        class="uppercase text-[14px] md:text-[18px] lg:text-[22px] font-open-sans text-[#3b4a2f] mb-1 line-clamp-2 font-medium">
                         {{ $service->title }}
                     </h3>
 
@@ -23,8 +23,8 @@
                     </p>
 
                     <!-- PHONE -->
-                    <p class="text-[#3b4a2f] text-[14px] md:text-[16px] font-medium mb-3">
-                        {{ $company_phone }}
+                    <p class="text-[#3b4a2f] text-[18px] md:text-[20px] font-medium mb-3 font-medium mt-4">
+                        Liên hệ: {{ $company_phone }}
                     </p>
 
                     <!-- BUTTON -->

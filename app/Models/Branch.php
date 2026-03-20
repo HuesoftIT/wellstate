@@ -33,6 +33,8 @@ class Branch extends Model
         'is_active' => 'boolean',
         'latitude' => 'float',
         'longitude' => 'float',
+        'open_time' => 'datetime:H:i:s',
+        'close_time' => 'datetime:H:i:s',
     ];
 
     protected static function booted()
@@ -44,14 +46,17 @@ class Branch extends Model
         });
     }
 
+  
+
     public function employees()
     {
         return $this->hasMany(Employee::class, 'branch_id');
     }
-    public function workingShifts(){
+    public function workingShifts()
+    {
         return $this->hasMany(WorkingShift::class, 'branch_id');
     }
-    
+
     public function scopeActive($query)
     {
         return $query->where('is_active', 1);

@@ -74,7 +74,6 @@ class BranchController extends Controller
     public function edit($id)
     {
         $branch = Branch::findOrFail($id);
-
         return view('admin.branches.edit', compact('branch'));
     }
 

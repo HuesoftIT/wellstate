@@ -76,7 +76,6 @@
 
                 {{-- Highlight --}}
                 <div class="flex items-start gap-4 pt-6">
-                    <img src="{{ asset('images/wellstate-logo.png') }}" alt="Wellstate" class="w-12 h-12 opacity-90">
                     <p class="text-[16px] leading-relaxed text-[#cfe29a]">
                         Ứng dụng những công nghệ tiên tiến nhất thế giới kết hợp cùng liệu pháp
                         trị liệu cổ truyền, đảm bảo hiệu quả tối ưu và sự an toàn tuyệt đối.

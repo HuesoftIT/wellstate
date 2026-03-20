@@ -1,7 +1,7 @@
 <section class="relative overflow-hidden bg-[#f5f8ea] py-20">
     {{-- Background SVG --}}
     <div class="absolute inset-0 bg-no-repeat bg-center bg-contain opacity-10"
-        style="background-image: url('{{ asset('images/pattern.svg') }}')">
+       >
     </div>
 
     {{-- Content --}}
@@ -16,10 +16,7 @@
                 WELLSTATE
             </h1>
 
-            <p class="mt-2 text-sm tracking-[0.3em] text-[#6b7a3a]">
-                HOLDING
-            </p>
-
+         
             {{-- Divider --}}
             <div class="flex justify-center my-6">
                 <span class="w-16 h-px bg-[#6b7a3a]"></span>

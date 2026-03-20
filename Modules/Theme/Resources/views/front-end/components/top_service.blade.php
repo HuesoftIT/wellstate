@@ -8,16 +8,16 @@
                text-center text-white font-cormorant px-4">
         <!-- Dòng 1 -->
         <h1 class="text-[50px] font-semibold tracking-[0.15em] uppercase">
-            SANA IMPERIAL SPA
+            WELLSTATE SPA
         </h1>
 
         <!-- Dòng 2 -->
         <p class="mt-4 text-[28px] font-normal leading-relaxed">
-            Đến Huế, đến Sana để yêu thương lấy bản thân mình
+            Đến Huế, đến Wellstate để yêu thương lấy bản thân mình
         </p>
 
         <!-- Button -->
-        <a href="/lien-he"
+        <a href="{{ route('page.contact')}}"
             class="mt-10 inline-block
                    px-12 py-3
                    text-[25px] uppercase

@@ -136,9 +136,9 @@
                             {{-- WORKING TIME --}}
                             <td class="text-center">
                                 @if ($item->open_time && $item->close_time)
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $item->open_time)->format('H:i') }}
+                                    {{ $item->open_time->format('H:i') }}
                                     -
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $item->close_time)->format('H:i') }}
+                                    {{ $item->close_time->format('H:i') }}
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif

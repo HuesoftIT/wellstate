@@ -13,7 +13,7 @@ class BranchController extends Controller
 {
     //
 
-    public function getAvailableTimes( Request $request)
+    public function getAvailableTimes(Request $request)
     {
         $branch = Branch::findOrFail($request->branch_id);
 
@@ -26,8 +26,8 @@ class BranchController extends Controller
 
         $capacity = $branchRoomType->capacity;
 
-        $open = Carbon::createFromFormat('H:i:s', $branch->open_time);
-        $close = Carbon::createFromFormat('H:i:s', $branch->close_time);
+        $open  = $branch->open_time->copy();
+        $close = $branch->close_time->copy();
 
         $step = 15;
 
@@ -65,8 +65,8 @@ class BranchController extends Controller
         }
 
         return response()->json([
-            'open_time' => substr($branch->open_time, 0, 5),
-            'close_time' => substr($branch->close_time, 0, 5),
+            'open_time' => $branch->open_time->format('H:i'),
+            'close_time' => $branch->close_time->format('H:i'),
             'disabled_times' => $disabled
         ]);
     }

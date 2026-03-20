@@ -40,7 +40,7 @@ class ServiceObserver
 
     protected function generateSlugWithCategory(Service $service): string
     {
-        $serviceSlug  = Str::slug($service->name);
+        $serviceSlug  = Str::slug($service->title);
         $categorySlug = optional($service->serviceCategory)->slug;
 
         return trim("{$serviceSlug}-{$categorySlug}", '-');

@@ -13,6 +13,7 @@ class ImageCategorySeeder extends Seeder
         $categories = [
             'Slide',
             'Khoảnh khắc khách hàng',
+            'Không gian',
             'Google Review',
             'Văn hóa doanh nghiệp',
             'Về chúng tôi',

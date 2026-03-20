@@ -1,4 +1,4 @@
-<header class="fixed top-0 right-0 left-0 z-20 bg-[#3b401c] h-[100px] flex items-center font-inter">
+<header class="fixed top-0 right-0 left-0 z-20 bg-[#383e1a] h-[100px] flex items-center font-inter">
 
 
     <div class="container mx-auto h-full flex items-center justify-between px-6">
@@ -15,18 +15,26 @@
             <nav class="h-full hidden lg:flex">
                 <ul class="flex items-center h-full gap-6 uppercase text-[16px] font-medium text-white">
                     <li>
-                        <a href="{{ route('page.home') }}" class="hover:text-[#c6d36a] transition font-light">Trang
+                        <a href="{{ route('page.home') }}"
+                            class="relative inline-block font-light
+       transition-all duration-300 ease-out
+       hover:text-[#c6d36a]
+       hover:-translate-y-1">Trang
                             chủ</a>
                     </li>
 
                     <li>
-                        <a href="{{ route('page.introduce') }}" class="hover:text-[#c6d36a] transition font-light">Về
+                        <a href="{{ route('page.introduce') }}"
+                            class="relative inline-block font-light
+       transition-all duration-300 ease-out
+       hover:text-[#c6d36a]
+       hover:-translate-y-1">Về
                             chúng tôi</a>
                     </li>
 
                     <li class="relative group">
 
-                        <a href="/dich-vu" class="flex items-center gap-1 hover:text-[#c6d36a] transition font-light">
+                        <a href="/dich-vu" class="flex items-center gap-1 hover:text-[#c6d36a] transition-all duration-300 ease-out hover:-translate-y-1 font-light">
                             Dịch vụ
 
                             <svg class="w-4 h-4 mt-[1px]" fill="none" stroke="currentColor" stroke-width="2"
@@ -114,7 +122,7 @@
                         <li class="relative group">
                             {{-- MENU CHA --}}
                             <a href="/{{ $parent->slug }}"
-                                class="flex items-center gap-1 hover:text-[#c6d36a] transition font-light">
+                                class="flex items-center gap-1 hover:text-[#c6d36a] transition-all duration-300 ease-out hover:-translate-y-1 font-light ">
                                 {{ $parent->name }}
                                 @if ($parent->children->count())
                                     <svg class="w-4 h-4 mt-[1px]" fill="none" stroke="currentColor" stroke-width="2"
@@ -165,7 +173,11 @@
 
 
                     <li>
-                        <a href="{{ route('page.contact') }}" class="hover:text-[#c6d36a] transition font-light">Liên
+                        <a href="{{ route('page.contact') }}"
+                            class="relative inline-block font-light
+       transition-all duration-300 ease-out
+       hover:text-[#c6d36a]
+       hover:-translate-y-1">Liên
                             hệ</a>
                     </li>
                 </ul>

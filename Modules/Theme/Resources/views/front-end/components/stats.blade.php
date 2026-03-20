@@ -5,7 +5,7 @@
 
             {{-- LEFT CONTENT --}}
             <div class="lg:col-span-6">
-                <p class="text-xs tracking-widest text-gray-600 mb-3">
+                <p class="text-xs tracking-widest text-gray-600 mb-3 font-bold">
                     WELLSTATE
                 </p>
 
@@ -21,7 +21,7 @@
                 </p>
 
                 <a href="/gioi-thieu"
-                    class="inline-block bg-[#7a8f2c] text-white text-sm px-8 py-3 rounded hover:bg-[#8fa63b] transition">
+                    class="inline-block bg-[#7a8f2c] text-white text-sm px-8 py-3 rounded-sm hover:bg-[#8fa63b] transition">
                     TÌM HIỂU THÊM
                 </a>
             </div>
@@ -34,9 +34,15 @@
                        mt-8 lg:mt-0">
                 @foreach ([10000, 10000, 10000, 10000] as $number)
                     <div class="bg-[#dfecc1] p-8 text-center rounded">
-                        <p class="stat-number text-4xl font-semibold text-[#3f4d1c]" data-target="{{ $number }}">
-                            0
-                        </p>
+                        <div class="flex justify-center">
+                            <p class="stat-number text-[72px] font-light text-[#3f4d1c]"
+                                data-target="{{ $number }}">
+                                0
+                            </p>
+                            <span class="text-[72px] font-light text-[#3f4d1c]">+</span>
+
+                        </div>
+
                         <p class="font-cormorant text-[19px] text-gray-700 mt-2 uppercase tracking-wide font-bold">
                             Khách hàng trên cả nước
                         </p>

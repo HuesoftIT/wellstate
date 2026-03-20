@@ -3,7 +3,7 @@
 
         <!-- Left Image -->
         <div class="md:col-span-3 w-full slide-left opacity-0">
-            <img src="{{ asset("images/service-introduce-1.png")}}" alt="Spa hallway"
+            <img src="{{ asset("images/service-introduce-1.jpg")}}" alt="Spa hallway"
                 class="w-full max-w-full h-auto object-cover rounded-md">
         </div>
 

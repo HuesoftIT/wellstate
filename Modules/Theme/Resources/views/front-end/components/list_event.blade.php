@@ -90,14 +90,7 @@
                     </a>
                 @endforeach
             </div>
-            {{-- <div class="flex items-start gap-6">
-                <img src="{{ asset('images/doi-ngu.jpeg') }}" alt="" class="w-[40%] h-[100px] object-cover text-center">
-
-                <div class="flex flex-col gap-3 items-start">
-                    <h4 class="text-[18px] font-medium text-[#829137]">SANA WELLNESS SEASON – ƯU ĐÃI CHẠM ĐỈNH THƯ GIÃN 20%</h4>
-                    <span class="text-[12px] text-[#adadad] font-cormorant">15 Tháng 12, 2025 Không có bình luận</span>
-                </div>
-            </div> --}}
+          
         </div>
 
     </div>

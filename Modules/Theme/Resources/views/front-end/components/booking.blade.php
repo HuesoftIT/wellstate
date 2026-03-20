@@ -1,6 +1,6 @@
-<section class="bg-[#383e1a] py-20">
+<section class="bg-[#383e1a] py-20 ">
     <!-- WRAPPER CHUNG -->
-    <div class="mx-auto max-w-4xl px-6 font-open-sans">
+    <div class="mx-auto max-w-6xl px-6 font-open-sans">
 
         <!-- HEADER -->
         <div class="mb-10">
@@ -17,7 +17,7 @@
             class="bg-[#fbf6e8]
                    rounded-xl
                    shadow-xl
-                   p-6 md:p-10">
+                   p-6 md:p-10 ">
 
             <!-- TABS -->
             <div class="flex flex-wrap gap-2 mb-6">

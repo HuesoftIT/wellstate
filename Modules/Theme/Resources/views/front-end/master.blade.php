@@ -94,15 +94,6 @@
         }
 
 
-
-        @font-face {
-            font-family: 'Lora';
-            src: url('/fonts/lora/Lora-Italic-VariableFont_wght.ttf') format('truetype');
-            font-weight: 100 900;
-            font-style: italic;
-            font-display: swap;
-        }
-
         @font-face {
             font-family: 'Open Sans';
             src: url('/fonts/open-sans/OpenSans-VariableFont_wdth,wght.ttf') format('truetype');
@@ -283,6 +274,20 @@
         .scroll-to-top.show {
             opacity: 1;
             visibility: visible;
+        }
+
+        @keyframes spinSlow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin-slow {
+            animation: spinSlow 10s linear infinite;
         }
     </style>
 
@@ -1192,7 +1197,8 @@
             if (!branch || !date || !roomType) return;
 
             fetch(
-                    `/api/branches/available-slots?date=${date}&room_type_id=${roomType.value}&branch_id=${branch.value}`)
+                    `/api/branches/available-slots?date=${date}&room_type_id=${roomType.value}&branch_id=${branch.value}`
+                    )
                 .then(res => res.json())
                 .then(data => {
                     render(data.open_time, data.close_time, data.disabled_times);

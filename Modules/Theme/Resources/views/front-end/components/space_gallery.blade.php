@@ -3,7 +3,9 @@
 
         <!-- TITLE -->
         <div class="text-center max-w-3xl mx-auto mb-10">
-            <h2 class="text-[58px] font-open-sans font-medium text-[#4C4C4C] mb-4">
+            <h2
+                class="text-[58px] font-open-sans font-medium bg-gradient-to-r from-[#a3c163] to-[#3f4b2a]
+    bg-clip-text text-transparent mb-4">
                 Không gian sang trọng & chuẩn mực nghỉ dưỡng
             </h2>
 
@@ -21,7 +23,7 @@
             <div class="swiper-wrapper">
 
                 <!-- ITEM -->
-                @foreach ($customer_review_images as $item)
+                @foreach ($images_space as $item)
                     <div class="swiper-slide">
                         <img src="{{ Storage::url($item->image) }}" class="w-full h-[260px] object-cover rounded-xl"
                             alt="{{ $item->name }}">
