@@ -35,11 +35,11 @@
                 @foreach ([10000, 10000, 10000, 10000] as $number)
                     <div class="bg-[#dfecc1] p-8 text-center rounded">
                         <div class="flex justify-center">
-                            <p class="stat-number text-[72px] font-light text-[#3f4d1c]"
+                            <p class="stat-number text-[50px] md:text-[72px] font-light text-[#3f4d1c]"
                                 data-target="{{ $number }}">
                                 0
                             </p>
-                            <span class="text-[72px] font-light text-[#3f4d1c]">+</span>
+                            <span class=" text-[50px] md:text-[72px] font-light text-[#3f4d1c]">+</span>
 
                         </div>
 
